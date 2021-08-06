@@ -1,0 +1,16 @@
+name: tests
+
+on: push
+
+jobs:
+  unit_tests:
+    runs-on: ubuntu-latest
+    container: magisslac/magis-docker
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v2
+
+      - name: run pytest
+        run: |
+          pip install -e .
+          pytest -v --tb=native -rA tests/tests.py

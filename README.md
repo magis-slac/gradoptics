@@ -12,7 +12,7 @@ The API designed similar rendering software, and has been heavily inspired by [[
 
 
 # Getting Started
-[Getting Started](https://github.com/magis-slac/differentiable-optics/blob/main/docs/tutorials/quickstart.ipynb)
+[Getting Started](https://github.com/magis-slac/differentiable-optics/blob/main/docs/tutorials/quickStart.ipynb)
 
 
 ## Installation
