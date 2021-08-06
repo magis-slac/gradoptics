@@ -1,0 +1,24 @@
+import setuptools
+from setuptools import setup
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+    
+setup(
+  name='diffoptics',
+  version='0.0.1',
+  description='End-to-end differentiable optics',
+  long_description=long_description,
+  long_description_content_type="text/markdown",
+  author='Michael Kagan, Maxime Vandegar',
+  author_email='makagan@slac.stanford.edu, maxime.vandegar@slac.stanford.edu',
+  url="https://github.com/MaximeVandegar/differentiable-optics",
+  py_modules=["diffoptics"],
+  packages=setuptools.find_packages(),
+  classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+  package_dir={'': 'src'},
+)

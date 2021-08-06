@@ -1,0 +1,51 @@
+FROM nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
+
+LABEL maintainer="makagan"
+LABEL contact="makagan@slac.stanford.edu"
+LABEL type="gpu"
+LABEL version="ub18.04-cuda10.2-torch1.7-jax1.64"
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get -y update
+RUN apt-get -y install dpkg-dev g++ gcc binutils git wget curl emacs vim openssh-client krb5-user && \
+    apt-get -y install python3-dev python3-tk python3-pip python3-setuptools && \
+    apt-get -y install libopenblas-dev libxerces-c-dev && \
+    apt-get -y install gdb screen tmux libhdf5-dev # valgrind
+
+
+# pip basics
+RUN pip3 --no-cache-dir install -U pip
+RUN pip3 --no-cache-dir install --upgrade setuptools && \
+    pip3 --no-cache-dir install jedi==0.17.2 && \
+    pip3 --no-cache-dir install numpy wheel zmq six pygments pyyaml cython pytest && \
+    pip3 --no-cache-dir install gputil psutil humanize h5py tqdm && \
+    pip3 --no-cache-dir install scipy tables pandas scikit-image scikit-learn Pillow opencv-python && \
+    pip3 --no-cache-dir install matplotlib seaborn cufflinks && \
+    pip3 --no-cache-dir install plotly==4.14.3 plotly_express==0.4.1 && \
+    pip3 --no-cache-dir install ipython ipykernel && \
+    pip3 --no-cache-dir install jupyter "notebook>=5.3" "ipywidgets>=7.5" jupyterthemes && \
+    pip3 --no-cache-dir install html-parser && \
+    pip3 --no-cache-dir install dash dash_renderer && \
+    pip3 --no-cache-dir install dash_html_components dash_core_components dash_bootstrap_components
+    
+# Jupyter lab
+RUN pip3 --no-cache-dir install jupyterlab && \
+    pip3 --no-cache-dir install psutil requests && \
+    pip3 --no-cache-dir install plotly-geo==1.0.0
+
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get -y install nodejs && \
+    apt-cache policy nodejs && \
+    jupyter labextension install --minimize=False jupyterlab-plotly@4.14.3 && \
+    jupyter labextension install --minimize=False @jupyter-widgets/jupyterlab-manager plotlywidget@4.14.3 && \
+    pip3 install kaleido
+
+# torch
+RUN pip3 --no-cache-dir install torch==1.7.1 torchvision==0.8.2
+
+# jax
+RUN pip3 --no-cache-dir install jax jaxlib==0.1.64+cuda102 -f https://storage.googleapis.com/jax-releases/jax_releases.html
+
+# remove temporary cache
+RUN apt-get autoremove -y && apt-get clean -y
