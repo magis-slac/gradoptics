@@ -1,7 +1,6 @@
-[![Tests](https://github.com/MaximeVandegar/differentiable_optic/actions/workflows/main.yml/badge.svg)](https://github.com/MaximeVandegar/differentiable_optic/actions)
-[![Build Status](https://travis-ci.com/MaximeVandegar/differentiable_optic.svg?token=LBAvFbnCy9PEgexzsTUS&branch=main)](https://travis-ci.com/MaximeVandegar/differentiable_optic)
-[![codecov](https://codecov.io/gh/MaximeVandegar/differentiable_optic/branch/main/graph/badge.svg)](https://codecov.io/gh/MaximeVandegar/differentiable_optic)
-[![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/mackelab/sbi/blob/master/CONTRIBUTING.md)
+[![Tests](https://github.com/magis-slac/differentiable-optics/actions/workflows/main.yml/badge.svg)](https://github.com/magis-slac/differentiable-optics/actions)
+[![Build Status](https://travis-ci.com/magis-slac/differentiable-optics.svg?token=LBAvFbnCy9PEgexzsTUS&branch=main)](https://travis-ci.com/magis-slac/differentiable-optics)
+[![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/magis-slac/differentiable-optics/blob/master/README.md)
 ![version](https://img.shields.io/badge/version-0.0.1-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 

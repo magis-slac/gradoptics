@@ -1,0 +1,23 @@
+dist: xenial
+language: python
+python:
+  - "3.7"
+  - "3.8"
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+  - pip install -e .
+  - pip install coveralls
+  - pip install pytest-cov
+  - pip install pyyaml
+# command to run tests
+env:
+  - github-token: ${{ secrets.github_token }}
+script: 
+  - pytest --cov=diffoptics tests/tests.py
+  
+notifications:
+  email: false
+  
+after_success:
+  - coveralls --service=github -v 
