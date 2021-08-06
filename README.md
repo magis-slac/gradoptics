@@ -11,7 +11,7 @@
 The API designed similar rendering software, and has been heavily inspired by [[Physically Based Rendering]](#2). 
 
 
-# Getting Started
+## Getting Started
 [Getting Started](https://github.com/magis-slac/differentiable-optics/blob/main/docs/tutorials/quickStart.ipynb)
 
 
