@@ -4,16 +4,14 @@ import math
 from diffoptics.distributions.BaseDistribution import BaseDistribution
 from diffoptics.distributions.GaussianDistribution import GaussianDistribution
 from diffoptics.inference.RejectionSampling import rejection_sampling
-from diffoptics.light_sources.BaseLightSource import BaseLightSource
-from diffoptics.optics.Ray import Rays
-from diffoptics.optics.Vector import batch_vector
 
-class AtomCloud(BaseDistribution, BaseLightSource):
+
+class AtomCloud(BaseDistribution):
 
     def __init__(self, n=int(1e6), f=2, position=torch.tensor([0.31, 0., 0.]), w0=0.002, h_bar=1.0546 * 1e-34,
                  m=1.44 * 1e-25, x_a=0., y_a=0., z_a=0., t_final_bs=3., t_extra=0.1, port_bvz=.15, k_fringe=1 / 0.0003,
-                 a_quad=1e-12, phi=0.1, phi2=math.pi / 2, eps=1e-15, proposal_distribution = GaussianDistribution(
-                 mean=0.0, std=0.0002)):
+                 a_quad=1e-12, phi=0.1, phi2=math.pi / 2, eps=1e-15, proposal_distribution=GaussianDistribution(
+                mean=0.0, std=0.0002)):
         super().__init__()
         self.n = n
         self.f = f
@@ -35,7 +33,8 @@ class AtomCloud(BaseDistribution, BaseLightSource):
 
         # Define a sampler to sample from the cloud density (using rejection sampling)
         self.density_samplers = [lambda pdf, nb_point, device: rejection_sampling(pdf, nb_point, proposal_distribution,
-                                                                              m=None, device=device) for _ in range(3)]
+                                                                                  m=None, device=device) for _ in
+                                 range(3)]
 
     def marginal_cloud_density_x(self, x):
         """
@@ -104,21 +103,6 @@ class AtomCloud(BaseDistribution, BaseLightSource):
         ray_origins = atoms + self.position
         del atoms
         return ray_origins
-
-    def sample_rays(self, nb_rays, device='cpu'):
-
-        # Sample rays in 4 pi
-        azimuthal_angle = torch.rand(nb_rays) * 2 * math.pi
-        polar_angle = torch.arccos(1 - 2 * torch.rand(nb_rays))
-
-        emitted_direction = batch_vector(torch.sin(polar_angle) * torch.sin(azimuthal_angle),
-                                         torch.sin(polar_angle) * torch.cos(azimuthal_angle),
-                                         torch.cos(polar_angle))
-        del azimuthal_angle
-        del polar_angle
-        torch.cuda.empty_cache()
-
-        return Rays(self.sample(nb_rays, device=device), emitted_direction, device=device)
 
     def plot(self, ax, **kwargs):
         ax.scatter(self.position[0], self.position[1], self.position[2], **kwargs)

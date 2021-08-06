@@ -1,16 +1,13 @@
 import torch
 import matplotlib.pyplot as plt
-
-from diffoptics.inference.RejectionSampling import rejection_sampling
-from diffoptics.optics import batch_vector, Rays, PerfectLens, Window, Sensor
-from diffoptics.distributions.GaussianDistribution import GaussianDistribution
-from diffoptics.light_sources.AtomCloud import AtomCloud
+import diffoptics as optics
+from diffoptics.optics import batch_vector
 
 
 def _test_ray(dim=1000):
     o = batch_vector(torch.zeros(dim), torch.zeros(dim), torch.zeros(dim))
     d = batch_vector(torch.ones(dim), torch.zeros(dim), torch.zeros(dim))
-    ray = Rays(o, d)
+    ray = optics.Rays(o, d)
 
     if ((ray.origins.shape[0] == ray.directions.shape[0] == dim) and (
             ray.origins.shape[1] == ray.directions.shape[1] == 3)):
@@ -21,13 +18,13 @@ def _test_ray(dim=1000):
 
 def _test_rejection_sampling():
     # Atom cloud
-    atom_cloud = AtomCloud()
+    atom_cloud = optics.AtomCloud()
 
     # Define a sampler to sample from the cloud density
-    proposal_dist = GaussianDistribution(mean=0., std=0.0002)
-    x = rejection_sampling(atom_cloud.marginal_cloud_density_x, int(1e6), proposal_dist, m=None)
-    y = rejection_sampling(atom_cloud.marginal_cloud_density_y, int(1e6), proposal_dist, m=None)
-    z = rejection_sampling(atom_cloud.marginal_cloud_density_z, int(1e6), proposal_dist, m=None)
+    proposal_dist = optics.GaussianDistribution(mean=0., std=0.0002)
+    x = optics.rejection_sampling(atom_cloud.marginal_cloud_density_x, int(1e6), proposal_dist, m=None)
+    y = optics.rejection_sampling(atom_cloud.marginal_cloud_density_y, int(1e6), proposal_dist, m=None)
+    z = optics.rejection_sampling(atom_cloud.marginal_cloud_density_z, int(1e6), proposal_dist, m=None)
 
     plt.hist(x.numpy(), bins=300, histtype='step', color='k', label='x')
     plt.hist(y.numpy(), bins=300, histtype='step', color='C0', label='y')
@@ -41,7 +38,7 @@ def _test_rejection_sampling():
 
 def _test_atom_cloud(nb_atoms=int(1e4)):
     # Atom cloud
-    atom_cloud = AtomCloud()
+    atom_cloud = optics.LightSourceFromDistribution(optics.AtomCloud())
 
     rays = atom_cloud.sample_rays(nb_atoms)
 
@@ -66,7 +63,7 @@ def _test_atom_cloud(nb_atoms=int(1e4)):
 
 
 def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True):
-    lens = PerfectLens(f=f, m=m)
+    lens = optics.PerfectLens(f=f, m=m)
 
     # Create rays parallel to the optical axis
     z_pos = torch.linspace(-lens.f * lens.na / 2 + 1e-5, lens.f * lens.na / 2 - 1e-5, nb_rays)
@@ -78,7 +75,7 @@ def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True):
                               torch.zeros(nb_rays),
                               torch.zeros(nb_rays))
 
-    rays = Rays(origins, directions)
+    rays = optics.Rays(origins, directions)
     t = lens.get_ray_intersection(rays)
     refracted_rays = lens.intersect(rays, t)
 
@@ -121,7 +118,7 @@ def _ray_marching_test_sensor(eps=1e-3):
     f = 0.05
     m = 0.15
 
-    sensor = Sensor(position=(-f * (1 + m), 0, 0))
+    sensor = optics.Sensor(position=(-f * (1 + m), 0, 0))
     pts = sensor.sample_points_on_sensor(1000000)
 
     plt.hist2d(pts[:, 1].numpy(), pts[:, 2].numpy(), bins=40)
@@ -146,7 +143,7 @@ def _ray_marching_test_lens(eps=1e-3):
     f = 0.05
     na = 1 / 1.4
 
-    lens = PerfectLens(f=f, na=na)
+    lens = optics.PerfectLens(f=f, na=na)
     pts = lens.sample_points_on_lens(1000000)
 
     plt.figure()
@@ -166,9 +163,8 @@ def _test_window():
     obj_x_pos = 0.31
     left_interface_x_position = obj_x_pos + .056
     right_interface_x_position = left_interface_x_position + .05
-    window = Window(left_interface_x_position,
-                    right_interface_x_position)
-    atom_cloud = AtomCloud(position=torch.tensor([obj_x_pos, 0., 0.]))
+    window = optics.Window(left_interface_x_position, right_interface_x_position)
+    atom_cloud = optics.LightSourceFromDistribution(optics.AtomCloud(position=torch.tensor([obj_x_pos, 0., 0.])))
     nb_atoms = int(1e5)
 
     rays = atom_cloud.sample_rays(nb_atoms)
