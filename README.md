@@ -55,7 +55,7 @@ pytest tests/tests.py
 
 ## Support
 
-[*diffoptics*](https://github.com/magis-slac/differentiable-optics) was developed in the context of the MAGIS-100 experiment supported by the US Department of Energy (DOE) under grant DE-AC02-76SF00515.
+[*diffoptics*](https://github.com/magis-slac/differentiable-optics) was developed in the context of the MAGIS-100 experiment 
 
 ## References
 <a id="1">[1]</a> 
