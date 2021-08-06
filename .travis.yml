@@ -11,8 +11,7 @@ install:
   - pip install pytest-cov
   - pip install pyyaml
 # command to run tests
-env:
-  - github-token: ${{ secrets.github_token }}
+
 script: 
   - pytest --cov=diffoptics tests/tests.py
   
