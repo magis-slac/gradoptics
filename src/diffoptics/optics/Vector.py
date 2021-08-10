@@ -7,11 +7,10 @@ def batch_vector(x, y, z):
 
 def normalize_batch_vector(input_vector, eps=1e-15):
     vector_norm = torch.sqrt(input_vector[:, 0] ** 2 + input_vector[:, 1] ** 2 + input_vector[:, 2] ** 2)
-    # The following syntax is required to allow the flow of gradients (intermediate variables need to be stored)
-    input_vector[:, 0] = (input_vector[:, 0] / (vector_norm + eps)).clone().detach().requires_grad_(True)
-    input_vector[:, 1] = (input_vector[:, 1] / (vector_norm + eps)).clone().detach().requires_grad_(True)
-    input_vector[:, 2] = (input_vector[:, 2] / (vector_norm + eps)).clone().detach().requires_grad_(True)
-    return input_vector
+    x = (input_vector[:, 0] / (vector_norm + eps)).reshape(-1, 1)
+    y = (input_vector[:, 1] / (vector_norm + eps)).reshape(-1, 1)
+    z = (input_vector[:, 2] / (vector_norm + eps)).reshape(-1, 1)
+    return torch.cat((x, y, z), dim=1)
 
 
 def dot_product(batch_vector1, batch_vector2):
