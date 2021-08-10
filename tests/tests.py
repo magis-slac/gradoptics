@@ -189,6 +189,29 @@ def _test_window():
         return -1
 
 
+def _test_grad_rays():
+    def toy_intersect(rays: optics.Rays, normal=torch.tensor([.2, .2, .6])) -> optics.Rays:
+        x = (rays.directions[:, 0] * normal[0]).reshape(-1, 1)
+        y = (rays.directions[:, 1] * normal[1]).reshape(-1, 1)
+        z = (rays.directions[:, 2] * normal[2]).reshape(-1, 1)
+        new_directions = torch.cat((x, y, z), dim=1)
+        new_origins = rays.origins * 2 + 1
+        return optics.Rays(new_origins, new_directions)
+
+    origins = torch.randn(1, 3, requires_grad=True)
+    directions = torch.randn(1, 3, requires_grad=True)
+    rays1 = optics.Rays(origins, directions)
+    rays2 = toy_intersect(rays1)
+    assert directions.is_leaf
+    assert origins.is_leaf
+
+    toy_loss = (rays2.origins * rays2.directions).sum()
+    toy_loss.backward()
+    assert origins.grad.abs().sum() > 0
+    assert directions.grad.abs().sum() > 0
+    return 0
+
+
 """
             Tests for pytest
 """
@@ -227,3 +250,7 @@ def test_ray_marching():
 
 def test_window():
     assert _test_window() == 0
+
+
+def test_gradients():
+    assert _test_grad_rays() == 0
