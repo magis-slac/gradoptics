@@ -28,8 +28,8 @@ class Sensor(BaseOptics):
         y = origins[:, 1] + t * directions[:, 1]
         z = origins[:, 2] + t * directions[:, 2]
 
-        condition = (t > 0) & (torch.abs(y) <= self.resolution[0] / 2 * self.pixel_size[0]) & \
-                    (torch.abs(z) <= self.resolution[1] / 2 * self.pixel_size[1])
+        condition = (t > 0) & (torch.abs(y - self.position[1]) <= self.resolution[0] / 2 * self.pixel_size[0]) & \
+                    (torch.abs(z - self.position[2]) <= self.resolution[1] / 2 * self.pixel_size[1])
         t[~condition] = float('nan')
         return t
 
