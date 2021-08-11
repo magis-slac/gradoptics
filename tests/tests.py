@@ -212,6 +212,75 @@ def _test_grad_rays():
     return 0
 
 
+def _test_grad_mirror(mirror_position=torch.ones(3), ray_origins=torch.randn(2, 3, requires_grad=True)):
+    mirror = optics.Mirror(mirror_position[0], mirror_position[1], mirror_position[2], torch.tensor([.2, .2, .6]), .005)
+
+    directions = [(mirror_position[0] - ray_origins[:, 0]).reshape(-1, 1),
+                  (mirror_position[1] - ray_origins[:, 1]).reshape(-1, 1),
+                  (mirror_position[2] - ray_origins[:, 2]).reshape(-1, 1)]
+    directions = torch.cat(directions, dim=1)
+    directions = directions.clone().detach().requires_grad_(True)
+    rays = optics.Rays(ray_origins, directions)
+    t = mirror.get_ray_intersection(rays)
+
+    outgoing_rays = mirror.intersect(rays, t)
+
+    loss = (outgoing_rays.origins * outgoing_rays.directions).sum()
+    loss.backward()
+
+    assert ray_origins.is_leaf
+    assert directions.is_leaf
+    assert ray_origins.grad.abs().sum() > 0
+    assert directions.grad.abs().sum() > 0
+    return 0
+
+
+def _test_grad_lens(lens_position=torch.ones(3), ray_origins=torch.randn(2, 3, requires_grad=True)):
+    lens = optics.PerfectLens(position=lens_position)
+    directions = [(lens_position[0] - ray_origins[:, 0]).reshape(-1, 1),
+                  (lens_position[1] - ray_origins[:, 1]).reshape(-1, 1),
+                  (lens_position[2] - ray_origins[:, 2]).reshape(-1, 1)]
+    directions = torch.cat(directions, dim=1)
+    directions = directions.clone().detach().requires_grad_(True)
+    rays = optics.Rays(ray_origins, directions)
+    t = lens.get_ray_intersection(rays)
+
+    outgoing_rays = lens.intersect(rays, t)
+
+    loss = (outgoing_rays.origins * outgoing_rays.directions).sum()
+    loss.backward()
+
+    assert directions.is_leaf
+    assert ray_origins.is_leaf
+    assert ray_origins.grad.abs().sum() > 0
+    assert directions.grad.abs().sum() > 0
+    return 0
+
+
+def _test_grad_sensor(sensor_position=torch.ones(3), ray_origins=torch.randn(2, 3, requires_grad=True)):
+    sensor = optics.Sensor(position=sensor_position)
+    directions = [(sensor_position[0] - ray_origins[:, 0]).reshape(-1, 1),
+                  (sensor_position[1] - ray_origins[:, 1]).reshape(-1, 1),
+                  (sensor_position[2] - ray_origins[:, 2]).reshape(-1, 1)]
+    directions = torch.cat(directions, dim=1)
+    directions = directions.clone().detach().requires_grad_(True)
+    rays = optics.Rays(ray_origins, directions)
+    t = sensor.get_ray_intersection(rays)
+
+    hit_position, _ = sensor.intersect(rays, t)
+
+    target_position = torch.randn(hit_position.shape)
+
+    l1_loss = (hit_position - target_position).abs().mean()
+    l1_loss.backward()
+
+    assert directions.is_leaf
+    assert ray_origins.is_leaf
+    assert ray_origins.grad.abs().sum() > 0
+    assert directions.grad.abs().sum() > 0
+    return 0
+
+
 """
             Tests for pytest
 """
@@ -254,3 +323,6 @@ def test_window():
 
 def test_gradients():
     assert _test_grad_rays() == 0
+    assert _test_grad_mirror() == 0
+    assert _test_grad_lens() == 0
+    assert _test_grad_sensor() == 0
