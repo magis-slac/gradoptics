@@ -107,7 +107,7 @@ class Sensor(BaseOptics):
                          self.resolution[1] * self.pixel_size[1] / 2 + self.position[2],
                          res)
         y, z = torch.meshgrid(y, z)
-        x = torch.zeros(resolution_ * resolution_) + self.position[0]
+        x = torch.zeros(y.shape[0] * y.shape[1]) + self.position[0]
         ax.scatter(x, y.reshape(-1), z.reshape(-1), s=s, c=color)
 
     def plot_image(self, ax, img_height=750, cmap="Blues"):
