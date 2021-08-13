@@ -212,7 +212,8 @@ def _test_grad_rays():
     return 0
 
 
-def _test_grad_mirror(mirror_position=torch.ones(3), ray_origins=torch.randn(2, 3, requires_grad=True)):
+def _test_grad_mirror_wrt_incident_rays(mirror_position=torch.ones(3),
+                                        ray_origins=torch.randn(2, 3, requires_grad=True)):
     mirror = optics.Mirror(mirror_position[0], mirror_position[1], mirror_position[2], torch.tensor([.2, .2, .6]), .005)
 
     directions = [(mirror_position[0] - ray_origins[:, 0]).reshape(-1, 1),
@@ -235,7 +236,7 @@ def _test_grad_mirror(mirror_position=torch.ones(3), ray_origins=torch.randn(2, 
     return 0
 
 
-def _test_grad_lens(lens_position=torch.ones(3), ray_origins=torch.randn(2, 3, requires_grad=True)):
+def _test_grad_lens_wrt_incident_rays(lens_position=torch.ones(3), ray_origins=torch.randn(2, 3, requires_grad=True)):
     lens = optics.PerfectLens(position=lens_position)
     directions = [(lens_position[0] - ray_origins[:, 0]).reshape(-1, 1),
                   (lens_position[1] - ray_origins[:, 1]).reshape(-1, 1),
@@ -257,7 +258,8 @@ def _test_grad_lens(lens_position=torch.ones(3), ray_origins=torch.randn(2, 3, r
     return 0
 
 
-def _test_grad_sensor(sensor_position=torch.ones(3), ray_origins=torch.randn(2, 3, requires_grad=True)):
+def _test_grad_sensor_wrt_incident_rays(sensor_position=torch.ones(3),
+                                        ray_origins=torch.randn(2, 3, requires_grad=True)):
     sensor = optics.Sensor(position=sensor_position)
     directions = [(sensor_position[0] - ray_origins[:, 0]).reshape(-1, 1),
                   (sensor_position[1] - ray_origins[:, 1]).reshape(-1, 1),
@@ -278,6 +280,39 @@ def _test_grad_sensor(sensor_position=torch.ones(3), ray_origins=torch.randn(2, 
     assert ray_origins.is_leaf
     assert ray_origins.grad.abs().sum() > 0
     assert directions.grad.abs().sum() > 0
+    return 0
+
+
+def _test_grad_mirror_wrt_self_parameters():
+    mirror_normal = torch.tensor([.2, .2, .6], requires_grad=True)
+    mirror_position = torch.tensor([1., 1., 1.], requires_grad=True)
+    mirror = optics.Mirror(mirror_position[0], mirror_position[1], mirror_position[2], mirror_normal, .005)
+
+    origins = torch.randn(2, 3)
+    directions = [(mirror_position[0].item() - origins[:, 0]).reshape(-1, 1),
+                  (mirror_position[1].item() - origins[:, 1]).reshape(-1, 1),
+                  (mirror_position[2].item() - origins[:, 2]).reshape(-1, 1)]
+    directions = torch.cat(directions, dim=1)
+    rays = optics.Rays(origins, directions)
+    t = mirror.get_ray_intersection(rays)
+    outgoing_rays = mirror.intersect(rays, t)
+
+    # Toy loss
+    loss = (outgoing_rays.origins * outgoing_rays.directions).sum()
+    loss.backward()
+
+    assert mirror_normal.is_leaf
+    assert mirror_position.is_leaf
+    assert mirror_position.grad.abs().sum() > 0
+    assert mirror_normal.grad.abs().sum() > 0
+    return 0
+
+
+def _test_grad_lens_wrt_self_parameters():
+    return 0
+
+
+def _test_grad_sensor_wrt_self_parameters():
     return 0
 
 
@@ -321,8 +356,20 @@ def test_window():
     assert _test_window() == 0
 
 
-def test_gradients():
+def test_gradients_wrt_incident_rays():
+    """
+    For each optical component, check that the gradients with respect the incident rays propagate correctly
+    """
     assert _test_grad_rays() == 0
-    assert _test_grad_mirror() == 0
-    assert _test_grad_lens() == 0
-    assert _test_grad_sensor() == 0
+    assert _test_grad_mirror_wrt_incident_rays() == 0
+    assert _test_grad_lens_wrt_incident_rays() == 0
+    assert _test_grad_sensor_wrt_incident_rays() == 0
+
+
+def test_gradients_wrt_self_parameters():
+    """
+    For each optical component, check that the gradients with respect its parameters propagate correctly
+    """
+    assert _test_grad_mirror_wrt_self_parameters() == 0
+    assert _test_grad_lens_wrt_self_parameters() == 0
+    assert _test_grad_sensor_wrt_self_parameters() == 0
