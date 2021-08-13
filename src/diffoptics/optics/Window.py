@@ -22,7 +22,6 @@ class Window(BaseOptics):
         self.n_glass = n_glass
         self.eps = eps
 
-    @torch.no_grad()
     def _get_ray_intersection_left_interface(self, incident_rays):
         """
         Computes the times t at which the incident rays will intersect the left interface of the window

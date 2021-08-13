@@ -19,7 +19,6 @@ class PerfectLens(BaseOptics):
         self.pof = f * (m + 1) / m
         self.eps = eps
 
-    @torch.no_grad()
     def get_ray_intersection(self, incident_rays):
         """
         Computes the times t at which the incident rays will intersect the lens
@@ -121,6 +120,7 @@ class PerfectLens(BaseOptics):
         z = z[indices] + self.position[2]
 
         ax.scatter(x, y, z, s=s, c=color)
+
 
 class ThickLens(BaseOptics):
 

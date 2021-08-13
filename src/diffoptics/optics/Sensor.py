@@ -15,7 +15,6 @@ class Sensor(BaseOptics):
         self.poisson_noise_mean = poisson_noise_mean
         self.quantum_efficiency = quantum_efficiency
 
-    @torch.no_grad()
     def get_ray_intersection(self, incident_rays):
         """
         Computes the time t at which the incident ray will intersect the sensor

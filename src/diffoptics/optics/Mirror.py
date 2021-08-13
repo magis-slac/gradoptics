@@ -30,7 +30,6 @@ class Mirror(BaseOptics):
         d = - self.normal[0] * self.x_mirror - self.normal[1] * self.y_mirror - self.normal[2] * self.z_mirror
         return a, b, c, d
 
-    @torch.no_grad()
     def get_ray_intersection(self, incident_rays, eps=1e-15):
         """
         Computes the time t at which the incident ray will intersect the mirror
@@ -46,7 +45,7 @@ class Mirror(BaseOptics):
         num = -(mirror_plane_coefficients[0] * origins[:, 0] + mirror_plane_coefficients[1] * origins[:, 1] +
                 mirror_plane_coefficients[2] * origins[:, 2] + mirror_plane_coefficients[3])
         den = mirror_plane_coefficients[0] * directions[:, 0] + mirror_plane_coefficients[1] * directions[:, 1] + \
-            mirror_plane_coefficients[2] * directions[:, 2]
+              mirror_plane_coefficients[2] * directions[:, 2]
         t = num / (den + eps)
 
         # Make sure that the ray hits the mirror
@@ -94,7 +93,6 @@ class Mirror(BaseOptics):
         return reflected_ray
 
     def plot(self, ax, show_normal=False, s=0.1, color='lightblue', resolution=100):
-
         y = torch.arange(-self.mirror_radii, self.mirror_radii, 2 * self.mirror_radii / resolution)
         z = torch.arange(-self.mirror_radii, self.mirror_radii, 2 * self.mirror_radii / resolution)
         y, z = torch.meshgrid(y, z)
