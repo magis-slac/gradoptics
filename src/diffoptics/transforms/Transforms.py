@@ -6,7 +6,7 @@ from diffoptics.optics.Vector import cross_product
 
 def get_look_at_transform(viewing_direction: torch.tensor, pos: torch.tensor, up=torch.tensor([0., 0., 1.])):
     """
-    Given a viewing direction in a left-handed coordinate system, returns the
+    Given a viewing direction in a world-space, returns the
     4x4 transform matrices to move a point from camera-space to world-space and
     from world-space to camera-space
     References: Physically based rendering, section 2.7.7 The look-at transform

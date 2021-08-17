@@ -7,7 +7,7 @@ class BaseOptics(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_ray_intersection(self, incident_rays, eps=1e-15):
+    def get_ray_intersection(self, incident_rays):
         return NotImplemented
 
     @abc.abstractmethod

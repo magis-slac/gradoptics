@@ -200,6 +200,7 @@ def _test_cross_product():
     assert (cross_product(torch.tensor([1, 0, 0]), torch.tensor([0, 0, 1])) == torch.tensor([0, -1, 0])).all()
     return 0
 
+
 def _test_look_at_transform():
     up = torch.tensor([0., 0., 1.])
     viewing_direction = torch.tensor([1., 0., 0.])
@@ -327,7 +328,7 @@ def _test_grad_sensor_wrt_incident_rays(sensor_position=torch.ones(3),
 
     target_position = torch.randn(hit_position.shape)
 
-    l1_loss = (hit_position - target_position).abs().mean()
+    l1_loss = ((hit_position - target_position)**2).mean()
     l1_loss.backward()
 
     assert directions.is_leaf
