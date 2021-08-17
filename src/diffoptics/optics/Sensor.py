@@ -1,12 +1,14 @@
 import torch
 
 from diffoptics.optics.BaseOptics import BaseOptics
+from diffoptics.transforms.Transforms import get_look_at_transform
 
 
 class Sensor(BaseOptics):
 
     def __init__(self, resolution=(9600, 9600), pixel_size=(3.76e-6, 3.76e-6), position=(-0.057499999999999996, 0, 0),
-                 poisson_noise_mean=2, quantum_efficiency=0.8):
+                 poisson_noise_mean=2, quantum_efficiency=0.8, viewing_direction=torch.tensor([1, 0, 0]),
+                 up=torch.tensor([0, 0, 1])):
         super(Sensor, self).__init__()
         self.position = position
         self.resolution = resolution
@@ -14,6 +16,8 @@ class Sensor(BaseOptics):
         self.image = torch.zeros((resolution[0], resolution[1]))
         self.poisson_noise_mean = poisson_noise_mean
         self.quantum_efficiency = quantum_efficiency
+        self.camera_to_world, self.world_to_camera = get_look_at_transform(viewing_direction, torch.tensor(position),
+                                                                           up=up)
 
     def get_ray_intersection(self, incident_rays):
         """

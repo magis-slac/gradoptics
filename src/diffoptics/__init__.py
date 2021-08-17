@@ -1,3 +1,5 @@
+from diffoptics.optics.Vector import vector, batch_vector, normalize_batch_vector, normalize_vector
+
 from diffoptics.distributions.GaussianDistribution import GaussianDistribution
 from diffoptics.distributions.AtomCloud import AtomCloud
 
