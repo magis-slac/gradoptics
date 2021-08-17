@@ -2,6 +2,8 @@ import torch
 import matplotlib.pyplot as plt
 import diffoptics as optics
 from diffoptics.optics import batch_vector
+from diffoptics.optics.Vector import cross_product
+from diffoptics.transforms.Transforms import get_look_at_transform
 
 
 def _test_ray(dim=1000):
@@ -189,6 +191,58 @@ def _test_window():
         return -1
 
 
+def _test_cross_product():
+    assert (cross_product(torch.tensor([1, 0, 0]), torch.tensor([0, 1, 0])) == torch.tensor([0, 0, 1])).all()
+    assert (cross_product(torch.tensor([0, 1, 0]), torch.tensor([0, 0, 1])) == torch.tensor([1, 0, 0])).all()
+    assert (cross_product(torch.tensor([0, 0, 1]), torch.tensor([1, 0, 0])) == torch.tensor([0, 1, 0])).all()
+    assert (cross_product(torch.tensor([0, 1, 0]), torch.tensor([1, 0, 0])) == torch.tensor([0, 0, -1])).all()
+    assert (cross_product(torch.tensor([0, 0, 1]), torch.tensor([0, 1, 0])) == torch.tensor([-1, 0, 0])).all()
+    assert (cross_product(torch.tensor([1, 0, 0]), torch.tensor([0, 0, 1])) == torch.tensor([0, -1, 0])).all()
+    return 0
+
+def _test_look_at_transform():
+    up = torch.tensor([0., 0., 1.])
+    viewing_direction = torch.tensor([1., 0., 0.])
+    pos = torch.tensor([0., 0., 0.])
+    camera_to_world, world_to_camera = get_look_at_transform(viewing_direction, pos, up=up)
+
+    assert (camera_to_world == torch.tensor([[0., 0., 1., 0.],
+                                             [1., 0., 0., 0.],
+                                             [0., 1., 0., 0.],
+                                             [0., 0., 0., 1.]])).all()
+
+    up = torch.tensor([0., 0., 1.])
+    viewing_direction = torch.tensor([-1., 0., 0.])
+    pos = torch.tensor([0., 0., 0.])
+    camera_to_world, world_to_camera = get_look_at_transform(viewing_direction, pos, up)
+
+    assert (camera_to_world == (torch.tensor([[0., 0., -1., 0.],
+                                              [-1., 0., 0., 0.],
+                                              [0., 1., 0., 0.],
+                                              [0., 0., 0., 1.]]))).all()
+
+    up = torch.tensor([1., 0., 0.])
+    viewing_direction = torch.tensor([0., 0., 1.])
+    pos = torch.tensor([0., 0., 0.])
+    camera_to_world, world_to_camera = get_look_at_transform(viewing_direction, pos, up)
+
+    assert (camera_to_world == (torch.tensor([[0., 1., 0., 0.],
+                                              [-1., 0., 0., 0.],
+                                              [0., -0., 1., 0.],
+                                              [0., 0., 0., 1.]]))).all()
+
+    up = torch.tensor([-1., 0., 0.])
+    viewing_direction = torch.tensor([0., 0., 1.])
+    pos = torch.tensor([0., 0., 0.])
+    camera_to_world, world_to_camera = get_look_at_transform(viewing_direction, pos, up)
+
+    assert (camera_to_world == (torch.tensor([[0., -1., 0., 0.],
+                                              [1., 0., 0., 0.],
+                                              [-0., 0., 1., 0.],
+                                              [0., 0., 0., 1.]]))).all()
+    return 0
+
+
 def _test_grad_rays():
     def toy_intersect(rays: optics.Rays, normal=torch.tensor([.2, .2, .6])) -> optics.Rays:
         x = (rays.directions[:, 0] * normal[0]).reshape(-1, 1)
@@ -373,3 +427,11 @@ def test_gradients_wrt_self_parameters():
     assert _test_grad_mirror_wrt_self_parameters() == 0
     assert _test_grad_lens_wrt_self_parameters() == 0
     assert _test_grad_sensor_wrt_self_parameters() == 0
+
+
+def test_vectors():
+    assert _test_cross_product() == 0
+
+
+def test_transforms():
+    assert _test_look_at_transform() == 0

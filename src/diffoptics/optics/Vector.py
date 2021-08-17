@@ -19,6 +19,13 @@ def dot_product(batch_vector1, batch_vector2):
            batch_vector1[:, 2] * batch_vector2[:, 2]
 
 
+def cross_product(vector1, vector2):
+    x = vector1[1] * vector2[2] - vector1[2] * vector2[1]
+    y = vector1[2] * vector2[0] - vector1[0] * vector2[2]
+    z = vector1[0] * vector2[1] - vector1[1] * vector2[0]
+    return torch.tensor([x, y, z])
+
+
 def vector(x, y, z):
     return torch.tensor([x, y, z], dtype=torch.float32)
 
