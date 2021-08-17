@@ -30,7 +30,7 @@ def get_look_at_transform(viewing_direction: torch.tensor, pos: torch.tensor, up
     # Sanity check (making sure that the inversion went well)
     assert (torch.matmul(camera_to_world, world_to_camera) == torch.eye(4)).all()
     x = torch.randn(4, 4)
-    assert torch.allclose(torch.matmul(camera_to_world, torch.matmul(world_to_camera, x)), x)
-    assert torch.allclose(torch.matmul(world_to_camera, torch.matmul(camera_to_world, x)), x)
+    assert torch.allclose(torch.matmul(camera_to_world, torch.matmul(world_to_camera, x)), x, rtol=1e-04, atol=1e-06)
+    assert torch.allclose(torch.matmul(world_to_camera, torch.matmul(camera_to_world, x)), x, rtol=1e-04, atol=1e-06)
 
     return camera_to_world, world_to_camera
