@@ -49,15 +49,19 @@ class Sensor(BaseOptics):
 
         origins = incident_rays.origins
         directions = incident_rays.directions
-        hit_position = torch.empty((origins.shape[0], 3), device=incident_rays.device)
-        hit_position[:, 0] = origins[:, 0] + t * directions[:, 0]
-        hit_position[:, 1] = origins[:, 1] + t * directions[:, 1]
-        hit_position[:, 2] = origins[:, 2] + t * directions[:, 2]
+        hit_positions = torch.empty((origins.shape[0], 3), device=incident_rays.device)
+        hit_positions[:, 0] = origins[:, 0] + t * directions[:, 0]
+        hit_positions[:, 1] = origins[:, 1] + t * directions[:, 1]
+        hit_positions[:, 2] = origins[:, 2] + t * directions[:, 2]
 
         if do_pixelize:
-            self.pixelize(hit_position, quantum_efficiency=quantum_efficiency)
+            self.pixelize(hit_positions, quantum_efficiency=quantum_efficiency)
 
-        return hit_position, incident_rays.luminosities
+        hit_positions = torch.matmul(self.world_to_camera,
+                                     torch.cat((hit_positions,
+                                                torch.ones(hit_positions.shape[0], 1)), dim=1).unsqueeze(-1))[:, :3, 0]
+
+        return hit_positions, incident_rays.luminosities
 
     def pixelize(self, hit_positions, quantum_efficiency=True):
         """
@@ -67,10 +71,6 @@ class Sensor(BaseOptics):
         :return:
         """
         self.image = self.image.to(hit_positions.device)
-
-        hit_positions = torch.matmul(self.world_to_camera,
-                                     torch.cat((hit_positions,
-                                                torch.ones(hit_positions.shape[0], 1)), dim=1).unsqueeze(-1))[:, :3, 0]
 
         # Only keep the rays that make it to the sensor
         mask = (hit_positions[:, 0] < self.pixel_size[0] * (self.resolution[0] // 2 - 1)) & \
