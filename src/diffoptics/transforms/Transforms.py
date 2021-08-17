@@ -4,7 +4,7 @@ from diffoptics.optics.Vector import normalize_vector
 from diffoptics.optics.Vector import cross_product
 
 
-def get_look_at_transform(viewing_direction: torch.tensor, pos: torch.tensor, up=torch.tensor([0, 0, 1])):
+def get_look_at_transform(viewing_direction: torch.tensor, pos: torch.tensor, up=torch.tensor([0., 0., 1.])):
     """
     Given a viewing direction in a left-handed coordinate system, returns the
     4x4 transform matrices to move a point from camera-space to world-space and
@@ -24,7 +24,7 @@ def get_look_at_transform(viewing_direction: torch.tensor, pos: torch.tensor, up
     camera_to_world = torch.tensor([[left[0], new_up[0], dir_[0], pos[0]],
                                     [left[1], new_up[1], dir_[1], pos[1]],
                                     [left[2], new_up[2], dir_[2], pos[2]],
-                                    [0, 0, 0, 1]])
+                                    [0., 0., 0., 1.]])
     world_to_camera = torch.inverse(camera_to_world)
 
     # Sanity check (making sure that the inversion went well)

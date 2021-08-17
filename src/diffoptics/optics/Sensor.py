@@ -7,8 +7,8 @@ from diffoptics.transforms.Transforms import get_look_at_transform
 class Sensor(BaseOptics):
 
     def __init__(self, resolution=(9600, 9600), pixel_size=(3.76e-6, 3.76e-6), position=(-0.057499999999999996, 0, 0),
-                 poisson_noise_mean=2, quantum_efficiency=0.8, viewing_direction=torch.tensor([1, 0, 0]),
-                 up=torch.tensor([0, 0, 1])):
+                 poisson_noise_mean=2, quantum_efficiency=0.8, viewing_direction=torch.tensor([1., 0., 0.]),
+                 up=torch.tensor([0., 0., 1.])):
         super(Sensor, self).__init__()
         self.position = position
         self.resolution = resolution
