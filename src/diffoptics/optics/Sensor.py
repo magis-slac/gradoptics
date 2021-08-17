@@ -22,6 +22,7 @@ class Sensor(BaseOptics):
     def get_ray_intersection(self, incident_rays):
         """
         Computes the time t at which the incident ray will intersect the sensor
+        Note: Assume that the sensor is perpendicular to the optical axis
         :param incident_rays:
         :return:
         """
@@ -67,11 +68,15 @@ class Sensor(BaseOptics):
         """
         self.image = self.image.to(hit_positions.device)
 
+        hit_positions = torch.matmul(self.world_to_camera,
+                                     torch.cat((hit_positions,
+                                                torch.ones(hit_positions.shape[0], 1)), dim=1).unsqueeze(-1))[:, :3, 0]
+
         # Only keep the rays that make it to the sensor
-        mask = (hit_positions[:, 1] < self.pixel_size[0] * (self.resolution[0] // 2 - 1)) & \
-               (hit_positions[:, 2] < self.pixel_size[1] * (self.resolution[1] // 2 - 1)) & \
-               (hit_positions[:, 1] >= - self.pixel_size[0] * (self.resolution[0] // 2)) & \
-               (hit_positions[:, 2] >= - self.pixel_size[1] * (self.resolution[1] // 2))
+        mask = (hit_positions[:, 0] < self.pixel_size[0] * (self.resolution[0] // 2 - 1)) & \
+               (hit_positions[:, 1] < self.pixel_size[1] * (self.resolution[1] // 2 - 1)) & \
+               (hit_positions[:, 0] >= - self.pixel_size[0] * (self.resolution[0] // 2)) & \
+               (hit_positions[:, 1] >= - self.pixel_size[1] * (self.resolution[1] // 2))
         hit_positions = hit_positions[mask]
         del mask
 
@@ -138,22 +143,23 @@ class Pixelize(torch.autograd.Function):
         # ctx is a context object that can be used to stash information
         # for backward computation
 
-        nb_horizontal_pixel_from_center = torch.round((hit_positions[:, 1] - position[1]) / (pixel_size[0])).type(
+        nb_horizontal_pixel_from_center = torch.round((hit_positions[:, 0]) / (pixel_size[0])).type(
             torch.int64)
         # Shift because indexing starts from the bottom left corner
         index_x = nb_horizontal_pixel_from_center + resolution[0] // 2
-        nb_vertical_pixel_from_center = torch.round((hit_positions[:, 2] - position[2]) / (pixel_size[1])).type(
+        nb_vertical_pixel_from_center = torch.round((hit_positions[:, 1]) / (pixel_size[1])).type(
             torch.int64)
         # Shift because indexing starts from the bottom left corner
         index_y = nb_vertical_pixel_from_center + resolution[1] // 2
 
         # Update pixel values
-        indices = index_x * 9600 + index_y
+        scale = max(resolution)
+        indices = index_x * scale + index_y
         indices_and_counts = indices.unique(return_counts=True)
         tmp = torch.zeros(image.shape, device=image.device)
         for cnt in indices_and_counts[1].unique():
             ind = indices_and_counts[0][indices_and_counts[1] == cnt]
-            tmp[ind // 9600, ind % 9600] += cnt
+            tmp[ind // scale, ind % scale] += cnt
 
         ctx.indices = indices
         ctx.op = tmp
@@ -170,7 +176,6 @@ class Pixelize(torch.autograd.Function):
                              [0., 0., 0.],
                              [-1., -2., -1.]]]], device=ctx.device)
 
-        # @TODO, both in forward and backward, all indexing should be checked and renamed!
         # x in 3d disappears in 2d
         # y in 3d -> columns in image => second index (not flipped, just shifted)
         # z in 3d -> rows in image => first index (flipped and shifted)
