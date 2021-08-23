@@ -64,14 +64,14 @@ def _test_atom_cloud(nb_atoms=int(1e4)):
     return 0
 
 
-def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True):
-    lens = optics.PerfectLens(f=f, m=m)
+def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, position=torch.tensor([0., 0., 0.])):
+    lens = optics.PerfectLens(f=f, m=m, position=position)
 
     # Create rays parallel to the optical axis
     z_pos = torch.linspace(-lens.f * lens.na / 2 + 1e-5, lens.f * lens.na / 2 - 1e-5, nb_rays)
     origins = batch_vector(torch.zeros(nb_rays) + (1000 if right_of_lens else -1000),
-                           torch.zeros(nb_rays),
-                           z_pos)
+                           torch.zeros(nb_rays) + lens.position[1],
+                           z_pos + lens.position[2])
 
     directions = batch_vector(torch.ones(nb_rays) * (-1 if right_of_lens else 1),
                               torch.zeros(nb_rays),
@@ -81,11 +81,11 @@ def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True):
     t = lens.get_ray_intersection(rays)
     refracted_rays = lens.intersect(rays, t)
 
-    # check if all rays intersect at the focal length
+    # Computes the time t at which the rays will intersect with the image focal plane
     o = refracted_rays.origins
     d = refracted_rays.directions
     f_ = f if right_of_lens else -f
-    t = (o[:, 0] - f_) / d[:, 0]
+    t = (o[:, 0] - lens.position[0] - f_) / d[:, 0]
 
     pt = torch.empty((nb_rays, 3))
     pt[:, 0] = o[:, 0] + t * d[:, 0]
@@ -94,10 +94,12 @@ def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True):
 
     fig = plt.figure(figsize=(12, 12))
     ax = fig.gca(projection='3d')
+    # Plot the incoming rays
     for i in range(o.shape[0]):
         ax.plot([o[i, 0] - directions[i, 0] / 10, o[i, 0]],
                 [o[i, 1], o[i, 1]],
                 [o[i, 2], o[i, 2]])
+    # Plot the rays refracted by the lens
     for i in range(o.shape[0]):
         ax.plot([o[i, 0], pt[i, 0]],
                 [o[i, 1], pt[i, 1]],
@@ -105,6 +107,7 @@ def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True):
     plt.savefig('test_lens.pdf')
     plt.close()
 
+    # Check that all rays intersect at the same point
     pt_mean = pt.mean(dim=0)
     error = 0
     for point in pt:
@@ -390,16 +393,17 @@ def test_atom_cloud():
 
 
 def test_lens():
-    assert _test_lens(f=0.05, m=0.15) == 0
-    assert _test_lens(f=0.04, m=0.15) == 0
-    assert _test_lens(f=0.01, m=0.15) == 0
-    assert _test_lens(f=0.05, m=0.1) == 0
-    assert _test_lens(f=0.04, m=0.1) == 0
-    assert _test_lens(f=0.01, m=0.1) == 0
+    for lens_position in [torch.tensor([0., 0., 0.]), torch.tensor([-0.1, 0., 0.]), torch.tensor([0.1, 0.1, 0.1])]:
+        assert _test_lens(f=0.05, m=0.15, position=lens_position) == 0
+        assert _test_lens(f=0.04, m=0.15, position=lens_position) == 0
+        assert _test_lens(f=0.01, m=0.15, position=lens_position) == 0
+        assert _test_lens(f=0.05, m=0.1, position=lens_position) == 0
+        assert _test_lens(f=0.04, m=0.1, position=lens_position) == 0
+        assert _test_lens(f=0.01, m=0.1, position=lens_position) == 0
 
-    assert _test_lens(f=0.05, m=0.15, right_of_lens=False) == 0
-    assert _test_lens(f=0.01, m=0.15, right_of_lens=False) == 0
-    assert _test_lens(f=0.05, m=0.1, right_of_lens=False) == 0
+        assert _test_lens(f=0.05, m=0.15, right_of_lens=False, position=lens_position) == 0
+        assert _test_lens(f=0.01, m=0.15, right_of_lens=False, position=lens_position) == 0
+        assert _test_lens(f=0.05, m=0.1, right_of_lens=False, position=lens_position) == 0
 
 
 def test_ray_marching():
