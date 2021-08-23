@@ -68,9 +68,10 @@ class Sensor(BaseOptics):
         hit_positions[:, 2] = origins[:, 2] + t * directions[:, 2]
 
         # World-space to camera-space
-        hit_positions = torch.matmul(self.world_to_camera,
-                                     torch.cat((hit_positions,
-                                                torch.ones(hit_positions.shape[0], 1)), dim=1).unsqueeze(-1))[:, :3, 0]
+        hit_positions = torch.matmul(self.world_to_camera.to(hit_positions.device),
+                                     torch.cat((hit_positions, torch.ones((hit_positions.shape[0], 1),
+                                                                          device=hit_positions.device)), dim=1
+                                               ).unsqueeze(-1))[:, :3, 0]
 
         # Camera space (origin in the center of the image, horizontal x axis pointing to the right and vertical y axis
         # pointing upwards) to python convention (origin in the upper left, vertical x axis and horizontal y axis)
