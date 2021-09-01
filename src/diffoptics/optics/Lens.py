@@ -56,37 +56,21 @@ class PerfectLens(BaseOptics):
         camera_pos = self.position[0] - self.f * (1 + self.m) * torch.sign(x_objects[:, 0] - self.position[0])
 
         # Intersections with the lens
-        x_0 = torch.empty((x_objects.shape[0], 3), device=incident_rays.device)
-        x_0[:, 0] = x_objects[:, 0] + t * d_0[:, 0]
-        x_0[:, 1] = x_objects[:, 1] + t * d_0[:, 1]
-        x_0[:, 2] = x_objects[:, 2] + t * d_0[:, 2]
+        x_0 = x_objects + t.unsqueeze(1) * d_0
 
         # computes x_star, the intersections of the rays with the plane of focus
         t = (x_0[:, 0] - pof) / (d_0[:, 0] + self.eps)
         t = -t
-        x_star = torch.empty((x_0.shape[0], 3), device=incident_rays.device)
-        x_star[:, 0] = x_0[:, 0] + t * d_0[:, 0]
-        x_star[:, 1] = x_0[:, 1] + t * d_0[:, 1]
-        x_star[:, 2] = x_0[:, 2] + t * d_0[:, 2]
+        x_star = x_0 + t.unsqueeze(1) * d_0
 
         # Computes x_v, the intersections of the rays coming from x_star and passing trough the optical center with the
         # camera
-        # direction along dim 0
-        d = torch.empty((x_star.shape[0], 3), device=incident_rays.device)
-        d[:, 0] = optical_center_pos[0] - x_star[:, 0]
-        d[:, 1] = optical_center_pos[1] - x_star[:, 1]
-        d[:, 2] = optical_center_pos[2] - x_star[:, 2]
+        d = optical_center_pos - x_star
         t = (camera_pos - x_star[:, 0]) / (d[:, 0] + self.eps)
-        x_v = torch.empty((x_star.shape[0], 3), device=incident_rays.device)
-        x_v[:, 0] = x_star[:, 0] + t * d[:, 0]
-        x_v[:, 1] = x_star[:, 1] + t * d[:, 1]
-        x_v[:, 2] = x_star[:, 2] + t * d[:, 2]
+        x_v = x_star + t.unsqueeze(1) * d
 
         _d_out = batch_vector(x_v[:, 0] - x_0[:, 0], x_v[:, 1] - x_0[:, 1], x_v[:, 2] - x_0[:, 2])
-        return Rays(x_0,
-                    _d_out,
-                    luminosities=incident_rays.luminosities,
-                    device=incident_rays.device)
+        return Rays(x_0, _d_out, luminosities=incident_rays.luminosities, device=incident_rays.device)
 
     def sample_points_on_lens(self, nb_points, device='cpu', eps=1e-15):
         """

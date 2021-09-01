@@ -45,14 +45,11 @@ class Mirror(BaseOptics):
         num = -(mirror_plane_coefficients[0] * origins[:, 0] + mirror_plane_coefficients[1] * origins[:, 1] +
                 mirror_plane_coefficients[2] * origins[:, 2] + mirror_plane_coefficients[3])
         den = mirror_plane_coefficients[0] * directions[:, 0] + mirror_plane_coefficients[1] * directions[:, 1] + \
-              mirror_plane_coefficients[2] * directions[:, 2]
+            mirror_plane_coefficients[2] * directions[:, 2]
         t = num / (den + eps)
 
         # Make sure that the ray hits the mirror
-        intersection_points = torch.empty((origins.shape[0], 3), device=incident_rays.device)
-        intersection_points[:, 0] = origins[:, 0] + t * directions[:, 0]
-        intersection_points[:, 1] = origins[:, 1] + t * directions[:, 1]
-        intersection_points[:, 2] = origins[:, 2] + t * directions[:, 2]
+        intersection_points = origins + t.unsqueeze(1) * directions
         condition = (t > 0) & (
                 ((intersection_points[:, 0] - self.x_mirror) ** 2 + (intersection_points[:, 1] - self.y_mirror) ** 2 + (
                         intersection_points[:, 2] - self.z_mirror) ** 2) < self.mirror_radii ** 2)
@@ -69,10 +66,7 @@ class Mirror(BaseOptics):
         """
         origins = incident_rays.origins
         directions = incident_rays.directions
-        collision_points = torch.empty((origins.shape[0], 3), device=incident_rays.device)
-        collision_points[:, 0] = origins[:, 0] + directions[:, 0] * t
-        collision_points[:, 1] = origins[:, 1] + directions[:, 1] * t
-        collision_points[:, 2] = origins[:, 2] + directions[:, 2] * t
+        collision_points = origins + t.unsqueeze(1) * directions
 
         # https://www.fabrizioduroni.it/2017/08/25/how-to-calculate-reflection-vector.html
         directions = -directions
@@ -86,9 +80,7 @@ class Mirror(BaseOptics):
         direction_reflected_rays = batch_vector(scaling * n[:, 0] - directions[:, 0],
                                                 scaling * n[:, 1] - directions[:, 1],
                                                 scaling * n[:, 2] - directions[:, 2])
-        reflected_ray = Rays(collision_points,
-                             direction_reflected_rays,
-                             luminosities=incident_rays.luminosities,
+        reflected_ray = Rays(collision_points, direction_reflected_rays, luminosities=incident_rays.luminosities,
                              device=incident_rays.device)
         return reflected_ray
 

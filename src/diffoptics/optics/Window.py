@@ -84,10 +84,7 @@ class Window(BaseOptics):
 
         origins = incident_rays.origins
         directions = incident_rays.directions
-        origin_refracted_rays = torch.empty((origins.shape[0], 3), device=incident_rays.device)
-        origin_refracted_rays[:, 0] = origins[:, 0] + t * directions[:, 0]
-        origin_refracted_rays[:, 1] = origins[:, 1] + t * directions[:, 1]
-        origin_refracted_rays[:, 2] = origins[:, 2] + t * directions[:, 2]
+        origin_refracted_rays = origins + t.unsqueeze(1) * directions
 
         # Interaction with the first interface
         window_normal = torch.zeros(directions.shape, device=origins.device)
@@ -130,10 +127,7 @@ class Window(BaseOptics):
         t = t[~torch.isnan(t)]
         origins = ray_in_glass.origins
         directions = ray_in_glass.directions
-        origin_refracted_rays = torch.empty((origins.shape[0], 3), device=incident_rays.device)
-        origin_refracted_rays[:, 0] = origins[:, 0] + t * directions[:, 0]
-        origin_refracted_rays[:, 1] = origins[:, 1] + t * directions[:, 1]
-        origin_refracted_rays[:, 2] = origins[:, 2] + t * directions[:, 2]
+        origin_refracted_rays = origins + t.unsqueeze(1) * directions
         mu = self.n_glass / self.n_ext
         tmp = 1 - mu ** 2 * (1 - (dot_product(window_normal, directions)) ** 2)
         c = dot_product(window_normal, directions)
@@ -153,9 +147,7 @@ class Window(BaseOptics):
                                direction_refracted_rays[:, 2] * window_normal[:, 2])
         assert ((torch.sin(theta_1) * self.n_glass - torch.sin(theta_2) * self.n_ext).abs().sum() / theta_1.shape[
             0]) < 1e-5
-        return Rays(origin_refracted_rays,
-                    direction_refracted_rays,
-                    luminosities=incident_rays.luminosities,
+        return Rays(origin_refracted_rays, direction_refracted_rays, luminosities=incident_rays.luminosities,
                     device=incident_rays.device)
 
     def plot(self, ax, s=0.1, color='lightblue', resolution=100):
