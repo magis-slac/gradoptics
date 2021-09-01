@@ -65,7 +65,7 @@ class Sensor(BaseOptics):
         hit_positions = origins + t.unsqueeze(1) * directions
 
         # World-space to camera-space
-        hit_positions = torch.matmul(self.world_to_camera.to(hit_positions.device),
+        hit_positions = torch.matmul(self.world_to_camera.type(hit_positions.dtype).to(hit_positions.device),
                                      torch.cat((hit_positions, torch.ones((hit_positions.shape[0], 1),
                                                                           device=hit_positions.device)), dim=1
                                                ).unsqueeze(-1))[:, :3, 0]
