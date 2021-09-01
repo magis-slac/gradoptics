@@ -148,7 +148,7 @@ class Window(BaseOptics):
         assert ((torch.sin(theta_1) * self.n_glass - torch.sin(theta_2) * self.n_ext).abs().sum() / theta_1.shape[
             0]) < 1e-5
         return Rays(origin_refracted_rays, direction_refracted_rays, luminosities=incident_rays.luminosities,
-                    device=incident_rays.device)
+                    meta=incident_rays.meta, device=incident_rays.device)
 
     def plot(self, ax, s=0.1, color='lightblue', resolution=100):
         # @Todo, change this to plot_surface

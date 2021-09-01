@@ -327,7 +327,7 @@ def _test_grad_sensor_wrt_incident_rays(sensor_position=torch.ones(3),
     rays = optics.Rays(ray_origins, directions)
     t = sensor.get_ray_intersection(rays)
 
-    hit_position, _ = sensor.intersect(rays, t)
+    hit_position, _, _ = sensor.intersect(rays, t)
 
     target_position = torch.randn(hit_position.shape)
 

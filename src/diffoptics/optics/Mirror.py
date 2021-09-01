@@ -81,7 +81,7 @@ class Mirror(BaseOptics):
                                                 scaling * n[:, 1] - directions[:, 1],
                                                 scaling * n[:, 2] - directions[:, 2])
         reflected_ray = Rays(collision_points, direction_reflected_rays, luminosities=incident_rays.luminosities,
-                             device=incident_rays.device)
+                             meta=incident_rays.meta, device=incident_rays.device)
         return reflected_ray
 
     def plot(self, ax, show_normal=False, s=0.1, color='lightblue', resolution=100):

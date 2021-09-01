@@ -89,9 +89,8 @@ def forward_ray_tracing(incident_rays: Rays, scene: Scene, max_iterations=2, ax=
     #        ray.plot_ray(ax, rays_lens_camera[j], t_camera[j], line_width=0.2)
 
     # energy deposit at sensor
-    hit_position, luminosities = scene.sensor.intersect(rays_lens_camera,
-                                                        t_camera,
-                                                        quantum_efficiency=quantum_efficiency)
+    hit_position, luminosities, meta = scene.sensor.intersect(rays_lens_camera, t_camera,
+                                                              quantum_efficiency=quantum_efficiency)
 
     if incident_rays.origins.shape[0] > 0:
         warnings.warn("The maximum number of iteration has been reached and there are still rays"
@@ -105,7 +104,7 @@ def forward_ray_tracing(incident_rays: Rays, scene: Scene, max_iterations=2, ax=
     del rays_lens_camera
     torch.cuda.empty_cache()
 
-    return hit_position, luminosities
+    return hit_position, luminosities, meta
 
 
 def backward_ray_tracing(incident_rays: Rays, scene: Scene):

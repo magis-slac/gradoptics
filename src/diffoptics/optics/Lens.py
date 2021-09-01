@@ -70,7 +70,8 @@ class PerfectLens(BaseOptics):
         x_v = x_star + t.unsqueeze(1) * d
 
         _d_out = batch_vector(x_v[:, 0] - x_0[:, 0], x_v[:, 1] - x_0[:, 1], x_v[:, 2] - x_0[:, 2])
-        return Rays(x_0, _d_out, luminosities=incident_rays.luminosities, device=incident_rays.device)
+        return Rays(x_0, _d_out, luminosities=incident_rays.luminosities, meta=incident_rays.meta,
+                    device=incident_rays.device)
 
     def sample_points_on_lens(self, nb_points, device='cpu', eps=1e-15):
         """
