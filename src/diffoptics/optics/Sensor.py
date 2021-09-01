@@ -106,7 +106,7 @@ class Sensor(BaseOptics):
 
         # Update pixel values
         scale = max(self.resolution)
-        indices = torch.round(hit_positions[:, 0]).type(torch.int64) * scale + torch.round(hit_positions[:, 1]).type(
+        indices = torch.floor(hit_positions[:, 0]).type(torch.int64) * scale + torch.floor(hit_positions[:, 1]).type(
             torch.int64)
         indices_and_counts = indices.unique(return_counts=True)
         tmp = torch.zeros(self.image.shape, device=self.image.device)
