@@ -1,8 +1,10 @@
 import torch
-import matplotlib.pyplot as plt
+import numpy as np
 import diffoptics as optics
+import matplotlib.pyplot as plt
 from diffoptics.optics import batch_vector
 from diffoptics.optics.Vector import cross_product
+from diffoptics.optics.BoundingSphere import BoundingSphere
 from diffoptics.transforms.Transforms import get_look_at_transform
 
 
@@ -270,6 +272,59 @@ def _test_grad_rays():
     return 0
 
 
+def _test_bounding_sphere(nb_rays=1000):
+    fig = plt.figure(figsize=(12, 12))
+    ax = fig.gca(projection='3d')
+
+    cloud_envelopes = [BoundingSphere(xc=3e-3, radii=1e-3),
+                       BoundingSphere(xc=-3e-3, radii=1e-3),
+                       BoundingSphere(xc=0, yc=3e-3, radii=1e-3),
+                       BoundingSphere(xc=0, yc=-3e-3, radii=1e-3)]
+
+    for cloud_envelope in cloud_envelopes:
+        cloud_envelope.plot(ax)
+
+    # Rays
+    origins = torch.zeros((nb_rays, 3))
+    # Sample rays in 4 pi
+    azimuthal_angle = torch.rand(nb_rays) * 2 * np.pi
+    polar_angle = torch.arccos(1 - 2 * torch.rand(nb_rays))
+    emitted_direction = optics.batch_vector(torch.sin(polar_angle) * torch.sin(azimuthal_angle),
+                                            torch.sin(polar_angle) * torch.cos(azimuthal_angle),
+                                            torch.cos(polar_angle))
+    rays = optics.Rays(origins, emitted_direction)
+
+    # First intersection with the sphere
+    t_s = []
+    for cloud_envelope in cloud_envelopes:
+        t_s.append(cloud_envelope.get_ray_intersection(rays))
+
+    for t in t_s:
+        rays.plot(ax, t)
+        assert (t[~torch.isnan(t)] > 0).all()  # Check that all the times are greater than 0
+
+    # Second intersection with the sphere
+    for i, cloud_envelope in enumerate(cloud_envelopes):
+        cond = ~torch.isnan(t_s[i])
+        outgoing_rays = cloud_envelope.intersect(rays.get_at(cond), t_s[i][cond])
+        t_ = cloud_envelope.get_ray_intersection(outgoing_rays)
+        outgoing_rays.plot(ax, t_, color='r')
+        cond_ = torch.isnan(t_)
+        assert cond_.sum() == 0  # In this setup, All the rays should make it to the second intersection
+        assert torch.allclose(rays.get_at(cond).directions,
+                              outgoing_rays.directions)  # The sphere should not modify the directions
+        outgoing_rays = cloud_envelope.intersect(outgoing_rays, t_)
+        assert torch.allclose(rays.get_at(cond).directions,
+                              outgoing_rays.directions)  # The sphere should not modify the directions
+
+    ax.set_xlim([-0.004, 0.004])
+    ax.set_ylim([-0.004, 0.004])
+    ax.set_zlim([-0.004, 0.004])
+    plt.savefig('test_bounding_sphere.pdf')
+    plt.close()
+    return 0
+
+
 def _test_grad_mirror_wrt_incident_rays(mirror_position=torch.ones(3),
                                         ray_origins=torch.randn(2, 3, requires_grad=True)):
     mirror = optics.Mirror(mirror_position[0], mirror_position[1], mirror_position[2], torch.tensor([.2, .2, .6]), .005)
@@ -331,7 +386,7 @@ def _test_grad_sensor_wrt_incident_rays(sensor_position=torch.ones(3),
 
     target_position = torch.randn(hit_position.shape)
 
-    l1_loss = ((hit_position - target_position)**2).mean()
+    l1_loss = ((hit_position - target_position) ** 2).mean()
     l1_loss.backward()
 
     assert directions.is_leaf
@@ -440,3 +495,7 @@ def test_vectors():
 
 def test_transforms():
     assert _test_look_at_transform() == 0
+
+
+def test_bounding_sphere():
+    assert _test_bounding_sphere() == 0
