@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from diffoptics import Rays
+from diffoptics.optics.Ray import Rays
 from diffoptics.optics import BaseOptics
 
 
