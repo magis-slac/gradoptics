@@ -37,8 +37,8 @@ class BoundingSphere(BaseOptics):
         pho = b ** 2 - 4 * a * c
 
         # Initialize return values
-        t_min = torch.zeros(origins.shape[0]) + float('nan')
-        t_max = torch.zeros(origins.shape[0]) + float('nan')
+        t_min = torch.zeros(origins.shape[0], device=incident_rays.device) + float('nan')
+        t_max = torch.zeros(origins.shape[0], device=incident_rays.device) + float('nan')
 
         # Keep the rays that intersect with the sphere
         cond = pho > 0
