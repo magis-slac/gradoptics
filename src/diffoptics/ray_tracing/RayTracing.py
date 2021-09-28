@@ -15,8 +15,7 @@ def trace_rays(incident_rays: Rays, scene: Scene) -> Tuple[Rays, torch.Tensor, t
     :return:
     """
     device = incident_rays.device
-    t = torch.empty(incident_rays.origins.shape[0], device=device, 
-                    dtype=incident_rays.origins.dtype) + float('Inf')
+    t = torch.empty(incident_rays.origins.shape[0], device=device) + float('Inf')
     outgoing_ray = Rays(torch.empty(incident_rays.origins.shape[0], 3) + float('nan'),
                         torch.empty(incident_rays.origins.shape[0], 3) + float('nan'),
                         luminosities=(torch.empty(incident_rays.origins.shape[0],
@@ -30,7 +29,7 @@ def trace_rays(incident_rays: Rays, scene: Scene) -> Tuple[Rays, torch.Tensor, t
         # return values
         condition = (t_current < t) & (t_current > 1e-3) & (
             ~torch.isnan(t_current))  # & (not jnp.isnan(t_for_current_object))
-        t[condition] = t_current[condition]
+        t[condition] = t_current[condition].type(t.dtype)
         rays = o[0].intersect(incident_rays.get_at(condition), t_current[condition])
         outgoing_ray.origins[condition] = rays.origins
         outgoing_ray.directions[condition] = rays.directions
