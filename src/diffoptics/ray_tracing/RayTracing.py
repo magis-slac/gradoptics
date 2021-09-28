@@ -16,9 +16,11 @@ def trace_rays(incident_rays: Rays, scene: Scene) -> Tuple[Rays, torch.Tensor, t
     """
     device = incident_rays.device
     t = torch.empty(incident_rays.origins.shape[0], device=device) + float('Inf')
-    outgoing_ray = Rays(torch.empty(incident_rays.origins.shape[0], 3) + float('nan'),
-                        torch.empty(incident_rays.origins.shape[0], 3) + float('nan'),
-                        luminosities=(torch.empty(incident_rays.origins.shape[0],
+    outgoing_ray = Rays(torch.empty((incident_rays.origins.shape[0], 3),
+                                    dtype=incident_rays.origins.dtype) + float('nan'),
+                        torch.empty((incident_rays.directions.shape[0], 3),
+                                    dtype=incident_rays.directions.dtype) + float('nan'),
+                        luminosities=(torch.empty(incident_rays.luminosities.shape[0],
                                                   dtype=incident_rays.luminosities.dtype) + float('nan')) if
                         incident_rays.luminosities is not None else None, device=device)
     is_lens = torch.empty(incident_rays.origins.shape[0], device=device) + float('nan')
