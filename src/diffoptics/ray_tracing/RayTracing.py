@@ -15,7 +15,8 @@ def trace_rays(incident_rays: Rays, scene: Scene) -> Tuple[Rays, torch.Tensor, t
     :return:
     """
     device = incident_rays.device
-    t = torch.empty(incident_rays.origins.shape[0], device=device) + float('Inf')
+    t = torch.empty(incident_rays.origins.shape[0], device=device, 
+                    dtype=incident_rays.origins.dtype) + float('Inf')
     outgoing_ray = Rays(torch.empty(incident_rays.origins.shape[0], 3) + float('nan'),
                         torch.empty(incident_rays.origins.shape[0], 3) + float('nan'),
                         luminosities=(torch.empty(incident_rays.origins.shape[0],
