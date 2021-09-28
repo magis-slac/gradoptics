@@ -28,6 +28,7 @@ class Rays:
         self.meta = meta
         self.device = device
 
+        assert origins.dtype == directions.dtype
         # Sanity check: dimensionality consistency
         assert origins.shape == directions.shape
         if luminosities is not None:
