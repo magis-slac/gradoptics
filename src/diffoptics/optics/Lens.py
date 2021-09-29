@@ -46,7 +46,7 @@ class PerfectLens(BaseOptics):
         :return:
         """
 
-        optical_center_pos = self.position
+        optical_center_pos = self.position.to(incident_rays.origins.device)
         x_objects = incident_rays.origins
         d_0 = incident_rays.directions
 
