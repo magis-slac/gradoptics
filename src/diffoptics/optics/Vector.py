@@ -18,6 +18,11 @@ def dot_product(batch_vector1, batch_vector2):
            batch_vector1[:, 1] * batch_vector2[:, 1] + \
            batch_vector1[:, 2] * batch_vector2[:, 2]
 
+def cos_theta(batch_vector1, batch_vector2, eps=1e-15):
+    norm_v1 = torch.sqrt(batch_vector1[:, 0] ** 2 + batch_vector1[:, 1] ** 2 + batch_vector1[:, 2] ** 2)
+    norm_v2 = torch.sqrt(batch_vector2[:, 0] ** 2 + batch_vector2[:, 1] ** 2 + batch_vector2[:, 2] ** 2)
+    return dot_product(batch_vector1, batch_vector2) / (norm_v1 + norm_v2 + eps)
+
 
 def cross_product(vector1, vector2):
     x = vector1[1] * vector2[2] - vector1[2] * vector2[1]
