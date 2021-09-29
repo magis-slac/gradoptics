@@ -18,6 +18,7 @@ The API is designed similar to rendering softwares, and has been heavily inspire
 
 
 ```commandline
+git clone https://github.com/magis-slac/differentiable-optics.git
 cd differentiable-optics
 pip install -r requirements.txt
 pip install -e .
