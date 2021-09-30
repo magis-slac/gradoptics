@@ -73,7 +73,8 @@ class BoundingSphere(BaseOptics):
         return Rays(origins,
                     directions,
                     luminosities=incident_rays.luminosities,
-                    device=incident_rays.device)
+                    device=incident_rays.device,
+                    meta=incident_rays.meta)
 
     def plot(self, ax, color='grey', alpha=0.4):
         u = np.linspace(0, 2 * np.pi, 100)
