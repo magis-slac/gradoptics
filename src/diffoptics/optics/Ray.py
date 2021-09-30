@@ -1,4 +1,5 @@
 import torch
+import warnings
 
 from diffoptics.optics.BaseOptics import BaseOptics
 from diffoptics.optics.Vector import normalize_vector, normalize_batch_vector
@@ -36,7 +37,20 @@ class Rays:
         for key in meta.keys():
             assert meta[key].shape[0] == origins.shape[0]
 
+    def __getitem__(self, condition):
+        meta = {}
+        for key in self.meta.keys():
+            meta[key] = self.meta[key][condition]
+
+        return Rays(self.origins[condition],
+                    self.directions[condition],
+                    luminosities=self.luminosities[condition] if self.luminosities is not None else None,
+                    meta=meta,
+                    device=self.device)
+        
     def get_at(self, condition):
+        warnings.warn("get_at is deprecated, and will be removed in a future version of diffoptics. Please use __getitem__ instead", DeprecationWarning)
+
         meta = {}
         for key in self.meta.keys():
             meta[key] = self.meta[key][condition]
