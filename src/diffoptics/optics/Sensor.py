@@ -134,14 +134,13 @@ class Sensor(BaseOptics):
             del mask
 
         # Update pixel values
-        scale = max(self.resolution)
-        indices = torch.floor(hit_positions[:, 0]).type(torch.int64) * scale + torch.floor(hit_positions[:, 1]).type(
-            torch.int64)
+        indices = torch.floor(hit_positions[:, 1]).type(torch.int64) * self.resolution[1] + \
+                  torch.floor(hit_positions[:, 0]).type(torch.int64)
         indices_and_counts = indices.unique(return_counts=True)
         tmp = torch.zeros(self.depth_images[depth_id].shape, device=self.depth_images[depth_id].device)
         for cnt in indices_and_counts[1].unique():
             ind = indices_and_counts[0][indices_and_counts[1] == cnt]
-            tmp[ind // scale, ind % scale] += cnt
+            tmp[ind % self.resolution[1], ind // self.resolution[1]] += cnt
 
         self.depth_images[depth_id] = self.depth_images[depth_id] + tmp
 
