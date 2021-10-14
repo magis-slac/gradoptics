@@ -8,7 +8,7 @@ class Sensor(BaseOptics):
 
     def __init__(self, resolution=(9600, 9600), pixel_size=(3.76e-6, 3.76e-6), position=(-0.057499999999999996, 0, 0),
                  poisson_noise_mean=2, quantum_efficiency=0.8, viewing_direction=torch.tensor([1., 0., 0.]),
-                 up=torch.tensor([0., 0., 1.])):
+                 up=torch.tensor([0., 0., 1.]), psfs={}, psf_ratio=1):
         """
 
         :param resolution: Image processing convention: origin in the upper left corner, horizontal x axis and vertical
@@ -27,10 +27,21 @@ class Sensor(BaseOptics):
         self.position = position
         self.resolution = resolution
         self.pixel_size = pixel_size
-        self.image = torch.zeros((resolution[0], resolution[1]))
         self.poisson_noise_mean = poisson_noise_mean
         self.quantum_efficiency = quantum_efficiency
         self.camera_to_world, self.world_to_camera = get_look_at_transform(viewing_direction, position, up=up)
+        self.add_psf = len(psfs.keys()) > 0
+        self.psfs = psfs
+        self.psf_ratio = psf_ratio
+        self.resolution = resolution
+        assert type(psf_ratio) == int
+
+        if self.add_psf:
+            self.depth_images = [torch.zeros((resolution[0] * psf_ratio, resolution[1] * psf_ratio, 1)) for _ in
+                                 range(len(psfs['data'].keys()))]
+            self.psf_depth_bounds = list(psfs['data'].keys())
+        else:
+            self.depth_images = [torch.zeros((resolution[0] * psf_ratio, resolution[1] * psf_ratio, 1))]
 
     def get_ray_intersection(self, incident_rays):
         """
@@ -78,21 +89,39 @@ class Sensor(BaseOptics):
         hit_positions[:, 1] = -nb_horizontal_pixel_from_center + self.resolution[0] // 2
 
         if do_pixelize:
-            self.pixelize(hit_positions, quantum_efficiency=quantum_efficiency)
+
+            if self.add_psf:
+
+                nb_processed_rays = 0
+                for depth_id, (low_bounds, high_bounds) in enumerate(self.psf_depth_bounds):
+                    # Get the mask for the rays at the depths in [low_bounds, high_bounds]
+                    mask = (incident_rays.meta['depth'] < high_bounds) & (incident_rays.meta['depth'] > low_bounds)
+                    hit_positions_psf = hit_positions[mask] * self.psf_ratio
+                    self.pixelize(depth_id, hit_positions_psf, quantum_efficiency=quantum_efficiency)
+                    nb_processed_rays += mask.sum()
+
+                if not (nb_processed_rays == hit_positions.shape[0]):
+                    raise Exception(
+                        "Some rays were not processed: their origins' depths were not included in the psfs.")
+
+            else:
+                self.pixelize(0, hit_positions, quantum_efficiency=quantum_efficiency)
 
         return hit_positions, incident_rays.luminosities, incident_rays.meta
 
-    def pixelize(self, hit_positions, quantum_efficiency=True):
+    def pixelize(self, depth_id, hit_positions, quantum_efficiency=True):
         """
         @Todo
+        :param depth_id:
         :param quantum_efficiency:
         :param hit_positions: batch of ...
         :return:
         """
-        self.image = self.image.to(hit_positions.device)
+        self.depth_images[depth_id] = self.depth_images[depth_id].to(hit_positions.device)
 
         # Only keep the rays that make it to the sensor
-        mask = (hit_positions[:, 0] < self.resolution[1]) & (hit_positions[:, 1] < self.resolution[0]) & \
+        mask = (hit_positions[:, 0] < (self.resolution[1] * self.psf_ratio)) & (
+                    hit_positions[:, 1] < (self.resolution[0] * self.psf_ratio)) & \
                (hit_positions[:, 0] >= 0) & (hit_positions[:, 1] >= 0)
         hit_positions = hit_positions[mask]
         del mask
@@ -105,25 +134,40 @@ class Sensor(BaseOptics):
             del mask
 
         # Update pixel values
-        scale = max(self.resolution)
-        indices = torch.floor(hit_positions[:, 0]).type(torch.int64) * scale + torch.floor(hit_positions[:, 1]).type(
-            torch.int64)
+        indices = torch.floor(hit_positions[:, 1]).type(torch.int64) * self.resolution[1] + \
+                  torch.floor(hit_positions[:, 0]).type(torch.int64)
         indices_and_counts = indices.unique(return_counts=True)
-        tmp = torch.zeros(self.image.shape, device=self.image.device)
+        tmp = torch.zeros(self.depth_images[depth_id].shape, device=self.depth_images[depth_id].device)
         for cnt in indices_and_counts[1].unique():
             ind = indices_and_counts[0][indices_and_counts[1] == cnt]
-            tmp[ind // scale, ind % scale] += cnt
+            tmp[ind % self.resolution[1], ind // self.resolution[1]] += cnt
 
-        self.image = self.image + tmp
+        self.depth_images[depth_id] = self.depth_images[depth_id] + tmp
 
     def readout(self, add_poisson_noise=True):
-        tmp = self.image.clone()
-        self.image = torch.zeros((self.resolution[0], self.resolution[1]), device=tmp.device)
 
-        if add_poisson_noise:  # Add readout noise
-            tmp = tmp + torch.poisson(self.image + self.poisson_noise_mean, generator=None)
+        # If psfs were specified
+        if self.add_psf:
+            # Apply psf to each depth_image
+            for i, depth in enumerate(self.psfs['data'].keys()):
+                for key in self.psfs['data'][depth].keys():
+                    self.depth_images[i][key[0]:key[1], :, 0] = self.psfs['data'][depth][key](
+                        self.depth_images[i][key[0]:key[1], :, 0])
 
-        return tmp
+        # Summing all the depth images & rebinning
+        image = (torch.nn.AvgPool2d(self.psf_ratio)(
+            torch.cat(self.depth_images, dim=2).sum(dim=2).unsqueeze(0).unsqueeze(0)) * self.psf_ratio ** 2).squeeze(
+            0).squeeze(0)
+
+        # Reinitialize depth images
+        for i in range(len(self.depth_images)):
+            self.depth_images[i] *= 0
+
+        # Add readout noise
+        if add_poisson_noise:
+            image = image + torch.poisson(torch.zeros_like(image) + self.poisson_noise_mean, generator=None)
+
+        return image
 
     def plot(self, ax, s=0.1, color='grey', resolution_=100):
         """
