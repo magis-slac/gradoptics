@@ -37,11 +37,11 @@ class Sensor(BaseOptics):
         assert type(psf_ratio) == int
 
         if self.add_psf:
-            self.depth_images = [torch.zeros((resolution[0] * psf_ratio, resolution[1] * psf_ratio, 1)) for _ in
+            self.depth_images = [torch.zeros((resolution[1] * psf_ratio, resolution[0] * psf_ratio, 1)) for _ in
                                  range(len(psfs['data'].keys()))]
             self.psf_depth_bounds = list(psfs['data'].keys())
         else:
-            self.depth_images = [torch.zeros((resolution[0] * psf_ratio, resolution[1] * psf_ratio, 1))]
+            self.depth_images = [torch.zeros((resolution[1] * psf_ratio, resolution[0] * psf_ratio, 1))]
 
     def get_ray_intersection(self, incident_rays):
         """
