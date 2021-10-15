@@ -47,9 +47,10 @@ class Rays:
                     luminosities=self.luminosities[condition] if self.luminosities is not None else None,
                     meta=meta,
                     device=self.device)
-        
+
     def get_at(self, condition):
-        warnings.warn("get_at is deprecated, and will be removed in a future version of diffoptics. Please use __getitem__ instead", DeprecationWarning)
+        warnings.warn("get_at is deprecated, and will be removed in a future version of diffoptics. Please use "
+                      "__getitem__ instead", DeprecationWarning)
 
         meta = {}
         for key in self.meta.keys():
@@ -81,3 +82,11 @@ class Rays:
                     [self.origins[i, 1], point[1]],
                     [self.origins[i, 2], point[2]],
                     color=color, linewidth=line_width)
+
+
+def empty_like(rays: Rays):
+    origins = torch.empty(rays.origins.shape[0], 3)
+    directions = torch.empty(rays.origins.shape[0], 3)
+    luminosities = (
+        torch.empty(rays.origins.shape[0], dtype=rays.luminosities.dtype)) if rays.luminosities is not None else None
+    return Rays(origins, directions, luminosities=luminosities, device=rays.device)

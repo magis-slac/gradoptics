@@ -7,7 +7,7 @@ from diffoptics.inference.RejectionSampling import rejection_sampling
 
 from diffoptics.optics.Lens import PerfectLens
 from diffoptics.optics.Mirror import Mirror
-from diffoptics.optics.Ray import Ray, Rays
+from diffoptics.optics.Ray import Ray, Rays, empty_like
 from diffoptics.optics.Sensor import Sensor
 from diffoptics.optics.Window import Window
 from diffoptics.optics.BoundingSphere import BoundingSphere

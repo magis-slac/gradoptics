@@ -3,6 +3,7 @@ from typing import Tuple
 import torch
 import warnings
 
+import diffoptics as optics
 from diffoptics.optics import Rays
 from diffoptics.ray_tracing.Scene import Scene
 
@@ -16,13 +17,7 @@ def trace_rays(incident_rays: Rays, scene: Scene) -> Tuple[Rays, torch.Tensor, t
     """
     device = incident_rays.device
     t = torch.zeros(incident_rays.origins.shape[0], device=device) + float('Inf')
-    outgoing_ray = Rays(torch.empty((incident_rays.origins.shape[0], 3),
-                                    dtype=incident_rays.origins.dtype) + float('nan'),
-                        torch.empty((incident_rays.directions.shape[0], 3),
-                                    dtype=incident_rays.directions.dtype) + float('nan'),
-                        luminosities=(torch.empty(incident_rays.luminosities.shape[0],
-                                                  dtype=incident_rays.luminosities.dtype) + float('nan')) if
-                        incident_rays.luminosities is not None else None, device=device)
+    outgoing_ray = optics.empty_like(incident_rays)
     is_lens = torch.empty(incident_rays.origins.shape[0], device=device) + float('nan')
 
     for o in scene.objects:
