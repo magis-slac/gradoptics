@@ -90,3 +90,13 @@ def empty_like(rays: Rays):
     luminosities = (
         torch.empty(rays.origins.shape[0], dtype=rays.luminosities.dtype)) if rays.luminosities is not None else None
     return Rays(origins, directions, luminosities=luminosities, device=rays.device)
+
+
+def cat(rays1: Rays, rays2: Rays):
+    rays1.origins = torch.cat((rays1.origins, rays2.origins))
+    rays1.directions = torch.cat((rays1.directions, rays2.directions))
+
+    if rays1.luminosities is not None:
+        rays1.luminosities = torch.cat((rays1.luminosities, rays2.luminosities))
+
+    return rays1

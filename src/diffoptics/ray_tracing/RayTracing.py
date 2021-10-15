@@ -40,10 +40,8 @@ def trace_rays(incident_rays: Rays, scene: Scene) -> Tuple[Rays, torch.Tensor, t
 
 def forward_ray_tracing(incident_rays: Rays, scene: Scene, max_iterations=2, ax=None, quantum_efficiency=True) -> \
         Tuple[torch.Tensor, torch.Tensor]:
-    rays_lens_camera_origins = torch.tensor([], device=incident_rays.device)
-    rays_lens_camera_directions = torch.tensor([], device=incident_rays.device)
-    rays_lens_camera_luminosities = torch.tensor([], device=incident_rays.device) if \
-        incident_rays.luminosities is not None else None
+
+    rays_lens_camera = None
 
     for i in range(max_iterations):
         outgoing_rays, t, are_lens = trace_rays(incident_rays, scene)
@@ -58,21 +56,14 @@ def forward_ray_tracing(incident_rays: Rays, scene: Scene, max_iterations=2, ax=
         #        ray.plot_ray(ax, incident_rays[j], t[j], line_width=0.2)
 
         tmp_rays_lens_camera = outgoing_rays.get_at(are_lens)  # rays refracted by the lens, to track up to the sensor
-        rays_lens_camera_origins = torch.cat((rays_lens_camera_origins, tmp_rays_lens_camera.origins))
-        rays_lens_camera_directions = torch.cat((rays_lens_camera_directions, tmp_rays_lens_camera.directions))
-        if rays_lens_camera_luminosities is not None:
-            rays_lens_camera_luminosities = torch.cat(
-                (rays_lens_camera_luminosities, tmp_rays_lens_camera.luminosities))
+        rays_lens_camera = optics.cat(rays_lens_camera, tmp_rays_lens_camera) if rays_lens_camera is not None else \
+            tmp_rays_lens_camera
         incident_rays = outgoing_rays.get_at(~are_lens)  # rays that still need to be traced
 
         del tmp_rays_lens_camera
         torch.cuda.empty_cache()
 
     # Time at which the rays will hit the sensor
-    rays_lens_camera = Rays(rays_lens_camera_origins,
-                            rays_lens_camera_directions,
-                            luminosities=rays_lens_camera_luminosities,
-                            device=incident_rays.device)
     t_camera = scene.sensor.get_ray_intersection(rays_lens_camera)
     index = ~torch.isnan(t_camera)
     rays_lens_camera = rays_lens_camera.get_at(index)
@@ -93,9 +84,6 @@ def forward_ray_tracing(incident_rays: Rays, scene: Scene, max_iterations=2, ax=
         warnings.warn("The maximum number of iteration has been reached and there are still rays"
                       "bouncing in the scene. incident_rays.shape[0]: " + str(incident_rays.origins.shape[0]))
 
-    del rays_lens_camera_origins
-    del rays_lens_camera_directions
-    del rays_lens_camera_luminosities
     del t_camera
     del index
     del rays_lens_camera
