@@ -10,7 +10,7 @@ def rejection_sampling(pdf, nb_point, proposal_distribution, m=None, batch_size=
         u = torch.rand(batch_size, device=device)
 
         # 2: sample data from the proposal
-        proposed_data = proposal_distribution.sample(batch_size)
+        proposed_data = proposal_distribution.sample(batch_size, device=device)
 
         # If M is not specified, set it empirically
         if m is None:  # @Todo, share M over the different loops! (in order to keep the global extremum)
