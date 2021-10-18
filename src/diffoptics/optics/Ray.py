@@ -85,10 +85,9 @@ class Rays:
 
 
 def empty_like(rays: Rays):
-    origins = torch.empty(rays.origins.shape[0], 3)
-    directions = torch.empty(rays.origins.shape[0], 3)
-    luminosities = (
-        torch.empty(rays.origins.shape[0], dtype=rays.luminosities.dtype)) if rays.luminosities is not None else None
+    origins = torch.empty_like(rays.origins)
+    directions = torch.empty_like(rays.directions)
+    luminosities = (torch.empty_like(rays.luminosities)) if rays.luminosities is not None else None
     meta = {}
     for key in rays.meta.keys():
         meta[key] = torch.empty_like(rays.meta[key])
