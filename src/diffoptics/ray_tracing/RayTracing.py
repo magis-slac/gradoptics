@@ -27,7 +27,7 @@ def trace_rays(incident_rays: Rays, scene: Scene) -> Tuple[Rays, torch.Tensor, t
         condition = (t_current < t) & (t_current > 1e-3) & (
             ~torch.isnan(t_current))  # & (not jnp.isnan(t_for_current_object))
         t[condition] = t_current[condition].type(t.dtype)
-        rays = o[0].intersect(incident_rays.get_at(condition), t_current[condition])
+        rays = o[0].intersect(incident_rays[condition], t_current[condition])
         outgoing_ray.origins[condition] = rays.origins
         outgoing_ray.directions[condition] = rays.directions
         if outgoing_ray.luminosities is not None:
@@ -48,17 +48,17 @@ def forward_ray_tracing(incident_rays: Rays, scene: Scene, max_iterations=2, ax=
 
         # Only keep the rays that intersect with the system
         index = ~torch.isnan(t)
-        outgoing_rays = outgoing_rays.get_at(index)
+        outgoing_rays = outgoing_rays[index]
         are_lens = are_lens[index].type(torch.bool)
 
         # if ax is not None:  # Plot ray
         #    for j in range(outgoing_ray.shape[0]):
         #        ray.plot_ray(ax, incident_rays[j], t[j], line_width=0.2)
 
-        tmp_rays_lens_camera = outgoing_rays.get_at(are_lens)  # rays refracted by the lens, to track up to the sensor
+        tmp_rays_lens_camera = outgoing_rays[are_lens]  # rays refracted by the lens, to track up to the sensor
         rays_lens_camera = optics.cat(rays_lens_camera, tmp_rays_lens_camera) if rays_lens_camera is not None else \
             tmp_rays_lens_camera
-        incident_rays = outgoing_rays.get_at(~are_lens)  # rays that still need to be traced
+        incident_rays = outgoing_rays[~are_lens]  # rays that still need to be traced
 
         del tmp_rays_lens_camera
         torch.cuda.empty_cache()
@@ -66,7 +66,7 @@ def forward_ray_tracing(incident_rays: Rays, scene: Scene, max_iterations=2, ax=
     # Time at which the rays will hit the sensor
     t_camera = scene.sensor.get_ray_intersection(rays_lens_camera)
     index = ~torch.isnan(t_camera)
-    rays_lens_camera = rays_lens_camera.get_at(index)
+    rays_lens_camera = rays_lens_camera[index]
     t_camera = t_camera[index]
 
     # if rays_lens_camera.origins.shape[0] == 0:

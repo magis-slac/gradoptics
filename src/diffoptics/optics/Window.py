@@ -120,7 +120,7 @@ class Window(BaseOptics):
 
         # Interaction with the second interface
         t = self.get_ray_intersection(ray_in_glass)
-        ray_in_glass = ray_in_glass.get_at(~torch.isnan(t))
+        ray_in_glass = ray_in_glass[~torch.isnan(t)]
         incident_rays.origins = incident_rays.origins[~torch.isnan(t)]
         incident_rays.directions = incident_rays.directions[~torch.isnan(t)]
         window_normal = window_normal[~torch.isnan(t)]

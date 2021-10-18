@@ -176,7 +176,7 @@ def _test_window():
 
     rays = atom_cloud.sample_rays(nb_atoms)
     t = window.get_ray_intersection(rays)
-    r = rays.get_at(~torch.isnan(t))
+    r = rays[~torch.isnan(t)]
     t = t[~torch.isnan(t)]
     rays = window.intersect(r, t)
 
@@ -306,15 +306,15 @@ def _test_bounding_sphere(nb_rays=1000):
     # Second intersection with the sphere
     for i, cloud_envelope in enumerate(cloud_envelopes):
         cond = ~torch.isnan(t_s[i])
-        outgoing_rays = cloud_envelope.intersect(rays.get_at(cond), t_s[i][cond])
+        outgoing_rays = cloud_envelope.intersect(rays[cond], t_s[i][cond])
         t_ = cloud_envelope.get_ray_intersection(outgoing_rays)
         outgoing_rays.plot(ax, t_, color='r')
         cond_ = torch.isnan(t_)
         assert cond_.sum() == 0  # In this setup, All the rays should make it to the second intersection
-        assert torch.allclose(rays.get_at(cond).directions,
+        assert torch.allclose(rays[cond].directions,
                               outgoing_rays.directions)  # The sphere should not modify the directions
         outgoing_rays = cloud_envelope.intersect(outgoing_rays, t_)
-        assert torch.allclose(rays.get_at(cond).directions,
+        assert torch.allclose(rays[cond].directions,
                               outgoing_rays.directions)  # The sphere should not modify the directions
 
     ax.set_xlim([-0.004, 0.004])
