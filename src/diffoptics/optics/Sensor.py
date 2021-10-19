@@ -144,7 +144,7 @@ class Sensor(BaseOptics):
 
         self.depth_images[depth_id] = self.depth_images[depth_id] + tmp
 
-    def readout(self, add_poisson_noise=True):
+    def readout(self, add_poisson_noise=True, destructive_readout=True):
 
         # If psfs were specified
         if self.add_psf:
@@ -159,9 +159,10 @@ class Sensor(BaseOptics):
             torch.cat(self.depth_images, dim=2).sum(dim=2).unsqueeze(0).unsqueeze(0)) * self.psf_ratio ** 2).squeeze(
             0).squeeze(0)
 
-        # Reinitialize depth images
-        for i in range(len(self.depth_images)):
-            self.depth_images[i] *= 0
+        if destructive_readout:
+            # Reinitialize depth images
+            for i in range(len(self.depth_images)):
+                self.depth_images[i] *= 0
 
         # Add readout noise
         if add_poisson_noise:
