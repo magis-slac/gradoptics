@@ -5,7 +5,7 @@ from diffoptics.optics.Vector import cross_product
 from diffoptics.transforms.BaseTransform import BaseTransform
 
 
-class LookAtTransform(BaseTransform):
+class SimpleTransform(BaseTransform):
 
     def __init__(self, theta_x: float, theta_y: float, theta_z: float, t: torch.tensor):
         t = torch.tensor([[1, 0, 0, t[0]],
