@@ -10,15 +10,15 @@ class SimpleTransform(BaseTransform):
     def __init__(self, theta_x: float, theta_y: float, theta_z: float, t: torch.tensor):
 
         M_x = torch.tensor([[1, 0, 0],
-                            [0, torch.cos(theta_x), -torch.sin(theta_x)],
-                            [0, torch.sin(theta_x), torch.cos(theta_x)]])
+                            [0, torch.cos(torch.tensor([theta_x])), -torch.sin(torch.tensor([theta_x]))],
+                            [0, torch.sin(torch.tensor([theta_x])), torch.cos(torch.tensor([theta_x]))]])
 
-        M_y = torch.tensor([[torch.cos(theta_y), 0, -torch.sin(theta_y)],
+        M_y = torch.tensor([[torch.cos(torch.tensor([theta_y])), 0, -torch.sin(torch.tensor([theta_y]))],
                             [0, 1, 0],
-                            [torch.sin(theta_y), 0, torch.cos(theta_y)]])
+                            [torch.sin(torch.tensor([theta_y])), 0, torch.cos(torch.tensor([theta_y]))]])
 
-        M_z = torch.tensor([[torch.cos(theta_z), -torch.sin(theta_z), 0],
-                            [torch.sin(theta_z), torch.cos(theta_z), 0],
+        M_z = torch.tensor([[torch.cos(torch.tensor([theta_z])), -torch.sin(torch.tensor([theta_z])), 0],
+                            [torch.sin(torch.tensor([theta_z])), torch.cos(torch.tensor([theta_z])), 0],
                             [0, 0, 1]])
         M = M_z @ M_y @ M_x
 
