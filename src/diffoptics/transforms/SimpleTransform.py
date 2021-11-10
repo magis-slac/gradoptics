@@ -8,27 +8,24 @@ from diffoptics.transforms.BaseTransform import BaseTransform
 class SimpleTransform(BaseTransform):
 
     def __init__(self, theta_x: float, theta_y: float, theta_z: float, t: torch.tensor):
-        t = torch.tensor([[1, 0, 0, t[0]],
-                          [0, 1, 0, t[1]],
-                          [0, 0, 1, t[2]],
-                          [0, 0, 0, 1]])
 
-        M_x = torch.tensor([[1, 0, 0, 0],
-                            [0, torch.cos(theta_x), -torch.sin(theta_x), 0],
-                            [0, torch.sin(theta_x), torch.cos(theta_x), 0],
-                            [0, 0, 0, 1]])
+        M_x = torch.tensor([[1, 0, 0],
+                            [0, torch.cos(theta_x), -torch.sin(theta_x)],
+                            [0, torch.sin(theta_x), torch.cos(theta_x)]])
 
-        M_y = torch.tensor([[torch.cos(theta_y), 0, -torch.sin(theta_y), 0],
-                            [0, 1, 0, 0],
-                            [torch.sin(theta_y), 0, torch.cos(theta_y), 0],
-                            [0, 0, 0, 1]])
+        M_y = torch.tensor([[torch.cos(theta_y), 0, -torch.sin(theta_y)],
+                            [0, 1, 0],
+                            [torch.sin(theta_y), 0, torch.cos(theta_y)]])
 
-        M_z = torch.tensor([[torch.cos(theta_z), -torch.sin(theta_z), 0, 0],
-                            [torch.sin(theta_z), torch.cos(theta_z), 0, 0],
-                            [0, 0, 1, 0],
-                            [0, 0, 0, 1]])
+        M_z = torch.tensor([[torch.cos(theta_z), -torch.sin(theta_z), 0],
+                            [torch.sin(theta_z), torch.cos(theta_z), 0],
+                            [0, 0, 1]])
+        M = M_z @ M_y @ M_x
 
-        self.transform = M_z @ M_y @ M_x @ t
+        self.transform = torch.tensor([[M[0, 0], M[0, 1], M[0, 2], t[0]],
+                                       [M[1, 0], M[1, 1], M[1, 2], t[1]],
+                                       [M[2, 0], M[2, 1], M[2, 2], t[2]],
+                                       [0, 0, 0, 1]])
         self.inverse_transform = torch.inverse(self.transform)
 
         # Sanity check (making sure that the inversion went well)
