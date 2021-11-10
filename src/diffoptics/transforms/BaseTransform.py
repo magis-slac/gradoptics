@@ -22,3 +22,8 @@ class BaseTransform(abc.ABC):
                              torch.cat((rays.directions, torch.zeros((rays.directions.shape[0], 1),
                                         device=rays.device)), dim=1).unsqueeze(-1))[:, :3, 0]
         return Rays(new_o, new_d, luminosities=rays.luminosities, meta=rays.meta, device=rays.device)
+
+    def apply_transform_(self, points: torch.tensor):
+        return torch.matmul(self.transform.type(points.dtype).to(points.device),
+                            torch.cat((points, torch.ones((points.shape[0], 1),
+                                                          device=points.device)), dim=1).unsqueeze(-1))[:, :3, 0]
