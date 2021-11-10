@@ -4,20 +4,24 @@ import numpy as np
 from diffoptics.optics.BaseOptics import BaseOptics
 from diffoptics.optics.Ray import Rays
 from diffoptics.optics.Vector import batch_vector
+from diffoptics.transforms.SimpleTransform import SimpleTransform
 
 
 class PerfectLens(BaseOptics):
 
     # Assumes that the lens is on the plane x=self.position[0]! Generalization may be required for other usages.
 
-    def __init__(self, f=0.05, na=1 / 1.4, position=torch.tensor([0., 0., 0.]), m=0.15, eps=1e-15):
+    def __init__(self, f=0.05, na=1 / 1.4, position=torch.tensor([0., 0., 0.]), m=0.15, transform=None, eps=1e-15):
         super(PerfectLens, self).__init__()
         self.f = f
         self.na = na
-        self.position = position
         self.m = m
         self.pof = f * (m + 1) / m
         self.eps = eps
+        if transform is None:
+            self.transform = SimpleTransform(0., 0., 0., position)
+        else:
+            self.transform = transform
 
     def get_ray_intersection(self, incident_rays):
         """
@@ -25,15 +29,15 @@ class PerfectLens(BaseOptics):
         :param incident_rays:
         :return:
         """
+        incident_rays = self.transform.apply_inverse_transform(incident_rays)  # World space to lens space
         origins = incident_rays.origins
         directions = incident_rays.directions
-        t = (self.position[0] - origins[:, 0]) / (directions[:, 0] + self.eps)
+        t = (- origins[:, 0]) / (directions[:, 0] + self.eps)
         y = origins[:, 1] + t * directions[:, 1]
         z = origins[:, 2] + t * directions[:, 2]
 
         # Check that the intersection is real (t>0) and within the lens' bounds
-        condition = (t > 0) & (
-                ((y - self.position[1]) ** 2 + (z - self.position[2]) ** 2) < (self.f * self.na / 2) ** 2)
+        condition = (t > 0) & ((y ** 2 + z ** 2) < (self.f * self.na / 2) ** 2)
         t[~condition] = float('nan')
         return t
 
@@ -45,15 +49,15 @@ class PerfectLens(BaseOptics):
         :param t:
         :return:
         """
+        incident_rays = self.transform.apply_inverse_transform(incident_rays)  # World space to lens space
 
-        optical_center_pos = self.position.to(incident_rays.origins.device)
         x_objects = incident_rays.origins
         d_0 = incident_rays.directions
 
         # If x_objects is on the left of the lens, put the plane of focus on the left as well
-        pof = self.position[0] + self.pof * torch.sign(x_objects[:, 0] - self.position[0])
+        pof = self.pof * torch.sign(x_objects[:, 0])
         # Put the camera on the opposite side of the lens with respect to x_objects
-        camera_pos = self.position[0] - self.f * (1 + self.m) * torch.sign(x_objects[:, 0] - self.position[0])
+        camera_pos = - self.f * (1 + self.m) * torch.sign(x_objects[:, 0])
 
         # Intersections with the lens
         x_0 = x_objects + t.unsqueeze(1) * d_0
@@ -65,13 +69,13 @@ class PerfectLens(BaseOptics):
 
         # Computes x_v, the intersections of the rays coming from x_star and passing trough the optical center with the
         # camera
-        d = optical_center_pos - x_star
+        d = - x_star
         t = (camera_pos - x_star[:, 0]) / (d[:, 0] + self.eps)
         x_v = x_star + t.unsqueeze(1) * d
-
         _d_out = batch_vector(x_v[:, 0] - x_0[:, 0], x_v[:, 1] - x_0[:, 1], x_v[:, 2] - x_0[:, 2])
-        return Rays(x_0, _d_out, luminosities=incident_rays.luminosities, meta=incident_rays.meta,
-                    device=incident_rays.device)
+
+        return self.transform.apply_transform(Rays(x_0, _d_out, luminosities=incident_rays.luminosities,
+                                                   meta=incident_rays.meta, device=incident_rays.device))
 
     def sample_points_on_lens(self, nb_points, device='cpu', eps=1e-15):
         """
@@ -79,7 +83,6 @@ class PerfectLens(BaseOptics):
         :return:
         """
         points = torch.zeros((nb_points, 3), device=device)
-        points[:, 0] = self.position[0]
         lens_radius = self.f * self.na / 2
         # Sampling uniformly on a disk.
         # See https://stats.stackexchange.com/questions/481543/generating-random-points-uniformly-on-a-disk
@@ -87,7 +90,7 @@ class PerfectLens(BaseOptics):
         theta = torch.rand(nb_points, device=device) * 2 * np.pi
         points[:, 1] = torch.sqrt(r_squared + eps) * torch.cos(theta)
         points[:, 2] = torch.sqrt(r_squared + eps) * torch.sin(theta)
-        return points
+        return self.transform.apply_transform_(points)
 
     def plot(self, ax, s=0.1, color='lightblue', resolution=100):
         # @Todo, change this to plot_surface
@@ -100,11 +103,14 @@ class PerfectLens(BaseOptics):
         x = torch.zeros(resolution * resolution)
 
         indices = (y ** 2 + z ** 2) < (self.f * self.na / 2) ** 2
-        x = x[indices] + self.position[0]
-        y = y[indices] + self.position[1]
-        z = z[indices] + self.position[2]
+        x = x[indices]
+        y = y[indices]
+        z = z[indices]
 
-        ax.scatter(x, y, z, s=s, c=color)
+        # Lens space to world space
+        xyz = self.transform.apply_transform_(torch.cat((x.reshape(-1, 1), y.reshape(-1, 1), z.reshape(-1, 1)), dim=1))
+
+        ax.scatter(xyz[:, 0], xyz[:, 1], xyz[:, 2], s=s, c=color)
 
 
 class ThickLens(BaseOptics):

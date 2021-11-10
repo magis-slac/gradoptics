@@ -6,6 +6,7 @@ from diffoptics.optics import batch_vector
 from diffoptics.optics.Vector import cross_product
 from diffoptics.optics.BoundingSphere import BoundingSphere
 from diffoptics.transforms.LookAtTransform import LookAtTransform
+from diffoptics.transforms.SimpleTransform import SimpleTransform
 
 
 def _test_ray(dim=1000):
@@ -67,13 +68,14 @@ def _test_atom_cloud(nb_atoms=int(1e4)):
 
 
 def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, position=torch.tensor([0., 0., 0.])):
+
     lens = optics.PerfectLens(f=f, m=m, position=position)
 
     # Create rays parallel to the optical axis
     z_pos = torch.linspace(-lens.f * lens.na / 2 + 1e-5, lens.f * lens.na / 2 - 1e-5, nb_rays)
     origins = batch_vector(torch.zeros(nb_rays) + (1000 if right_of_lens else -1000),
-                           torch.zeros(nb_rays) + lens.position[1],
-                           z_pos + lens.position[2])
+                           torch.zeros(nb_rays) + position[1],
+                           z_pos + position[2])
 
     directions = batch_vector(torch.ones(nb_rays) * (-1 if right_of_lens else 1),
                               torch.zeros(nb_rays),
@@ -87,7 +89,7 @@ def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, position=torch.te
     o = refracted_rays.origins
     d = refracted_rays.directions
     f_ = f if right_of_lens else -f
-    t = (o[:, 0] - lens.position[0] - f_) / d[:, 0]
+    t = (o[:, 0] - position[0] - f_) / d[:, 0]
 
     pt = torch.empty((nb_rays, 3))
     pt[:, 0] = o[:, 0] + t * d[:, 0]
@@ -119,6 +121,54 @@ def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, position=torch.te
         return 0
     else:
         return -1
+
+
+def _test_lens_transform(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, position=torch.tensor([0., 0., 0.])):
+    transform = SimpleTransform(0., 45 / 180 * np.pi, 0., position)
+
+    lens = optics.PerfectLens(f=f, m=m, position=position, transform=transform)
+
+    # Create rays parallel to the optical axis
+    z_pos = torch.linspace(-lens.f * lens.na / 2 + 1e-5, lens.f * lens.na / 2 - 1e-5, nb_rays)
+    origins = batch_vector(torch.zeros(nb_rays) + (1000 if right_of_lens else -1000),
+                           torch.zeros(nb_rays) + position[1],
+                           z_pos + position[2])
+
+    directions = batch_vector(torch.ones(nb_rays) * (-1 if right_of_lens else 1),
+                              torch.zeros(nb_rays),
+                              torch.zeros(nb_rays))
+
+    rays = optics.Rays(origins, directions)
+    t = lens.get_ray_intersection(rays)
+    refracted_rays = lens.intersect(rays, t)
+
+    # Computes the time t at which the rays will intersect with the image focal plane
+    o = refracted_rays.origins
+    d = refracted_rays.directions
+    f_ = f if right_of_lens else -f
+    t = (o[:, 0] - position[0] - f_) / d[:, 0]
+
+    pt = torch.empty((nb_rays, 3))
+    pt[:, 0] = o[:, 0] + t * d[:, 0]
+    pt[:, 1] = o[:, 1] + t * d[:, 1]
+    pt[:, 2] = o[:, 2] + t * d[:, 2]
+
+    fig = plt.figure(figsize=(12, 12))
+    ax = fig.gca(projection='3d')
+    # Plot the incoming rays
+    for i in range(o.shape[0]):
+        ax.plot([o[i, 0] - directions[i, 0] / 10, o[i, 0]],
+                [o[i, 1], o[i, 1]],
+                [o[i, 2], o[i, 2]])
+    # Plot the rays refracted by the lens
+    for i in range(o.shape[0]):
+        ax.plot([o[i, 0], pt[i, 0]],
+                [o[i, 1], pt[i, 1]],
+                [o[i, 2], pt[i, 2]])
+    plt.savefig('test_lens_transform.pdf')
+    plt.close()
+
+    return 0
 
 
 def _ray_marching_test_sensor(eps=1e-3):
@@ -459,6 +509,8 @@ def test_lens():
         assert _test_lens(f=0.05, m=0.15, right_of_lens=False, position=lens_position) == 0
         assert _test_lens(f=0.01, m=0.15, right_of_lens=False, position=lens_position) == 0
         assert _test_lens(f=0.05, m=0.1, right_of_lens=False, position=lens_position) == 0
+
+    assert _test_lens_transform(f=0.05, m=0.15, position=torch.tensor([0., 0., 0.])) == 0
 
 
 def test_ray_marching():
