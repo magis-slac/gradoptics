@@ -18,6 +18,6 @@ from diffoptics.ray_tracing.RayTracing import forward_ray_tracing
 
 from diffoptics.light_sources.LightSourceFromDistribution import LightSourceFromDistribution
 
-from diffoptics.transforms.Transforms import get_look_at_transform
+from diffoptics.transforms import BaseTransform, LookAtTransform, SimpleTransform
 
 from diffoptics.optics.PSF import PSF

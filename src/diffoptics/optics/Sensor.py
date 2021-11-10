@@ -1,8 +1,7 @@
 import torch
 
 from diffoptics.optics.BaseOptics import BaseOptics
-from diffoptics.transforms.Transforms import get_look_at_transform
-
+from diffoptics.transforms.LookAtTransform import LookAtTransform
 
 class Sensor(BaseOptics):
 
@@ -29,7 +28,7 @@ class Sensor(BaseOptics):
         self.pixel_size = pixel_size
         self.poisson_noise_mean = poisson_noise_mean
         self.quantum_efficiency = quantum_efficiency
-        self.camera_to_world, self.world_to_camera = get_look_at_transform(viewing_direction, position, up=up)
+        self.c2w = LookAtTransform(viewing_direction, position, up=up)
         self.add_psf = len(psfs.keys()) > 0
         self.psfs = psfs
         self.psf_ratio = psf_ratio
@@ -76,7 +75,7 @@ class Sensor(BaseOptics):
         hit_positions = origins + t.unsqueeze(1) * directions
 
         # World-space to camera-space
-        hit_positions = torch.matmul(self.world_to_camera.type(hit_positions.dtype).to(hit_positions.device),
+        hit_positions = torch.matmul(self.c2w.inverse_transform.type(hit_positions.dtype).to(hit_positions.device),
                                      torch.cat((hit_positions, torch.ones((hit_positions.shape[0], 1),
                                                                           device=hit_positions.device)), dim=1
                                                ).unsqueeze(-1))[:, :3, 0]

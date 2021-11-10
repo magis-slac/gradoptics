@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from diffoptics.optics import batch_vector
 from diffoptics.optics.Vector import cross_product
 from diffoptics.optics.BoundingSphere import BoundingSphere
-from diffoptics.transforms.Transforms import get_look_at_transform
+from diffoptics.transforms.LookAtTransform import LookAtTransform
 
 
 def _test_ray(dim=1000):
@@ -210,42 +210,42 @@ def _test_look_at_transform():
     up = torch.tensor([0., 0., 1.])
     viewing_direction = torch.tensor([1., 0., 0.])
     pos = torch.tensor([0., 0., 0.])
-    camera_to_world, world_to_camera = get_look_at_transform(viewing_direction, pos, up=up)
+    transform = LookAtTransform(viewing_direction, pos, up=up)
 
-    assert (camera_to_world == torch.tensor([[0., 0., 1., 0.],
-                                             [1., 0., 0., 0.],
-                                             [0., 1., 0., 0.],
-                                             [0., 0., 0., 1.]])).all()
+    assert (transform.transform == torch.tensor([[0., 0., 1., 0.],
+                                                 [1., 0., 0., 0.],
+                                                 [0., 1., 0., 0.],
+                                                 [0., 0., 0., 1.]])).all()
 
     up = torch.tensor([0., 0., 1.])
     viewing_direction = torch.tensor([-1., 0., 0.])
     pos = torch.tensor([0., 0., 0.])
-    camera_to_world, world_to_camera = get_look_at_transform(viewing_direction, pos, up)
+    transform = LookAtTransform(viewing_direction, pos, up)
 
-    assert (camera_to_world == (torch.tensor([[0., 0., -1., 0.],
-                                              [-1., 0., 0., 0.],
-                                              [0., 1., 0., 0.],
-                                              [0., 0., 0., 1.]]))).all()
+    assert (transform.transform == (torch.tensor([[0., 0., -1., 0.],
+                                                  [-1., 0., 0., 0.],
+                                                  [0., 1., 0., 0.],
+                                                  [0., 0., 0., 1.]]))).all()
 
     up = torch.tensor([1., 0., 0.])
     viewing_direction = torch.tensor([0., 0., 1.])
     pos = torch.tensor([0., 0., 0.])
-    camera_to_world, world_to_camera = get_look_at_transform(viewing_direction, pos, up)
+    transform = LookAtTransform(viewing_direction, pos, up)
 
-    assert (camera_to_world == (torch.tensor([[0., 1., 0., 0.],
-                                              [-1., 0., 0., 0.],
-                                              [0., -0., 1., 0.],
-                                              [0., 0., 0., 1.]]))).all()
+    assert (transform.transform == (torch.tensor([[0., 1., 0., 0.],
+                                                  [-1., 0., 0., 0.],
+                                                  [0., -0., 1., 0.],
+                                                  [0., 0., 0., 1.]]))).all()
 
     up = torch.tensor([-1., 0., 0.])
     viewing_direction = torch.tensor([0., 0., 1.])
     pos = torch.tensor([0., 0., 0.])
-    camera_to_world, world_to_camera = get_look_at_transform(viewing_direction, pos, up)
+    transform = LookAtTransform(viewing_direction, pos, up)
 
-    assert (camera_to_world == (torch.tensor([[0., -1., 0., 0.],
-                                              [1., 0., 0., 0.],
-                                              [-0., 0., 1., 0.],
-                                              [0., 0., 0., 1.]]))).all()
+    assert (transform.transform == (torch.tensor([[0., -1., 0., 0.],
+                                                  [1., 0., 0., 0.],
+                                                  [-0., 0., 1., 0.],
+                                                  [0., 0., 0., 1.]]))).all()
     return 0
 
 
