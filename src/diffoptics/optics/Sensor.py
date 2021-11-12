@@ -1,7 +1,8 @@
 import torch
+import warnings
 
 from diffoptics.optics.BaseOptics import BaseOptics
-from diffoptics.transforms.Transforms import get_look_at_transform
+from diffoptics.transforms.LookAtTransform import LookAtTransform
 
 
 class Sensor(BaseOptics):
@@ -29,7 +30,9 @@ class Sensor(BaseOptics):
         self.pixel_size = pixel_size
         self.poisson_noise_mean = poisson_noise_mean
         self.quantum_efficiency = quantum_efficiency
-        self.camera_to_world, self.world_to_camera = get_look_at_transform(viewing_direction, position, up=up)
+        self.c2w = LookAtTransform(viewing_direction, position, up=up)
+        self.viewing_direction = viewing_direction
+        self.position = position
         self.add_psf = len(psfs.keys()) > 0
         self.psfs = psfs
         self.psf_ratio = psf_ratio
@@ -76,7 +79,7 @@ class Sensor(BaseOptics):
         hit_positions = origins + t.unsqueeze(1) * directions
 
         # World-space to camera-space
-        hit_positions = torch.matmul(self.world_to_camera.type(hit_positions.dtype).to(hit_positions.device),
+        hit_positions = torch.matmul(self.c2w.inverse_transform.type(hit_positions.dtype).to(hit_positions.device),
                                      torch.cat((hit_positions, torch.ones((hit_positions.shape[0], 1),
                                                                           device=hit_positions.device)), dim=1
                                                ).unsqueeze(-1))[:, :3, 0]
@@ -121,7 +124,7 @@ class Sensor(BaseOptics):
 
         # Only keep the rays that make it to the sensor
         mask = (hit_positions[:, 0] < (self.resolution[1] * self.psf_ratio)) & (
-                    hit_positions[:, 1] < (self.resolution[0] * self.psf_ratio)) & \
+                hit_positions[:, 1] < (self.resolution[0] * self.psf_ratio)) & \
                (hit_positions[:, 0] >= 0) & (hit_positions[:, 1] >= 0)
         hit_positions = hit_positions[mask]
         del mask
@@ -187,8 +190,19 @@ class Sensor(BaseOptics):
                          self.resolution[1] * self.pixel_size[1] / 2 + self.position[2],
                          res)
         y, z = torch.meshgrid(y, z)
-        x = torch.zeros(y.shape[0] * y.shape[1]) + self.position[0]
-        ax.scatter(x, y.reshape(-1), z.reshape(-1), s=s, c=color)
+        y = y.reshape(-1)
+        z = z.reshape(-1)
+
+        # The equation of a plane containing the point (xm, ym, zm) with normal vector <A, B, C>
+        # is given by A(x-xm) + B(y-ym) + C(z-zm) = 0
+        a = self.viewing_direction[0]
+        b = self.viewing_direction[1]
+        c = self.viewing_direction[2]
+        d = - self.viewing_direction[0] * self.position[0] - self.viewing_direction[1] * self.position[1] - \
+            self.viewing_direction[2] * self.position[2]
+
+        x = (-d - c * z - b * y) / a
+        ax.scatter(x, y, z, s=s, c=color)
 
     def plot_image(self, ax, img_height=750, cmap="Blues"):
         # @Todo
@@ -199,6 +213,8 @@ class Sensor(BaseOptics):
         Useful for backward ray tracing
         :return:
         """
+        warnings.warn("Function not stable yet. Requires to be adapted with respect to transform.")
+
         points = torch.zeros((nb_points, 3), device=device)
         points[:, 0] = self.position[0]
         points[:, 1] = torch.rand(nb_points, device=device) * (self.pixel_size[1] * self.resolution[1]) - (
