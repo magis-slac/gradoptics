@@ -34,7 +34,7 @@ class Window(BaseOptics):
         y = origins[:, 1] + t * directions[:, 1]
         z = origins[:, 2] + t * directions[:, 2]
         # Check that the intersection is real (t>0) and within the windows' aperture
-        condition = (t > 0) & ((y ** 2 + z ** 2) < (self.diameter / 2) ** 2)
+        condition = (t > 1e-3) & ((y ** 2 + z ** 2) < (self.diameter / 2) ** 2)
         t[~condition] = float('inf')
         return t
 
@@ -51,36 +51,11 @@ class Window(BaseOptics):
         y = origins[:, 1] + t * directions[:, 1]
         z = origins[:, 2] + t * directions[:, 2]
         # Check that the intersection is real (t>0) and within the windows' aperture
-        condition = (t > 0) & ((y ** 2 + z ** 2) < (self.diameter / 2) ** 2)
+        condition = (t > 1e-3) & ((y ** 2 + z ** 2) < (self.diameter / 2) ** 2)
         t[~condition] = float('inf')
         return t
 
-    @torch.no_grad()
-    def get_ray_intersection(self, incident_rays):
-        """
-        Computes the times t at which the incident rays will intersect the window
-        :param incident_rays:
-        :return:
-        """
-        t_left = self._get_ray_intersection_left_interface(incident_rays)
-        t_right = self._get_ray_intersection_right_interface(incident_rays)
-        # Keep the smallest t
-        t = torch.empty(t_left.shape, device=t_left.device)
-        condition = t_right < t_left
-        t[condition] = t_right[condition]
-        t[~condition] = t_left[~condition]
-        t[torch.isinf(t)] = float('nan')
-        return t
-
-    def intersect(self, incident_rays, t):
-        """
-        Returns the ray refracted by the window
-        @Todo
-        Note: modifies incident_rays
-        :param incident_rays:
-        :param t:
-        :return:
-        """
+    def _get_rays_inside_window(self, incident_rays, t):
 
         origins = incident_rays.origins
         directions = incident_rays.directions
@@ -111,15 +86,64 @@ class Window(BaseOptics):
         theta_2 = torch.arccos(direction_refracted_rays[:, 0] * window_normal[:, 0] +
                                direction_refracted_rays[:, 1] * window_normal[:, 1] +
                                direction_refracted_rays[:, 2] * window_normal[:, 2])
-        assert ((torch.sin(theta_1) * self.n_ext - torch.sin(
-            theta_2) * self.n_glass).abs().sum() / theta_1.shape[0]) < 1e-5
-        ray_in_glass = Rays(origin_refracted_rays,
-                            direction_refracted_rays,
-                            luminosities=incident_rays.luminosities,
-                            device=incident_rays.device)
+
+        if theta_1.shape[0] > 0:
+            assert ((torch.sin(theta_1) * self.n_ext - torch.sin(theta_2) * self.n_glass).abs().mean()) < 1e-5
+        return Rays(origin_refracted_rays, direction_refracted_rays, luminosities=incident_rays.luminosities,
+                    device=incident_rays.device), window_normal
+
+    def _get_t_min(self, incident_rays):
+        """
+        Computes the times t at which the incident rays will intersect the window
+        :param incident_rays:
+        :return:
+        """
+        t_left = self._get_ray_intersection_left_interface(incident_rays)
+        t_right = self._get_ray_intersection_right_interface(incident_rays)
+        # Keep the smallest t
+        t = torch.empty(t_left.shape, device=t_left.device)
+        condition = t_right < t_left
+        t[condition] = t_right[condition]
+        t[~condition] = t_left[~condition]
+        t[torch.isinf(t)] = float('nan')
+        return t
+
+    @torch.no_grad()
+    def get_ray_intersection(self, incident_rays):
+        """
+        Computes the times t at which the incident rays will intersect the window
+        :param check_first_intersection:
+        :param incident_rays:
+        :return:
+        """
+        # Time t at which the rays will intersect the first interface
+        t1 = self._get_t_min(incident_rays)
+
+        # Computation of the rays that will not make it to the second interface
+        mask = ~torch.isnan(t1)
+        if mask.sum() == 0:
+            return t1
+        ray_in_glass, window_normal = self._get_rays_inside_window(incident_rays[mask], t1[mask])
+        # Interaction with the second interface
+        t2 = self._get_t_min(ray_in_glass)
+        nan_mask = torch.isnan(t2)
+        t2[~nan_mask] = t1[mask][~nan_mask]  # t2 should only override t1 where it is nan (rays that are lost)
+        t1[mask] = t2
+        return t1
+
+    def intersect(self, incident_rays, t):
+        """
+        Returns the ray refracted by the window
+        @Todo
+        Note: modifies incident_rays
+        :param incident_rays:
+        :param t:
+        :return:
+        """
+        ray_in_glass, window_normal = self._get_rays_inside_window(incident_rays, t)
 
         # Interaction with the second interface
-        t = self.get_ray_intersection(ray_in_glass)
+        t = self._get_t_min(ray_in_glass)
         ray_in_glass = ray_in_glass[~torch.isnan(t)]
         incident_rays.origins = incident_rays.origins[~torch.isnan(t)]
         incident_rays.directions = incident_rays.directions[~torch.isnan(t)]
@@ -145,8 +169,8 @@ class Window(BaseOptics):
         theta_2 = torch.arccos(direction_refracted_rays[:, 0] * window_normal[:, 0] +
                                direction_refracted_rays[:, 1] * window_normal[:, 1] +
                                direction_refracted_rays[:, 2] * window_normal[:, 2])
-        assert ((torch.sin(theta_1) * self.n_glass - torch.sin(theta_2) * self.n_ext).abs().sum() / theta_1.shape[
-            0]) < 1e-5
+        if theta_1.shape[0] > 0:
+            assert ((torch.sin(theta_1) * self.n_glass - torch.sin(theta_2) * self.n_ext).abs().mean()) < 1e-5
         return Rays(origin_refracted_rays, direction_refracted_rays, luminosities=incident_rays.luminosities,
                     meta=incident_rays.meta, device=incident_rays.device)
 
