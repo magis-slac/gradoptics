@@ -28,7 +28,7 @@ class LightSourceFromDistribution(BaseLightSource):
         del polar_angle
         torch.cuda.empty_cache()
 
-        return Rays(self.distribution.sample(nb_rays, device=device), emitted_direction, device=device)
+        return Rays(self.distribution.sample(nb_rays, device=device).type(emitted_direction.dtype), emitted_direction, device=device)
 
     def plot(self, ax, **kwargs):
         return self.distribution.plot(ax, **kwargs)
