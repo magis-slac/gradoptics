@@ -1,10 +1,12 @@
 from diffoptics.optics import BaseOptics
-
+from diffoptics.optics.Sensor import Sensor
+from diffoptics.light_sources.BaseLightSource import BaseLightSource
 
 class Scene:
 
-    def __init__(self, sensor):
+    def __init__(self, sensor: Sensor, light_source: BaseLightSource):
         self.sensor = sensor
+        self.light_source = light_source
         self.objects = []
 
     def add_object(self, obj : BaseOptics, is_lens : bool):
