@@ -1,4 +1,6 @@
 from diffoptics.optics.BaseOptics import BaseOptics
+from diffoptics.optics.Ray import Rays
+import torch
 
 
 class Camera(BaseOptics):
@@ -35,6 +37,8 @@ class Camera(BaseOptics):
             rays = obj.intersect(rays, t)
         t = self.sensor.get_ray_intersection(rays)
         self.sensor.intersect(rays, t, do_pixelize=True, quantum_efficiency=True)
+        return Rays(torch.zeros((0, 3), device=incident_rays.device), torch.zeros((0, 3), device=incident_rays.device),
+                    luminosities=None, meta={}, device=incident_rays.device)
 
     def plot(self, ax):
         self.lens.plot(ax)

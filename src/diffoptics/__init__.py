@@ -10,6 +10,7 @@ from diffoptics.optics.Mirror import Mirror
 from diffoptics.optics.Ray import Ray, Rays, empty_like, cat
 from diffoptics.optics.Sensor import Sensor
 from diffoptics.optics.Window import Window
+from diffoptics.optics.Camera import Camera
 from diffoptics.optics.BoundingSphere import BoundingSphere
 
 from diffoptics.ray_tracing.Scene import Scene

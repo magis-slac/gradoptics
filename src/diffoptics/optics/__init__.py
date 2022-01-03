@@ -6,3 +6,4 @@ from .Ray import Ray, Rays
 from .Sensor import Sensor
 from .Vector import vector, batch_vector, normalize_batch_vector, normalize_vector
 from .Window import Window
+from .Camera import Camera
