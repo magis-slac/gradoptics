@@ -72,7 +72,7 @@ class Window(BaseOptics):
         # See https://physics.stackexchange.com/questions/435512/snells-law-in-vector-form
         tmp = 1 - mu ** 2 * (1 - (dot_product(window_normal, directions)) ** 2)
         c = dot_product(window_normal, directions)
-        direction_refracted_rays = torch.empty((tmp.shape[0], 3), device=origins.device)
+        direction_refracted_rays = torch.empty((tmp.shape[0], 3), device=origins.device, dtype=origins.dtype)
         direction_refracted_rays[:, 0] = torch.sqrt(tmp) * window_normal[:, 0] + mu * (
                 directions[:, 0] - c * window_normal[:, 0])
         direction_refracted_rays[:, 1] = torch.sqrt(tmp) * window_normal[:, 1] + mu * (
