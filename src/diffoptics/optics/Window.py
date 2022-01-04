@@ -62,7 +62,7 @@ class Window(BaseOptics):
         origin_refracted_rays = origins + t.unsqueeze(1) * directions
 
         # Interaction with the first interface
-        window_normal = torch.zeros(directions.shape, device=origins.device)
+        window_normal = torch.zeros(directions.shape, device=directions.device, dtype=directions.dtype)
         window_normal[:, 0] = 1
         # Check for each ray if it is coming from the left
         condition = directions[:, 0] > 0
@@ -101,7 +101,7 @@ class Window(BaseOptics):
         t_left = self._get_ray_intersection_left_interface(incident_rays)
         t_right = self._get_ray_intersection_right_interface(incident_rays)
         # Keep the smallest t
-        t = torch.empty(t_left.shape, device=t_left.device)
+        t = torch.empty(t_left.shape, device=t_left.device, dtype=t_left.dtype)
         condition = t_right < t_left
         t[condition] = t_right[condition]
         t[~condition] = t_left[~condition]
