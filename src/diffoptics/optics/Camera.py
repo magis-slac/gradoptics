@@ -29,7 +29,7 @@ class Camera(BaseOptics):
         Propagates the incident rays to the sensor.
         :param incident_rays:
         :param t:
-        :return: empty rays
+        :return: nan rays
         """
         rays = self.lens.intersect(incident_rays, t)
         for obj in self.intermediate_objects:
@@ -37,11 +37,16 @@ class Camera(BaseOptics):
             rays = obj.intersect(rays, t)
         t = self.sensor.get_ray_intersection(rays)
         self.sensor.intersect(rays, t, do_pixelize=True, quantum_efficiency=True)
-        return Rays(torch.zeros((0, 3), device=incident_rays.device, dtype=incident_rays.origins.dtype) + float('nan'),
-                    torch.zeros((0, 3), device=incident_rays.device, dtype=incident_rays.directions.dtype) + float('nan'),
-                    luminosities=(torch.zeros((0, 3), device=incident_rays.device, dtype=incident_rays.directions.dtype)
-                                  + float('nan')) if (incident_rays.luminosities is not None) else None,
-                    meta={}, device=incident_rays.device)
+
+        # Return nan rays
+        origins = torch.zeros_like(incident_rays.origins) + float('nan')
+        directions = torch.zeros_like(incident_rays.directions) + float('nan')
+        luminosities = (torch.zeros_like(incident_rays.luminosities) + float(
+            'nan')) if incident_rays.luminosities is not None else None
+        meta = {}
+        for key in incident_rays.meta.keys():
+            meta[key] = torch.zeros_like(incident_rays.meta[key]) + float('nan')
+        return Rays(origins, directions, luminosities=luminosities, device=incident_rays.device, meta=meta)
 
     def plot(self, ax):
         self.lens.plot(ax)
