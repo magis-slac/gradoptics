@@ -89,9 +89,19 @@ class BoundingBox(BaseOptics):
         # Return first intersection and corresponding (rotated) origin/direction 
         return all_ts.min(dim=0).values, origins, directions
     
-    def intersect(self):
-        pass
-    
+    def intersect(self, incident_rays, t):
+        origins = incident_rays.origins
+        directions = incident_rays.directions
+
+        # Update the origin of the incoming rays
+        origins = origins + t.unsqueeze(1) * directions
+
+        return Rays(origins,
+                    directions,
+                    luminosities=incident_rays.luminosities,
+                    device=incident_rays.device,
+                    meta=incident_rays.meta)
+ 
     def plot(self, ax, color='grey', alpha=0.4):
         phi = np.arange(1,10,2)*np.pi/4
         Phi, Theta = np.meshgrid(phi, phi)
