@@ -182,27 +182,24 @@ class Sensor(BaseOptics):
         :param resolution_:
         :return:
         """
+        # @Todo, change this to plot_surface
         res = self.resolution[0] * self.pixel_size[0] / resolution_
-        y = torch.arange(-self.resolution[0] * self.pixel_size[0] / 2 + self.position[1],
-                         self.resolution[0] * self.pixel_size[0] / 2 + self.position[1],
+        x = torch.arange(-self.resolution[0] * self.pixel_size[0] / 2,
+                         self.resolution[0] * self.pixel_size[0] / 2,
                          res)
-        z = torch.arange(-self.resolution[1] * self.pixel_size[1] / 2 + self.position[2],
-                         self.resolution[1] * self.pixel_size[1] / 2 + self.position[2],
+        y = torch.arange(-self.resolution[1] * self.pixel_size[1] / 2,
+                         self.resolution[1] * self.pixel_size[1] / 2,
                          res)
-        y, z = torch.meshgrid(y, z)
+
+        x, y = torch.meshgrid(x, y)
+
+        x = x.reshape(-1)
         y = y.reshape(-1)
-        z = z.reshape(-1)
+        z = torch.zeros(x.shape)
 
-        # The equation of a plane containing the point (xm, ym, zm) with normal vector <A, B, C>
-        # is given by A(x-xm) + B(y-ym) + C(z-zm) = 0
-        a = self.viewing_direction[0]
-        b = self.viewing_direction[1]
-        c = self.viewing_direction[2]
-        d = - self.viewing_direction[0] * self.position[0] - self.viewing_direction[1] * self.position[1] - \
-            self.viewing_direction[2] * self.position[2]
-
-        x = (-d - c * z - b * y) / a
-        ax.scatter(x, y, z, s=s, c=color)
+        # Lens space to world space
+        xyz = self.c2w.apply_transform_(torch.cat((x.reshape(-1, 1), y.reshape(-1, 1), z.reshape(-1, 1)), dim=1))
+        ax.scatter(xyz[:, 0], xyz[:, 1], xyz[:, 2], s=s, c=color)
 
     def plot_image(self, ax, img_height=750, cmap="Blues"):
         # @Todo
