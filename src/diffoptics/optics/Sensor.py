@@ -53,14 +53,20 @@ class Sensor(BaseOptics):
         :param incident_rays:
         :return:
         """
+
+        # World space to camera space
+        incident_rays = self.c2w.apply_inverse_transform(incident_rays)
+
         origins = incident_rays.origins
         directions = incident_rays.directions
-        t = (self.position[0] - origins[:, 0]) / directions[:, 0]
+        # The optical axis is the z axis in the camera space
+        # Find the intersection with the sensor plane
+        t = - origins[:, 2] / directions[:, 2]
+        x = origins[:, 0] + t * directions[:, 0]
         y = origins[:, 1] + t * directions[:, 1]
-        z = origins[:, 2] + t * directions[:, 2]
 
-        condition = (t > 0) & (torch.abs(y - self.position[1]) <= self.resolution[0] / 2 * self.pixel_size[0]) & \
-                    (torch.abs(z - self.position[2]) <= self.resolution[1] / 2 * self.pixel_size[1])
+        condition = (t > 0) & (torch.abs(x) <= self.resolution[0] / 2 * self.pixel_size[0]) & \
+                    (torch.abs(y) <= self.resolution[1] / 2 * self.pixel_size[1])
         t[~condition] = float('nan')
         return t
 
@@ -74,15 +80,12 @@ class Sensor(BaseOptics):
         :return:
         """
 
+        # World space to camera space
+        incident_rays = self.c2w.apply_inverse_transform(incident_rays)
+
         origins = incident_rays.origins
         directions = incident_rays.directions
         hit_positions = origins + t.unsqueeze(1) * directions
-
-        # World-space to camera-space
-        hit_positions = torch.matmul(self.c2w.inverse_transform.type(hit_positions.dtype).to(hit_positions.device),
-                                     torch.cat((hit_positions, torch.ones((hit_positions.shape[0], 1),
-                                                                          device=hit_positions.device)), dim=1
-                                               ).unsqueeze(-1))[:, :3, 0]
 
         # Camera space (origin in the center of the image, horizontal x axis pointing to the right and vertical y axis
         # pointing upwards) to python convention (origin in the upper left, vertical x axis and horizontal y axis)
