@@ -27,3 +27,8 @@ class BaseTransform(abc.ABC):
         return torch.matmul(self.transform.type(points.dtype).to(points.device),
                             torch.cat((points, torch.ones((points.shape[0], 1),
                                                           device=points.device)), dim=1).unsqueeze(-1))[:, :3, 0]
+
+    def apply_inverse_transform_(self, points: torch.tensor):
+        return torch.matmul(self.inverse_transform.type(points.dtype).to(points.device),
+                            torch.cat((points, torch.ones((points.shape[0], 1),
+                                                          device=points.device)), dim=1).unsqueeze(-1))[:, :3, 0]
