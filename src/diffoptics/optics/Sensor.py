@@ -86,7 +86,8 @@ class Sensor(BaseOptics):
         origins = incident_rays.origins
         directions = incident_rays.directions
         hit_positions = origins + t.unsqueeze(1) * directions
-        assert torch.allclose(hit_positions[:, 2], torch.zeros(1, device=hit_positions.device), atol=1e-06)
+        assert torch.allclose(hit_positions[:, 2], torch.zeros(1, device=hit_positions.device,
+                                                               dtype=hit_positions.dtype), atol=1e-06)
 
         # Camera space (origin in the center of the image, horizontal x axis pointing to the right and vertical y axis
         # pointing upwards) to python convention (origin in the upper left, vertical x axis and horizontal y axis)
