@@ -1,5 +1,6 @@
 import abc  # Abstract Base Classes
 
+
 class BaseDistribution(abc.ABC):
 
     @abc.abstractmethod
@@ -7,7 +8,7 @@ class BaseDistribution(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def sample(self, nb_points):
+    def sample(self, nb_points, device='cpu'):
         raise NotImplemented
 
     @abc.abstractmethod

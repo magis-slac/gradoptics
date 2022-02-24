@@ -1,7 +1,9 @@
 import torch
+import diffoptics as optics
 
 
-def rejection_sampling(pdf, nb_point, proposal_distribution, m=None, batch_size=int(1e6), eps=1e-15, device='cpu'):
+def rejection_sampling(pdf, nb_point: int, proposal_distribution: optics.BaseDistribution, m=None, batch_size=int(1e6),
+                       eps=1e-15, device='cpu'):
     accepted_data = torch.tensor([], device=device)
 
     while accepted_data.shape[0] < nb_point:
