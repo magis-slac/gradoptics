@@ -30,7 +30,7 @@ class Mirror(BaseOptics):
         d = - self.normal[0] * self.x_mirror - self.normal[1] * self.y_mirror - self.normal[2] * self.z_mirror
         return a, b, c, d
 
-    def get_ray_intersection(self, incident_rays, eps=1e-15):
+    def get_ray_intersection(self, incident_rays, eps=1e-15, smooth=False, width_t=100, width_rad=1e8):
         """
         Computes the time t at which the incident ray will intersect the mirror
         :param eps:
@@ -50,12 +50,19 @@ class Mirror(BaseOptics):
 
         # Make sure that the ray hits the mirror
         intersection_points = origins + t.unsqueeze(1) * directions
-        condition = (t > 0) & (
-                ((intersection_points[:, 0] - self.x_mirror) ** 2 + (intersection_points[:, 1] - self.y_mirror) ** 2 + (
+        if smooth:
+            condition_t = torch.sigmoid(width_t*t)
+            condition_rad =  1-torch.sigmoid(width_rad*((intersection_points[:, 0] - self.x_mirror) ** 2 + (intersection_points[:, 1] - self.y_mirror) ** 2 + (
+                            intersection_points[:, 2] - self.z_mirror) ** 2 - self.mirror_radii ** 2))
+            condition = condition_rad*condition_t
+            return t*condition
+        else:
+            condition = (t > 0) & (
+                    ((intersection_points[:, 0] - self.x_mirror) ** 2 + (intersection_points[:, 1] - self.y_mirror) ** 2 + (
                         intersection_points[:, 2] - self.z_mirror) ** 2) < self.mirror_radii ** 2)
-        # Return nan for rays that have no intersection
-        t[~condition] = float('nan')
-        return t
+            # Return nan for rays that have no intersection
+            t[~condition] = float('nan')
+            return t
 
     def intersect(self, incident_rays, t):
         """
