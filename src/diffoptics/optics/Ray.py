@@ -60,6 +60,9 @@ class Rays:
                     luminosities=self.luminosities[condition] if self.luminosities is not None else None,
                     meta=meta, device=self.device)
 
+    def __call__(self, t):
+        return self.origins + t.unsqueeze(1) * self.directions
+
     def update_at(self):
         # @Todo & o & d private!
         raise NotImplementedError("Not implemented yet.")
