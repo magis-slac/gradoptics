@@ -1,5 +1,5 @@
-diffoptics.optics.Ray module
-============================
+diffoptics.optics.Ray
+=====================
 
 .. automodule:: diffoptics.optics.Ray
    :members:

@@ -1,5 +1,5 @@
-diffoptics.distributions.AtomCloud module
-=========================================
+diffoptics.distributions.AtomCloud
+==================================
 
 .. automodule:: diffoptics.distributions.AtomCloud
    :members:

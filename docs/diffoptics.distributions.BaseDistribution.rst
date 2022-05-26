@@ -1,5 +1,5 @@
-diffoptics.distributions.BaseDistribution module
-================================================
+diffoptics.distributions.BaseDistribution
+=========================================
 
 .. automodule:: diffoptics.distributions.BaseDistribution
    :members:

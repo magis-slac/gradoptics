@@ -1,5 +1,5 @@
-diffoptics.light\_sources.BaseLightSource module
-================================================
+diffoptics.light\_sources.BaseLightSource
+=========================================
 
 .. automodule:: diffoptics.light_sources.BaseLightSource
    :members:

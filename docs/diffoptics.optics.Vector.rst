@@ -1,5 +1,5 @@
-diffoptics.optics.Vector module
-===============================
+diffoptics.optics.Vector
+========================
 
 .. automodule:: diffoptics.optics.Vector
    :members:

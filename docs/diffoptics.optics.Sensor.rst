@@ -1,5 +1,5 @@
-diffoptics.optics.Sensor module
-===============================
+diffoptics.optics.Sensor
+========================
 
 .. automodule:: diffoptics.optics.Sensor
    :members:

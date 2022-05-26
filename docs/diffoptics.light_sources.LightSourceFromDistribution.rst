@@ -1,5 +1,5 @@
-diffoptics.light\_sources.LightSourceFromDistribution module
-============================================================
+diffoptics.light\_sources.LightSourceFromDistribution
+=====================================================
 
 .. automodule:: diffoptics.light_sources.LightSourceFromDistribution
    :members:

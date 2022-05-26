@@ -1,5 +1,5 @@
-diffoptics.ray\_tracing.Scene module
-====================================
+diffoptics.ray\_tracing.Scene
+=============================
 
 .. automodule:: diffoptics.ray_tracing.Scene
    :members:

@@ -1,5 +1,5 @@
-diffoptics.optics.Mirror module
-===============================
+diffoptics.optics.Mirror
+========================
 
 .. automodule:: diffoptics.optics.Mirror
    :members:

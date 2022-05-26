@@ -1,5 +1,5 @@
-diffoptics.optics.Window module
-===============================
+diffoptics.optics.Window
+========================
 
 .. automodule:: diffoptics.optics.Window
    :members:

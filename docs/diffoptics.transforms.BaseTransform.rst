@@ -1,5 +1,5 @@
-diffoptics.transforms.BaseTransform module
-==========================================
+diffoptics.transforms.BaseTransform
+===================================
 
 .. automodule:: diffoptics.transforms.BaseTransform
    :members:

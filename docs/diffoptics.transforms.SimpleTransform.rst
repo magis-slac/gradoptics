@@ -1,5 +1,5 @@
-diffoptics.transforms.SimpleTransform module
-============================================
+diffoptics.transforms.SimpleTransform
+=====================================
 
 .. automodule:: diffoptics.transforms.SimpleTransform
    :members:

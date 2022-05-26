@@ -1,5 +1,5 @@
-diffoptics.optics.BaseOptics module
-===================================
+diffoptics.optics.BaseOptics
+============================
 
 .. automodule:: diffoptics.optics.BaseOptics
    :members:

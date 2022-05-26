@@ -1,5 +1,5 @@
-diffoptics.optics.Lens module
-=============================
+diffoptics.optics.Lens
+======================
 
 .. automodule:: diffoptics.optics.Lens
    :members:

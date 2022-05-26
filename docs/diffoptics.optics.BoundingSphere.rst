@@ -1,5 +1,5 @@
-diffoptics.optics.BoundingSphere module
-=======================================
+diffoptics.optics.BoundingSphere
+================================
 
 .. automodule:: diffoptics.optics.BoundingSphere
    :members:

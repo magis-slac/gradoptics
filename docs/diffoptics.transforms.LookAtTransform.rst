@@ -1,5 +1,5 @@
-diffoptics.transforms.LookAtTransform module
-============================================
+diffoptics.transforms.LookAtTransform
+=====================================
 
 .. automodule:: diffoptics.transforms.LookAtTransform
    :members:

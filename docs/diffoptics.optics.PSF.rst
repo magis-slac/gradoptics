@@ -1,5 +1,5 @@
-diffoptics.optics.PSF module
-============================
+diffoptics.optics.PSF
+=====================
 
 .. automodule:: diffoptics.optics.PSF
    :members:

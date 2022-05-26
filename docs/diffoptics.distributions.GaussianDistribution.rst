@@ -1,5 +1,5 @@
-diffoptics.distributions.GaussianDistribution module
-====================================================
+diffoptics.distributions.GaussianDistribution
+=============================================
 
 .. automodule:: diffoptics.distributions.GaussianDistribution
    :members:

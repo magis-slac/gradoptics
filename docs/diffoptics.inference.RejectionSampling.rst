@@ -1,5 +1,5 @@
-diffoptics.inference.RejectionSampling module
-=============================================
+diffoptics.inference.RejectionSampling
+======================================
 
 .. automodule:: diffoptics.inference.RejectionSampling
    :members:

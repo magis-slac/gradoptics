@@ -1,5 +1,5 @@
-diffoptics.optics.Camera module
-===============================
+diffoptics.optics.Camera
+========================
 
 .. automodule:: diffoptics.optics.Camera
    :members:
