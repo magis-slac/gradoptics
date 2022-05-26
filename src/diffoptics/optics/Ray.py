@@ -1,13 +1,23 @@
 import torch
-import warnings
 
-from diffoptics.optics.BaseOptics import BaseOptics
 from diffoptics.optics.Vector import normalize_vector, normalize_batch_vector
 
 
-class Ray(BaseOptics):
+class Ray:
+    """
+    Models a ray characterized by an origin and a direction. The ray carries some luminosity and meta data which can
+    be used for storing information, for example during surface intersections.
+    """
 
     def __init__(self, origin, direction, luminosity=torch.tensor([1.]), meta={}, device='cpu'):
+        """
+        :param origin:
+        :param direction:
+        :param luminosity:
+        :param meta:
+        :param device:
+        """
+
         super(Ray, self).__init__()
         self.origin = origin.to(device)
         self.direction = normalize_vector(direction).to(device)
@@ -21,6 +31,10 @@ class Ray(BaseOptics):
 
 
 class Rays:
+    """
+    Models a batch of rays characterized by their origins and directions. The rays carry some luminosity and meta data
+    which can be used for storing information, for example during surface intersections.
+    """
 
     def __init__(self, origins, directions, luminosities=None, meta={}, device='cpu'):
         self.origins = origins.to(device)
@@ -42,25 +56,9 @@ class Rays:
         for key in self.meta.keys():
             meta[key] = self.meta[key][condition]
 
-        return Rays(self.origins[condition],
-                    self.directions[condition],
+        return Rays(self.origins[condition], self.directions[condition],
                     luminosities=self.luminosities[condition] if self.luminosities is not None else None,
-                    meta=meta,
-                    device=self.device)
-
-    def get_at(self, condition):
-        warnings.warn("get_at is deprecated, and will be removed in a future version of diffoptics. Please use "
-                      "__getitem__ instead", DeprecationWarning)
-
-        meta = {}
-        for key in self.meta.keys():
-            meta[key] = self.meta[key][condition]
-
-        return Rays(self.origins[condition],
-                    self.directions[condition],
-                    luminosities=self.luminosities[condition] if self.luminosities is not None else None,
-                    meta=meta,
-                    device=self.device)
+                    meta=meta, device=self.device)
 
     def update_at(self):
         # @Todo & o & d private!
