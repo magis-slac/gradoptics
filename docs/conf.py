@@ -62,7 +62,7 @@ html_static_path = ['_static']
 autodoc_default_options = {
     'members': True,
     'member-order': 'bysource',
-    'special-members': '__init__',
+    'special-members': '__init__, __getitem__, __call__',
     'undoc-members': True,
     'exclude-members': '__weakref__'
 }
