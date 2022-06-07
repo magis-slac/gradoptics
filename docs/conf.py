@@ -37,6 +37,8 @@ nb_custom_formats = {
     ".md": ["jupytext.reads", {"fmt": "mystnb"}],
 }
 
+nb_execution_timeout = 300 # Maximum execution time for jupyter notebooks
+
 napoleon_google_docstring = False
 
 # Add any paths that contain templates here, relative to this directory.
