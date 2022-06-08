@@ -3,7 +3,8 @@ from setuptools import setup
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
-    
+
+
 setup(
   name='diffoptics',
   version='0.0.1',
@@ -12,13 +13,12 @@ setup(
   long_description_content_type="text/markdown",
   author='Michael Kagan, Maxime Vandegar',
   author_email='makagan@slac.stanford.edu, maxime.vandegar@slac.stanford.edu',
-  url="https://github.com/MaximeVandegar/differentiable-optics",
-  py_modules=["diffoptics"],
-  packages=setuptools.find_packages(),
+  url="https://github.com/magis-slac/differentiable-optics",
   classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
   package_dir={'': 'src'},
+  packages=setuptools.find_packages(where="src"),
 )
