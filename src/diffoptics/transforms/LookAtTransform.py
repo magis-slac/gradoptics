@@ -6,19 +6,22 @@ from diffoptics.transforms.BaseTransform import BaseTransform
 
 
 class LookAtTransform(BaseTransform):
+    """
+    Transform that orients an object so that it is oriented towards a given direction.
 
-    def __init__(self, viewing_direction: torch.tensor, pos: torch.tensor, up=torch.tensor([0., 0., 1.])):
+    References: Physically based rendering, section 2.7.7 The look-at transform.
+    """
+
+    def __init__(self, viewing_direction, pos, up=torch.tensor([0., 0., 1.])):
         """
-        Given a viewing direction in a world-space, returns the
-        4x4 transform matrices to move a point from camera-space to world-space and
-        from world-space to camera-space
-        References: Physically based rendering, section 2.7.7 The look-at transform
-        :param viewing_direction: viewing direction of the camera
-        :param pos: position of the camera
-        :param up: a vector that orients the camera with respect to the viewing direction.
-                   For example, if up=torch.tensor([0, 0, 1]) the top of the camera will point upwards.
-                   If up=torch.tensor([0, 0, -1]), the top of the camera will point downwards.
-        :return:
+        Given a viewing direction in world-space, computes the 4x4 transform matrix to move a point from object-space
+        to world-space and from world-space to object-space
+
+        :param viewing_direction: viewing direction of the object (:obj:`torch.tensor`)
+        :param pos: position of the object (:obj:`torch.tensor`)
+        :param up: a vector that orients the object with respect to the viewing direction (:obj:`torch.tensor`).
+                   For example, if up=torch.tensor([0, 0, 1]) the top of the object will point upwards.
+                   If up=torch.tensor([0, 0, -1]), the top of the object will point downwards.
         """
         dir_ = normalize_vector(viewing_direction)
         left = normalize_vector(cross_product(normalize_vector(up), dir_))

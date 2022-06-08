@@ -8,12 +8,21 @@ from diffoptics.optics import Rays
 from diffoptics.ray_tracing.Scene import Scene
 
 
-def trace_rays(incident_rays: Rays, scene: Scene) -> Tuple[Rays, torch.Tensor, torch.Tensor]:
+def trace_rays(incident_rays, scene):
     """
-    @Todo
-    :param incident_rays:
-    :param scene:
-    :return:
+    Performs one iteration of ray tracing, i.e. finds the closest object in the ``scene`` each ray will intersect, and
+    computes the reflected or refracted rays. Rays with ``nan`` components are returned for rays that do not have
+    intersections
+
+    :param incident_rays: Batch of incident rays (:py:class:`~diffoptics.optics.Ray.Rays`)
+    :param scene: Scene in which the rays are travelling (:py:class:`~diffoptics.ray_tracing.Scene.Scene`)
+
+    :return: (:obj:`tuple`)
+
+             - Reflected or refracted rays after one iteration of ray tracing (:py:class:`~diffoptics.optics.Ray.Rays`)
+             - Times at which the rays intersect the closest object to them and ``nan`` for rays that have no
+               intersection (:obj:`torch.tensor`)
+             - Boolean tensor that indicates of the intersected objects are lenses (:obj:`torch.tensor`)
     """
     device = incident_rays.device
     t = torch.zeros(incident_rays.origins.shape[0], device=device) + float('Inf')
@@ -38,8 +47,25 @@ def trace_rays(incident_rays: Rays, scene: Scene) -> Tuple[Rays, torch.Tensor, t
     return outgoing_ray, t, is_lens
 
 
-def forward_ray_tracing(incident_rays: Rays, scene: Scene, max_iterations=2, ax=None, quantum_efficiency=True) -> \
-        Tuple[torch.Tensor, torch.Tensor]:
+def forward_ray_tracing(incident_rays, scene, max_iterations=2, ax=None, quantum_efficiency=True):
+    """
+    Performs forward ray tracing, i.e. computes the path taken by the rays ``incident_rays`` in the scene ``scene``
+    until the maximum number of bounces ``max_iterations`` is reached, or until the rays hit a sensor
+
+    :param incident_rays: Rays that should be traced in the scene (:py:class:`~diffoptics.optics.Ray.Rays`)
+    :param scene: Scene in which the rays are travelling (:py:class:`~diffoptics.ray_tracing.Scene.Scene`)
+    :param max_iterations: Maximum number of bounces in the ``scene`` (:obj:`int`)
+    :param ax: 3d axes in which the rays are plotted (if ``ax`` is not ``None``) as they traverse the scene
+               (:py:class:`mpl_toolkits.mplot3d.axes3d.Axes3D`). Default is ``None``
+    :param quantum_efficiency: A boolean that indicates if quantum efficiency should be used when the rays hit a sensor.
+                               Default is ``True``
+
+    :return: (:obj:`tuple`)
+
+             - Positions where the rays hit a sensor (in world-space) (:obj:`torch.tensor`)
+             - Luminosities carried by the rays (:obj:`torch.tensor`)
+             - Meta data stored in the rays (:obj:`dict`)
+    """
 
     rays_lens_camera = None
 
@@ -92,5 +118,5 @@ def forward_ray_tracing(incident_rays: Rays, scene: Scene, max_iterations=2, ax=
     return hit_position, luminosities, meta
 
 
-def backward_ray_tracing(incident_rays: Rays, scene: Scene):
+def backward_ray_tracing(incident_rays, scene):
     raise NotImplemented

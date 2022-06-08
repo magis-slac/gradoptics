@@ -7,8 +7,18 @@ from diffoptics.optics.Vector import batch_vector
 
 
 class Mirror(BaseOptics):
+    """
+    Models a flat mirror.
+    """
 
     def __init__(self, x_mirror, y_mirror, z_mirror, normal, mirror_radii):
+        """
+        :param x_mirror: Position of the center of the mirror along the x axis (:obj:`float`)
+        :param y_mirror: Position of the center of the mirror along the y axis (:obj:`float`)
+        :param z_mirror: Position of the center of the mirror along the z axis (:obj:`float`)
+        :param normal: Normal of the mirror (:obj:`torch.tensor`)
+        :param mirror_radii: Radii of the mirror (:obj:`float`)
+        """
         super(Mirror, self).__init__()
         self.x_mirror = x_mirror
         self.y_mirror = y_mirror
@@ -31,12 +41,6 @@ class Mirror(BaseOptics):
         return a, b, c, d
 
     def get_ray_intersection(self, incident_rays, eps=1e-15):
-        """
-        Computes the time t at which the incident ray will intersect the mirror
-        :param eps:
-        :param incident_rays:
-        :return:
-        """
 
         # Computes the intersection of the incident_ray with the mirror plane
         origins = incident_rays.origins
@@ -58,12 +62,7 @@ class Mirror(BaseOptics):
         return t
 
     def intersect(self, incident_rays, t):
-        """
-        Returns the ray reflected by the mirror
-        :param incident_rays:
-        :param t:
-        :return:
-        """
+
         origins = incident_rays.origins
         directions = incident_rays.directions
         collision_points = origins + t.unsqueeze(1) * directions

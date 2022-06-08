@@ -7,15 +7,25 @@ from diffoptics.inference.RejectionSampling import rejection_sampling
 
 
 class AtomCloud(BaseDistribution):
+    """
+    Atom cloud with a sine-wave density modulation fringe pattern
+    """
 
-    def __init__(self, n=int(1e6), f=2, position=torch.tensor([0.31, 0., 0.]), w0=0.002, h_bar=1.0546 * 1e-34,
-                 m=1.44 * 1e-25, x_a=0., y_a=0., z_a=0., t_final_bs=3., t_extra=0.1, port_bvz=.15, k_fringe=1 / 0.0003,
-                 a_quad=1e-12, phi=0.1, phi2=math.pi / 2, eps=1e-15, proposal_distribution=GaussianDistribution(
-                mean=0.0, std=0.0002)):
+    def __init__(self, n=int(1e6), f=2, position=[0.31, 0., 0.], w0=0.002, h_bar=1.0546 * 1e-34, m=1.44 * 1e-25, x_a=0.,
+                 y_a=0., z_a=0., t_final_bs=3., t_extra=0.1, port_bvz=.15, k_fringe=1 / 0.0003, a_quad=1e-12, phi=0.1,
+                 phi2=math.pi / 2, proposal_distribution=GaussianDistribution(mean=0.0, std=0.0002)):
+        """
+        :param n: Number of atoms (:obj:`int`)
+        :param position: Position of the center of the atom cloud (:obj:`list`)
+        :param phi: Phase of the sine-wave density modulation fringe pattern (:obj:`float`)
+        :param proposal_distribution: Proposal distribution used in rejection sampling for sampling from the
+                                      unnormalized cloud distribution
+                                      (:py:class:`~diffoptics.distributions.BaseDistribution.BaseDistribution`)
+        """
         super().__init__()
         self.n = n
         self.f = f
-        self.position = position
+        self.position = torch.tensor(position)
         self.w0 = w0
         self.h_bar = h_bar
         self.m = m
@@ -29,7 +39,6 @@ class AtomCloud(BaseDistribution):
         self.aQuad = a_quad
         self.phi2 = phi2
         self.phi = phi
-        self.eps = eps
 
         # Define a sampler to sample from the cloud density (using rejection sampling)
         self.density_samplers = [lambda pdf, nb_point, device: rejection_sampling(pdf, nb_point, proposal_distribution,
@@ -38,7 +47,14 @@ class AtomCloud(BaseDistribution):
 
     def marginal_cloud_density_x(self, x):
         """
-        x in meters!
+        Returns the marginal pdf function along the x axis, evaluated at ``x``
+
+        .. warning::
+           The pdf is unnormalized
+
+        :param x: Value where the pdf should be evaluated , in meters (:obj:`torch.tensor`)
+
+        :return: The marginal pdf function evaluated at ``x`` (:obj:`torch.tensor`)
         """
         x = x.clone().type(torch.float64)
         x *= 10  # x to dm
@@ -52,7 +68,14 @@ class AtomCloud(BaseDistribution):
 
     def marginal_cloud_density_y(self, y):
         """
-        y in meters!
+        Returns the marginal pdf function along the y axis, evaluated at ``y``
+
+        .. warning::
+           The pdf is unnormalized
+
+        :param y: Value where the pdf should be evaluated , in meters (:obj:`torch.tensor`)
+
+        :return: The marginal pdf function evaluated at ``y`` (:obj:`torch.tensor`)
         """
 
         y = y.clone().type(torch.float64)
@@ -69,7 +92,14 @@ class AtomCloud(BaseDistribution):
 
     def marginal_cloud_density_z(self, z):
         """
-        z in meters!
+        Returns the marginal pdf function along the z axis, evaluated at ``z``
+
+        .. warning::
+           The pdf is unnormalized
+
+        :param z: Value where the pdf should be evaluated , in meters (:obj:`torch.tensor`)
+
+        :return: The marginal pdf function evaluated at ``z`` (:obj:`torch.tensor`)
         """
 
         z = z.clone().type(torch.float64)
@@ -82,10 +112,18 @@ class AtomCloud(BaseDistribution):
         density = torch.abs(psi1_x) ** 2
         return density
 
-    def pdf(self, x, y, z):
-        return self.marginal_cloud_density_x(x) * \
-               self.marginal_cloud_density_y(y) * \
-               self.marginal_cloud_density_z(z)
+    def pdf(self, x, y, z):  # @Todo, refractor. x,y,z -> x
+        """
+        Returns the pdf function evaluated at ``x``
+
+        .. warning::
+           The pdf is unnormalized
+
+        :param x: Value where the pdf should be evaluated (:obj:`torch.tensor`)
+
+        :return: The pdf function evaluated at ``x`` (:obj:`torch.tensor`)
+        """
+        return self.marginal_cloud_density_x(x) * self.marginal_cloud_density_y(y) * self.marginal_cloud_density_z(z)
 
     def sample(self, nb_points, device='cpu'):
         atoms = torch.empty((nb_points, 3))
@@ -95,7 +133,7 @@ class AtomCloud(BaseDistribution):
         # Sample the cloud in the second dimension (Gaussian)
         tmp = self.density_samplers[1](self.marginal_cloud_density_y, nb_points, device)
         atoms[:, 1] = tmp
-        # Sample the cloud in the third dimension
+        # Sample the cloud in the third dimension (Fringes)
         tmp = self.density_samplers[2](self.marginal_cloud_density_z, nb_points, device)
         atoms[:, 2] = tmp
 
@@ -105,4 +143,9 @@ class AtomCloud(BaseDistribution):
         return ray_origins
 
     def plot(self, ax, **kwargs):
+        """
+        Plots the center of the atom cloud on the provided axes.
+
+        :param ax: 3d axes (:py:class:`mpl_toolkits.mplot3d.axes3d.Axes3D`)
+        """
         ax.scatter(self.position[0], self.position[1], self.position[2], **kwargs)

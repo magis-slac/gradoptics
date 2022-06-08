@@ -1,3 +1,4 @@
+import abc
 import torch
 import numpy as np
 
@@ -7,11 +8,39 @@ from diffoptics.optics.Vector import batch_vector
 from diffoptics.transforms.SimpleTransform import SimpleTransform
 
 
-class PerfectLens(BaseOptics):
+class Lens(BaseOptics, abc.ABC):
+    """
+    Base class for lenses.
+    """
 
-    # Assumes that the lens is on the plane x=self.position[0]! Generalization may be required for other usages.
+    @abc.abstractmethod
+    def sample_points_on_lens(self, nb_points, device='cpu'):
+        """
+        Sample points uniformly on the lens
 
-    def __init__(self, f=0.05, na=1 / 1.4, position=torch.tensor([0., 0., 0.]), m=0.15, transform=None, eps=1e-15):
+        :param nb_points: Number of points to sample (:obj:`int`)
+        :param device: The desired device of returned tensor (:obj:`str`). Default is ``'cpu'``
+
+        :return: Sampled points (:obj:`torch.tensor`)
+        """
+        raise NotImplemented
+
+
+class PerfectLens(Lens):
+    """
+    Models a thin lens.
+    """
+
+    def __init__(self, f=0.05, na=0.714, position=[0., 0., 0.], m=0.15, transform=None, eps=1e-15):
+        """
+        :param f: Focal length (:obj:`float`)
+        :param na: Inverse of the f-number (:obj:`float`)
+        :param position: Position of the lens (:obj:`list`)
+        :param m: Lens magnification  (:obj:`float`)
+        :param transform: Transform to orient the lens (:py:class:`~diffoptics.transforms.BaseTransform.BaseTransform`)
+        :param eps: Parameter used for numerical stability in the different class methods (:obj:`float`). Default
+                    is ``'1e-15'``
+        """
         super(PerfectLens, self).__init__()
         self.f = f
         self.na = na
@@ -19,16 +48,11 @@ class PerfectLens(BaseOptics):
         self.pof = f * (m + 1) / m
         self.eps = eps
         if transform is None:
-            self.transform = SimpleTransform(0., 0., 0., position)
+            self.transform = SimpleTransform(0., 0., 0., torch.tensor(position))
         else:
             self.transform = transform
 
     def get_ray_intersection(self, incident_rays):
-        """
-        Computes the times t at which the incident rays will intersect the lens
-        :param incident_rays:
-        :return:
-        """
         incident_rays = self.transform.apply_inverse_transform(incident_rays)  # World space to lens space
         origins = incident_rays.origins
         directions = incident_rays.directions
@@ -42,13 +66,6 @@ class PerfectLens(BaseOptics):
         return t
 
     def intersect(self, incident_rays, t):
-        """
-        Returns the ray refracted by the lens
-        @Todo
-        :param incident_rays:
-        :param t:
-        :return:
-        """
         incident_rays = self.transform.apply_inverse_transform(incident_rays)  # World space to lens space
 
         x_objects = incident_rays.origins
@@ -77,19 +94,16 @@ class PerfectLens(BaseOptics):
         return self.transform.apply_transform(Rays(x_0, _d_out, luminosities=incident_rays.luminosities,
                                                    meta=incident_rays.meta, device=incident_rays.device))
 
-    def sample_points_on_lens(self, nb_points, device='cpu', eps=1e-15):
-        """
-        Useful for ray marching
-        :return:
-        """
+    def sample_points_on_lens(self, nb_points, device='cpu'):
+
         points = torch.zeros((nb_points, 3), device=device)
         lens_radius = self.f * self.na / 2
         # Sampling uniformly on a disk.
         # See https://stats.stackexchange.com/questions/481543/generating-random-points-uniformly-on-a-disk
         r_squared = torch.rand(nb_points, device=device) * lens_radius ** 2
         theta = torch.rand(nb_points, device=device) * 2 * np.pi
-        points[:, 1] = torch.sqrt(r_squared + eps) * torch.cos(theta)
-        points[:, 2] = torch.sqrt(r_squared + eps) * torch.sin(theta)
+        points[:, 1] = torch.sqrt(r_squared) * torch.cos(theta)
+        points[:, 2] = torch.sqrt(r_squared) * torch.sin(theta)
         return self.transform.apply_transform_(points)
 
     def plot(self, ax, s=0.1, color='lightblue', resolution=100):
@@ -113,7 +127,10 @@ class PerfectLens(BaseOptics):
         ax.scatter(xyz[:, 0], xyz[:, 1], xyz[:, 2], s=s, c=color)
 
 
-class ThickLens(BaseOptics):
+class ThickLens(Lens):
+    """
+    Models a thick lens using Snell's law.
+    """
 
     def __init__(self):
         super(ThickLens, self).__init__()
