@@ -1,5 +1,6 @@
 [![Tests](https://github.com/magis-slac/differentiable-optics/actions/workflows/main.yml/badge.svg)](https://github.com/magis-slac/differentiable-optics/actions)
 [![Build Status](https://travis-ci.com/magis-slac/differentiable-optics.svg?token=LBAvFbnCy9PEgexzsTUS&branch=main)](https://travis-ci.com/magis-slac/differentiable-optics)
+[![Documentation Status](https://readthedocs.org/projects/differentiable-optics/badge/?version=latest)](https://differentiable-optics.readthedocs.io/en/latest/?badge=latest)
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/magis-slac/differentiable-optics/blob/master/README.md)
 ![version](https://img.shields.io/badge/version-0.0.1-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
