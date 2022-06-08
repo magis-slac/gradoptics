@@ -6,4 +6,5 @@ python:
     - method: pip
       path: .
     - requirements: docs/requirements.txt
+    - requirements: requirements.txt
   system_packages: true
