@@ -79,6 +79,23 @@ class Rays:
                     luminosities=self.luminosities[condition] if self.luminosities is not None else None,
                     meta=meta, device=self.device)
 
+    def __setitem__(self, condition, value):
+        """
+        Update the rays where the ``condition`` is true
+
+        :param condition: Boolean tensor (:obj:`torch.tensor`)
+        :param value: The new rays (:py:class:`~diffoptics.optics.Ray.Rays`)
+        """
+
+        self.origins[condition] = value.origins
+        self.directions[condition] = value.directions
+        self.luminosities[condition] = value.luminosities
+
+        assert len(self.meta.keys()) == len(value.meta.keys())
+
+        for key in self.meta.keys():
+            self.meta[key][condition] = value.meta[key]
+
     def __call__(self, t):
         """
         Returns the positions of the rays at times ``t``
