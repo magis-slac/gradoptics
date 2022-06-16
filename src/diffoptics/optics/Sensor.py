@@ -105,7 +105,7 @@ class Sensor(BaseOptics):
             else:
                 self.pixelize(0, hit_positions, quantum_efficiency=quantum_efficiency)
 
-        return hit_positions, incident_rays.luminosities, incident_rays.meta
+        return None
 
     def pixelize(self, depth_id, hit_positions, quantum_efficiency=True):
         """
