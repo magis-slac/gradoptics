@@ -85,16 +85,6 @@ class Window(BaseOptics):
         direction_refracted_rays = torch.sqrt(tmp).unsqueeze(1) * window_normal + mu * (
                 directions - c.unsqueeze(1) * window_normal)
 
-        # Checks
-        theta_1 = torch.arccos(directions[:, 0] * window_normal[:, 0] +
-                               directions[:, 1] * window_normal[:, 1] +
-                               directions[:, 2] * window_normal[:, 2])
-        theta_2 = torch.arccos(direction_refracted_rays[:, 0] * window_normal[:, 0] +
-                               direction_refracted_rays[:, 1] * window_normal[:, 1] +
-                               direction_refracted_rays[:, 2] * window_normal[:, 2])
-
-        if theta_1.shape[0] > 0:
-            assert ((torch.sin(theta_1) * self.n_ext - torch.sin(theta_2) * self.n_glass).abs().mean()) < 1e-5
         return Rays(origin_refracted_rays, direction_refracted_rays, luminosities=incident_rays.luminosities,
                     device=incident_rays.device), window_normal
 
@@ -151,22 +141,9 @@ class Window(BaseOptics):
         mu = self.n_glass / self.n_ext
         tmp = 1 - mu ** 2 * (1 - (dot_product(window_normal, directions)) ** 2)
         c = dot_product(window_normal, directions)
-        direction_refracted_rays = torch.empty((tmp.shape[0], 3), device=origins.device, dtype=origins.dtype)
-        direction_refracted_rays[:, 0] = torch.sqrt(tmp) * window_normal[:, 0] + mu * (
-                    directions[:, 0] - c * window_normal[:, 0])
-        direction_refracted_rays[:, 1] = torch.sqrt(tmp) * window_normal[:, 1] + mu * (
-                    directions[:, 1] - c * window_normal[:, 1])
-        direction_refracted_rays[:, 2] = torch.sqrt(tmp) * window_normal[:, 2] + mu * (
-                    directions[:, 2] - c * window_normal[:, 2])
-        # Checks
-        theta_1 = torch.arccos(directions[:, 0] * window_normal[:, 0] +
-                               directions[:, 1] * window_normal[:, 1] +
-                               directions[:, 2] * window_normal[:, 2])
-        theta_2 = torch.arccos(direction_refracted_rays[:, 0] * window_normal[:, 0] +
-                               direction_refracted_rays[:, 1] * window_normal[:, 1] +
-                               direction_refracted_rays[:, 2] * window_normal[:, 2])
-        if theta_1.shape[0] > 0:
-            assert ((torch.sin(theta_1) * self.n_glass - torch.sin(theta_2) * self.n_ext).abs().mean()) < 1e-5
+        direction_refracted_rays = torch.sqrt(tmp).unsqueeze(1) * window_normal + mu * (
+                directions - c.unsqueeze(1) * window_normal)
+
         return Rays(origin_refracted_rays, direction_refracted_rays, luminosities=incident_rays.luminosities,
                     meta=incident_rays.meta, device=incident_rays.device)
 
