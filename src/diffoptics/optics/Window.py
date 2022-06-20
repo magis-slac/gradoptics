@@ -123,15 +123,18 @@ class Window(BaseOptics):
         # Time t at which the rays will intersect the first interface
         t1 = self._get_t_min(incident_rays)
 
-        # Computation of the rays that will not make it to the second interface
+        # Only keep the rays that have intersected the first interface
         mask = ~torch.isnan(t1)
+
+        # Return if no rays have intersected the first interface
         if mask.sum() == 0:
             return t1
+
         ray_in_glass, window_normal = self._get_rays_inside_window(incident_rays[mask], t1[mask])
         # Interaction with the second interface
         t2 = self._get_t_min(ray_in_glass)
         nan_mask = torch.isnan(t2)
-        t2[~nan_mask] = t1[mask][~nan_mask]  # t2 should only override t1 where it is nan (rays that are lost)
+        t2[~nan_mask] = t1[mask][~nan_mask]  # t2 should only overwrite t1 where it is nan (rays that are lost)
         t1[mask] = t2
         return t1
 
