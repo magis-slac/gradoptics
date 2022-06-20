@@ -89,7 +89,9 @@ class Rays:
 
         self.origins[condition] = value.origins
         self.directions[condition] = value.directions
-        self.luminosities[condition] = value.luminosities
+
+        if self.luminosities is not None:
+            self.luminosities[condition] = value.luminosities
 
         assert len(self.meta.keys()) == len(value.meta.keys())
 
