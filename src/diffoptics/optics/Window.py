@@ -6,11 +6,21 @@ from diffoptics.optics.Vector import dot_product
 
 
 class Window(BaseOptics):
-
-    # Assumes that the window is on the plane x=x'. Generalization may be required for other usages.
+    """
+    Models a medium with a refractive index between two parallel surfaces. Refraction is modelled using Snell's law.
+    """
 
     def __init__(self, left_interface_x_position, right_interface_x_position, n_ext=1.000293, n_glass=1.494,
                  diameter=0.137, eps=1e-15):
+        """
+        :param left_interface_x_position: Position of the left interface along the x axis (:obj:`float`)
+        :param right_interface_x_position: Position of the right interface along the x axis (:obj:`float`)
+        :param n_ext: Refractive index of the external medium (:obj:`float`)
+        :param n_glass: Refractive index of the medium (:obj:`float`)
+        :param diameter: Diameter of the interfaces (:obj:`float`)
+        :param eps: Parameter used for numerical stability in the different class methods (:obj:`float`). Default
+                    is ``'1e-15'``
+        """
 
         super(Window, self).__init__()
         assert right_interface_x_position > left_interface_x_position
@@ -108,14 +118,8 @@ class Window(BaseOptics):
         t[torch.isinf(t)] = float('nan')
         return t
 
-    @torch.no_grad()
     def get_ray_intersection(self, incident_rays):
-        """
-        Computes the times t at which the incident rays will intersect the window
-        :param check_first_intersection:
-        :param incident_rays:
-        :return:
-        """
+
         # Time t at which the rays will intersect the first interface
         t1 = self._get_t_min(incident_rays)
 
@@ -132,14 +136,7 @@ class Window(BaseOptics):
         return t1
 
     def intersect(self, incident_rays, t):
-        """
-        Returns the ray refracted by the window
-        @Todo
-        Note: modifies incident_rays
-        :param incident_rays:
-        :param t:
-        :return:
-        """
+
         ray_in_glass, window_normal = self._get_rays_inside_window(incident_rays, t)
 
         # Interaction with the second interface

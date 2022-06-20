@@ -6,23 +6,27 @@ from diffoptics.transforms.LookAtTransform import LookAtTransform
 
 
 class Sensor(BaseOptics):
+    """
+    Models a sensor.
+    """
 
-    def __init__(self, resolution=(9600, 9600), pixel_size=(3.76e-6, 3.76e-6), position=(-0.057499999999999996, 0, 0),
-                 poisson_noise_mean=2, quantum_efficiency=0.8, viewing_direction=torch.tensor([1., 0., 0.]),
-                 up=torch.tensor([0., 0., 1.]), psfs={}, psf_ratio=1):
+    def __init__(self, resolution=(9600, 9600), pixel_size=(3.76e-6, 3.76e-6), position=(-0.0575, 0, 0),
+                 poisson_noise_mean=2, quantum_efficiency=0.8, viewing_direction=[1., 0., 0.], up=[0., 0., 1.],
+                 psfs={}, psf_ratio=1):
         """
-
         :param resolution: Image processing convention: origin in the upper left corner, horizontal x axis and vertical
-                           y axis (tuple)
+                           y axis (:obj:`tuple`)
         :param pixel_size: Image processing convention: origin in the upper left corner, horizontal x axis and vertical
-                           y axis
-        :param position: Position of the lens (list)
-        :param poisson_noise_mean: Mean readout noise (float)
-        :param quantum_efficiency: Quantum efficiency (float)
-        :param viewing_direction: Viewing direction of the sensor (torch.tensor)
-        :param up: A vector that orients the sensor with respect to the viewing direction (torch.tensor).
-                   For example, if up=torch.tensor([0., 0., 1.]) the top of the camera will point upwards.
-                   If up=torch.tensor([0., 0., -1.]), the top of the camera will point downwards.
+                           y axis  (:obj:`tuple`)
+        :param position: Position of the lens  (:obj:`list`)
+        :param poisson_noise_mean: Mean readout noise  (:obj:`float`)
+        :param quantum_efficiency: Quantum efficiency (:obj:`float`)
+        :param viewing_direction: Viewing direction of the sensor (:obj:`list`)
+        :param up: A vector that orients the sensor with respect to the viewing direction (:obj:`list`)
+                   For example, if up=[0., 0., 1.] the top of the camera will point upwards.
+                   If up=[0., 0., -1.], the top of the camera will point downwards.
+        :param psfs: Depth and position-dependant point spread function (:obj:`dict`)
+        :param psf_ratio: Ratio between the psf resolution and the sensor resolution (:obj:`int`)
         """
         super(Sensor, self).__init__()
         self.position = position
@@ -30,8 +34,8 @@ class Sensor(BaseOptics):
         self.pixel_size = pixel_size
         self.poisson_noise_mean = poisson_noise_mean
         self.quantum_efficiency = quantum_efficiency
-        self.c2w = LookAtTransform(viewing_direction, position, up=up)
-        self.viewing_direction = viewing_direction
+        self.c2w = LookAtTransform(torch.tensor(viewing_direction), position, up=torch.tensor(up))
+        self.viewing_direction = torch.tensor(viewing_direction)
         self.position = position
         self.add_psf = len(psfs.keys()) > 0
         self.psfs = psfs
@@ -47,12 +51,6 @@ class Sensor(BaseOptics):
             self.depth_images = [torch.zeros((resolution[1] * psf_ratio, resolution[0] * psf_ratio, 1))]
 
     def get_ray_intersection(self, incident_rays):
-        """
-        Computes the time t at which the incident ray will intersect the sensor
-        Note: Assume that the sensor is perpendicular to the optical axis
-        :param incident_rays:
-        :return:
-        """
 
         # World space to camera space
         incident_rays = self.c2w.apply_inverse_transform(incident_rays)
@@ -71,14 +69,6 @@ class Sensor(BaseOptics):
         return t
 
     def intersect(self, incident_rays, t, do_pixelize=True, quantum_efficiency=True):
-        """
-        @Todo
-        :param incident_rays:
-        :param t:
-        :param do_pixelize:
-        :param quantum_efficiency:
-        :return:
-        """
 
         # World space to camera space
         incident_rays = self.c2w.apply_inverse_transform(incident_rays)
@@ -115,16 +105,17 @@ class Sensor(BaseOptics):
             else:
                 self.pixelize(0, hit_positions, quantum_efficiency=quantum_efficiency)
 
-        return hit_positions, incident_rays.luminosities, incident_rays.meta
+        return None
 
     def pixelize(self, depth_id, hit_positions, quantum_efficiency=True):
         """
-        @Todo
-        :param depth_id:
-        :param quantum_efficiency:
-        :param hit_positions: batch of ...
-        :return:
+        Accumulates photons at the pixels hit by some rays at the positions ``hit_positions``
+
+        :param depth_id: index of the depth (encoded in the PSF) from where the rays come from (:obj:`int`)
+        :param hit_positions: The positions at which the rays hit the sensor (:obj:`torch.tensor`)
+        :param quantum_efficiency: Whether to use quantum efficiency or no (:obj:`bool`)
         """
+
         self.depth_images[depth_id] = self.depth_images[depth_id].to(hit_positions.device)
 
         # Only keep the rays that make it to the sensor
@@ -153,7 +144,14 @@ class Sensor(BaseOptics):
         self.depth_images[depth_id] = self.depth_images[depth_id] + tmp
 
     def readout(self, add_poisson_noise=True, destructive_readout=True):
+        """
+        Readouts the sensor
 
+        :param add_poisson_noise: Whether to add poisson noise or no (:obj:`bool`)
+        :param destructive_readout: Whether the accumulated photons should be destroyed or no (:obj:`bool`)
+
+        :returns: The produced image (:obj:`torch.tensor`)
+        """
         # If psfs were specified
         if self.add_psf:
             # Apply psf to each depth_image
@@ -179,14 +177,7 @@ class Sensor(BaseOptics):
         return image
 
     def plot(self, ax, s=0.1, color='grey', resolution_=100):
-        """
-        @Todo
-        :param ax:
-        :param s:
-        :param color:
-        :param resolution_:
-        :return:
-        """
+
         # @Todo, change this to plot_surface
         res = self.resolution[0] * self.pixel_size[0] / resolution_
         x = torch.arange(-self.resolution[0] * self.pixel_size[0] / 2,
@@ -206,14 +197,17 @@ class Sensor(BaseOptics):
         xyz = self.c2w.apply_transform_(torch.cat((x.reshape(-1, 1), y.reshape(-1, 1), z.reshape(-1, 1)), dim=1))
         ax.scatter(xyz[:, 0], xyz[:, 1], xyz[:, 2], s=s, c=color)
 
-    def plot_image(self, ax, img_height=750, cmap="Blues"):
-        # @Todo
-        raise NotImplementedError("Not implemented yet.")
+    # def plot_image(self, ax, img_height=750, cmap="Blues"):
+    #    raise NotImplementedError("Not implemented yet.")
 
     def sample_points_on_sensor(self, nb_points, device='cpu'):
         """
-        Useful for backward ray tracing
-        :return:
+        Sample points uniformly on the sensor
+
+        :param nb_points: Number of points to sample (:obj:`int`)
+        :param device: The desired device of returned tensor (:obj:`str`). Default is ``'cpu'``
+
+        :return: Sampled points (:obj:`torch.tensor`)
         """
         warnings.warn("Function not stable yet. Requires to be adapted with respect to transform.")
 

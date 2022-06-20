@@ -11,11 +11,11 @@ class Ray:
 
     def __init__(self, origin, direction, luminosity=torch.tensor([1.]), meta={}, device='cpu'):
         """
-        :param origin:
-        :param direction:
-        :param luminosity:
-        :param meta:
-        :param device:
+        :param origin: Origin of the ray (:obj:`torch.tensor`)
+        :param direction: Direction of the ray (:obj:`torch.tensor`)
+        :param luminosity: Luminosity carried by the ray (:obj:`torch.tensor`)
+        :param meta: Meta data carried by the ray (:obj:`dict`)
+        :param device: The desired device of returned tensor (:obj:`str`)
         """
 
         super(Ray, self).__init__()
@@ -25,8 +25,13 @@ class Ray:
         self.meta = meta
         self.device = device
 
-    def plot(self, ax):
-        # @Todo
+    def plot(self, ax, t):
+        """
+        Plots the ray at time ``t``
+
+        :param ax: 3d axes (:py:class:`mpl_toolkits.mplot3d.axes3d.Axes3D`)
+        :param t: times t (:obj:`torch.tensor`)
+        """
         raise NotImplementedError("Not implemented yet.")
 
 
@@ -37,6 +42,13 @@ class Rays:
     """
 
     def __init__(self, origins, directions, luminosities=None, meta={}, device='cpu'):
+        """
+        :param origins: Origins of the rays (:obj:`torch.tensor`)
+        :param directions: Directions of the rays (:obj:`torch.tensor`)
+        :param luminosities: Luminosities carried by the rays (:obj:`torch.tensor`)
+        :param meta: Meta data carried by the rays (:obj:`dict`)
+        :param device: The desired device of returned tensor (:obj:`str`)
+        """
         self.origins = origins.to(device)
         self.directions = normalize_batch_vector(directions).to(device)
         self.luminosities = luminosities.to(device) if luminosities is not None else None
@@ -52,6 +64,13 @@ class Rays:
             assert meta[key].shape[0] == origins.shape[0]
 
     def __getitem__(self, condition):
+        """
+        Returns the rays where the ``condition`` is true
+
+        :param condition: Boolean tensor (:obj:`torch.tensor`)
+
+        :return: A batch of rays where the ``condition`` is true (:py:class:`~diffoptics.optics.Ray.Rays`)
+        """
         meta = {}
         for key in self.meta.keys():
             meta[key] = self.meta[key][condition]
@@ -60,23 +79,59 @@ class Rays:
                     luminosities=self.luminosities[condition] if self.luminosities is not None else None,
                     meta=meta, device=self.device)
 
+    def __setitem__(self, condition, value):
+        """
+        Update the rays where the ``condition`` is true
+
+        :param condition: Boolean tensor (:obj:`torch.tensor`)
+        :param value: The new rays (:py:class:`~diffoptics.optics.Ray.Rays`)
+        """
+
+        self.origins[condition] = value.origins
+        self.directions[condition] = value.directions
+
+        if self.luminosities is not None:
+            self.luminosities[condition] = value.luminosities
+
+        assert len(self.meta.keys()) == len(value.meta.keys())
+
+        for key in self.meta.keys():
+            self.meta[key][condition] = value.meta[key]
+
     def __call__(self, t):
+        """
+        Returns the positions of the rays at times ``t``
+
+        :param t: Times t (:obj:`torch.tensor`)
+
+        :return: The positions of the rays at times t (:obj:`torch.tensor`)
+        """
         return self.origins + t.unsqueeze(1) * self.directions
 
-    def update_at(self):
-        # @Todo & o & d private!
-        raise NotImplementedError("Not implemented yet.")
-
     def get_origin_and_direction(self):
-        # @Todo & o & d private!
-        raise NotImplementedError("Not implemented yet.")
+        """
+        Returns the origins and directions of the rays
+
+        :return: The origins and directions of the batch of rays (:obj:`tuple`)
+        """
+        return self.origins, self.directions
 
     def get_size(self):
+        """
+        Returns the number of rays in the batch
+
+        :return: The number of rays in the batch (:obj:`int`)
+        """
         return self.origins.shape[0]
 
     def plot(self, ax, t, color='C0', line_width=None):
-        # @ Todo, parallelize
-        for i in range(len(t)):
+        """
+        Plots the rays at times ``t``
+
+        :param ax: 3d axes (:py:class:`mpl_toolkits.mplot3d.axes3d.Axes3D`)
+        :param t: times t (:obj:`torch.tensor`)
+        """
+        for i in range(len(t)):  # @Todo, parallelize
             point = self.origins[i] + t[i] * self.directions[i]
 
             ax.plot([self.origins[i, 0], point[0]],
@@ -85,7 +140,15 @@ class Rays:
                     color=color, linewidth=line_width)
 
 
-def empty_like(rays: Rays):
+def empty_like(rays):
+    """
+    Returns an uninitialized batch of rays with the same size as ``rays``
+
+    :param rays: the size of ``rays`` will determine the size of the new batch of rays
+                 (:py:class:`~diffoptics.optics.Ray.Rays`)
+
+    :return: A new batch of rays (:py:class:`~diffoptics.optics.Ray.Rays`)
+    """
     origins = torch.empty_like(rays.origins)
     directions = torch.empty_like(rays.directions)
     luminosities = (torch.empty_like(rays.luminosities)) if rays.luminosities is not None else None
@@ -96,7 +159,15 @@ def empty_like(rays: Rays):
     return Rays(origins, directions, luminosities=luminosities, device=rays.device, meta=meta)
 
 
-def cat(rays1: Rays, rays2: Rays):
+def cat(rays1, rays2):
+    """
+    Concatenates the two batch of rays
+
+    :param rays1: First batch of rays (:py:class:`~diffoptics.optics.Ray.Rays`)
+    :param rays2: Second batch of rays (:py:class:`~diffoptics.optics.Ray.Rays`)
+
+    :return New batch of rays (:py:class:`~diffoptics.optics.Ray.Rays`)
+    """
     rays1.origins = torch.cat((rays1.origins, rays2.origins))
     rays1.directions = torch.cat((rays1.directions, rays2.directions))
 
@@ -104,6 +175,6 @@ def cat(rays1: Rays, rays2: Rays):
         rays1.luminosities = torch.cat((rays1.luminosities, rays2.luminosities))
 
     for key in rays1.meta.keys():
-        rays1[key] = torch.cat((rays1.meta[key], rays2.meta[key]), dim=0)
+        rays1.meta[key] = torch.cat((rays1.meta[key], rays2.meta[key]), dim=0)
 
     return rays1

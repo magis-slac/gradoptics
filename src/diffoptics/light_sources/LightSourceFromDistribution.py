@@ -7,12 +7,19 @@ from diffoptics.optics import batch_vector
 
 
 class LightSourceFromDistribution(BaseLightSource):
+    """
+    Models a light source from a distribution. It emits rays in 4pi, with their origins sampled from the distribution.
+    """
 
     def __init__(self, distribution):
-        super().__init__()
+        """
+        :param distribution: Distribution from which photons will be sampled
+                             (:py:class:`~diffoptics.distributions.BaseDistribution.BaseDistribution`)
+        """
         self.distribution = distribution
 
     def sample_rays(self, nb_rays, device='cpu', sample_in_2pi=False):
+
         # Sample rays in 4 pi
         azimuthal_angle = torch.rand(nb_rays) * 2 * math.pi
         polar_angle = torch.arccos(1 - 2 * torch.rand(nb_rays))
@@ -28,7 +35,8 @@ class LightSourceFromDistribution(BaseLightSource):
         del polar_angle
         torch.cuda.empty_cache()
 
-        return Rays(self.distribution.sample(nb_rays, device=device).type(emitted_direction.dtype), emitted_direction, device=device)
+        return Rays(self.distribution.sample(nb_rays, device=device).type(emitted_direction.dtype), emitted_direction,
+                    device=device)
 
     def plot(self, ax, **kwargs):
         return self.distribution.plot(ax, **kwargs)

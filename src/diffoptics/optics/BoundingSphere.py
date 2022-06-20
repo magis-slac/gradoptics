@@ -6,8 +6,19 @@ from diffoptics.optics import BaseOptics
 
 
 class BoundingSphere(BaseOptics):
+    """
+    Models a sphere that can be used to bound a volume or a scene. Intersections with the sphere will not modify the
+    orientation of the incoming rays (no reflection nor refraction).
+    """
 
     def __init__(self, radii=1e-3, xc=0.31, yc=0.0, zc=0.0):
+        """
+        :param radii: Radii of the sphere (:obj:`float`)
+        :param xc: Position of the center of the sphere along the x axis (:obj:`float`)
+        :param yc: Position of the center of the sphere along the y axis (:obj:`float`)
+        :param zc: Position of the center of the sphere along the z axis (:obj:`float`)
+        """
+
         super().__init__()
         self.radii = radii
         self.xc = xc
@@ -15,12 +26,6 @@ class BoundingSphere(BaseOptics):
         self.zc = zc
 
     def get_ray_intersection(self, incident_rays, eps=1e-15):
-        """
-        @Todo
-        :param incident_rays:
-        :param eps:
-        :return:
-        """
 
         # Computes the intersection of the incident_ray with the sphere
         origins = incident_rays.origins
@@ -57,12 +62,6 @@ class BoundingSphere(BaseOptics):
         return t_min
 
     def intersect(self, incident_rays, t):
-        """
-        @Todo
-        :param incident_rays:
-        :param t:
-        :return:
-        """
 
         origins = incident_rays.origins
         directions = incident_rays.directions
@@ -70,10 +69,7 @@ class BoundingSphere(BaseOptics):
         # Update the origin of the incoming rays
         origins = origins + t.unsqueeze(1) * directions
 
-        return Rays(origins,
-                    directions,
-                    luminosities=incident_rays.luminosities,
-                    device=incident_rays.device,
+        return Rays(origins, directions, luminosities=incident_rays.luminosities, device=incident_rays.device,
                     meta=incident_rays.meta)
 
     def plot(self, ax, color='grey', alpha=0.4):

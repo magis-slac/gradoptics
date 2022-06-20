@@ -1,13 +1,20 @@
 import torch
 
-from diffoptics.optics.Vector import normalize_vector
-from diffoptics.optics.Vector import cross_product
 from diffoptics.transforms.BaseTransform import BaseTransform
 
 
 class SimpleTransform(BaseTransform):
+    """
+    Transform characterized by rotation vector [w_x, w_y, w_z]
+    """
 
-    def __init__(self, theta_x: float, theta_y: float, theta_z: float, t: torch.tensor):
+    def __init__(self, theta_x, theta_y, theta_z, t):
+        """
+        :param theta_x: Rotation along the x axis (:obj:`float`)
+        :param theta_y: Rotation along the y axis (:obj:`float`)
+        :param theta_z: Rotation along the z axis (:obj:`float`)
+        :param t: Translation vector, i.e. position of the transform (:obj:`torch.tensor`)
+        """
 
         M_x = torch.tensor([[1, 0, 0],
                             [0, torch.cos(torch.tensor([theta_x])), -torch.sin(torch.tensor([theta_x]))],

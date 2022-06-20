@@ -4,12 +4,16 @@ import torch
 
 
 class Camera(BaseOptics):
+    """
+    Models a camera by compounding multiple optical elements.
+    """
 
     def __init__(self, lens, sensor, intermediate_objects=[]):
         """
-        :param lens: external lens - interface with the world
-        :param sensor: sensor
-        :param intermediate_objects: list of optical elements (BaseOptics) between the external lens and sensor
+        :param lens: External lens - interface with the world (:py:class:`~diffoptics.optics.Lens.Lens`)
+        :param sensor: Sensor (:py:class:`~diffoptics.optics.Sensor.Sensor`)
+        :param intermediate_objects: list of optical elements between the external lens and the sensor
+                                     (:obj:`list` of :py:class:`~diffoptics.optics.BaseOptics.BaseOptics`)
         """
         super(Camera, self).__init__()
         self.lens = lens
@@ -17,20 +21,9 @@ class Camera(BaseOptics):
         self.intermediate_objects = intermediate_objects
 
     def get_ray_intersection(self, incident_rays):
-        """
-        Computes the time t at which the incident ray will intersect the camera (i.e. the external lens)
-        :param incident_rays:
-        :return:
-        """
         return self.lens.get_ray_intersection(incident_rays)
 
     def intersect(self, incident_rays, t):
-        """
-        Propagates the incident rays to the sensor.
-        :param incident_rays:
-        :param t:
-        :return: nan rays
-        """
         rays = self.lens.intersect(incident_rays, t)
         for obj in self.intermediate_objects:
             t = obj.get_ray_intersection(rays)
@@ -38,7 +31,7 @@ class Camera(BaseOptics):
         t = self.sensor.get_ray_intersection(rays)
         self.sensor.intersect(rays, t, do_pixelize=True, quantum_efficiency=True)
 
-        # Return nan rays
+        # Returns nan rays
         origins = torch.zeros_like(incident_rays.origins) + float('nan')
         directions = torch.zeros_like(incident_rays.directions) + float('nan')
         luminosities = (torch.zeros_like(incident_rays.luminosities) + float(
