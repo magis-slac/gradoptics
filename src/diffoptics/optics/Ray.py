@@ -9,7 +9,7 @@ class Ray:
     be used for storing information, for example during surface intersections.
     """
 
-    def __init__(self, origin, direction, luminosity=torch.tensor([1.]), meta={}, device='cpu'):
+    def __init__(self, origin, direction, luminosity=torch.tensor([1.]), meta=None, device='cpu'):
         """
         :param origin: Origin of the ray (:obj:`torch.tensor`)
         :param direction: Direction of the ray (:obj:`torch.tensor`)
@@ -19,10 +19,11 @@ class Ray:
         """
 
         super(Ray, self).__init__()
+
         self.origin = origin.to(device)
         self.direction = normalize_vector(direction).to(device)
         self.luminosity = luminosity.to(device)
-        self.meta = meta
+        self.meta = meta if meta is not None else {}
         self.device = device
 
     def plot(self, ax, t):
@@ -41,7 +42,7 @@ class Rays:
     which can be used for storing information, for example during surface intersections.
     """
 
-    def __init__(self, origins, directions, luminosities=None, meta={}, device='cpu'):
+    def __init__(self, origins, directions, luminosities=None, meta=None, device='cpu'):
         """
         :param origins: Origins of the rays (:obj:`torch.tensor`)
         :param directions: Directions of the rays (:obj:`torch.tensor`)
@@ -52,7 +53,7 @@ class Rays:
         self.origins = origins.to(device)
         self.directions = normalize_batch_vector(directions).to(device)
         self.luminosities = luminosities.to(device) if luminosities is not None else None
-        self.meta = meta
+        self.meta = meta if meta is not None else {}
         self.device = device
 
         assert origins.dtype == directions.dtype
@@ -60,7 +61,7 @@ class Rays:
         assert origins.shape == directions.shape
         if luminosities is not None:
             assert origins.shape[0] == luminosities.shape[0]
-        for key in meta.keys():
+        for key in self.meta.keys():
             assert meta[key].shape[0] == origins.shape[0]
 
     def __getitem__(self, condition):
