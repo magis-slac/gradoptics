@@ -112,7 +112,7 @@ class AtomCloud(BaseDistribution):
         density = torch.abs(psi1_x) ** 2
         return density
 
-    def pdf(self, x, y, z):  # @Todo, refractor. x,y,z -> x
+    def pdf(self, x):  # @Todo, refractor. x,y,z -> x
         """
         Returns the pdf function evaluated at ``x``
 
@@ -123,7 +123,8 @@ class AtomCloud(BaseDistribution):
 
         :return: The pdf function evaluated at ``x`` (:obj:`torch.tensor`)
         """
-        return self.marginal_cloud_density_x(x) * self.marginal_cloud_density_y(y) * self.marginal_cloud_density_z(z)
+        return self.marginal_cloud_density_x(x[:, 0]) * self.marginal_cloud_density_y(x[:, 1]) * \
+            self.marginal_cloud_density_z(x[:, 2])
 
     def sample(self, nb_points, device='cpu'):
         atoms = torch.empty((nb_points, 3))
