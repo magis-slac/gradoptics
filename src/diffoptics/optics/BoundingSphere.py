@@ -2,10 +2,10 @@ import numpy as np
 import torch
 
 from diffoptics.optics.Ray import Rays
-from diffoptics.optics import BaseOptics
+from diffoptics.optics.BoundingShape import BoundingShape
 
 
-class BoundingSphere(BaseOptics):
+class BoundingSphere(BoundingShape):
     """
     Models a sphere that can be used to bound a volume or a scene. Intersections with the sphere will not modify the
     orientation of the incoming rays (no reflection nor refraction).
@@ -25,7 +25,7 @@ class BoundingSphere(BaseOptics):
         self.yc = yc
         self.zc = zc
 
-    def get_ray_intersection(self, incident_rays, eps=1e-15):
+    def get_ray_intersection_(self, incident_rays, eps=1e-15):
 
         # Computes the intersection of the incident_ray with the sphere
         origins = incident_rays.origins
@@ -56,10 +56,15 @@ class BoundingSphere(BaseOptics):
         # Check that t is greater than 0
         cond_gt_0 = cond & (t_min > eps)
         t_min[~cond_gt_0] = t_max[~cond_gt_0]  # Update negative t with t_max (potentially > 0)
+        # Remove self-intersections
         cond_gt_0 = cond & (t_min > eps)
         t_min[~cond_gt_0] = float('nan')
+        t_max[~cond_gt_0] = float('nan')
 
-        return t_min
+        return t_min, t_max
+
+    def get_ray_intersection(self, incident_rays, eps=1e-15):
+        return self.get_ray_intersection_(incident_rays, eps=eps)[0]
 
     def intersect(self, incident_rays, t):
 

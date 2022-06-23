@@ -17,9 +17,13 @@ from diffoptics.optics.BoundingSphere import BoundingSphere
 from diffoptics.ray_tracing.Scene import Scene
 
 from diffoptics.ray_tracing.RayTracing import forward_ray_tracing
+from diffoptics.ray_tracing.RayTracing import backward_ray_tracing
 
 from diffoptics.light_sources.LightSourceFromDistribution import LightSourceFromDistribution
 
 from diffoptics.transforms import BaseTransform, LookAtTransform, SimpleTransform
 
 from diffoptics.optics.PSF import PSF
+
+from diffoptics.integrator.BaseIntegrator import BaseIntegrator
+from diffoptics.integrator.StratifiedSamplingIntegrator import StratifiedSamplingIntegrator
