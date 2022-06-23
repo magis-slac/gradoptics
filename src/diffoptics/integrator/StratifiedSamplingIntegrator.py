@@ -4,7 +4,7 @@ from diffoptics.integrator.BaseIntegrator import BaseIntegrator
 
 class StratifiedSamplingIntegrator(BaseIntegrator):
     """
-    Computes line integrals using stratified sampling.
+    Computes line integrals using stratified sampling
     """
 
     def __init__(self, nb_mc_steps):

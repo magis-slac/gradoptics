@@ -6,6 +6,17 @@ class BaseLightSource(abc.ABC):
     Base class for light sources.
     """
 
+    def __init__(self, bounding_shape=None):
+        """
+        :param bounding_shape: A bounding shape that bounds the light source
+                               (:py:class:`~diffoptics.optics.BoundingShape.BoundingShape`). Default is ``None``
+
+        .. note::
+             A bounding shape is required if this light source is used with backward ray tracing
+
+        """
+        self.bounding_shape = bounding_shape
+
     @abc.abstractmethod
     def sample_rays(self, nb_rays, device='cpu'):
         """

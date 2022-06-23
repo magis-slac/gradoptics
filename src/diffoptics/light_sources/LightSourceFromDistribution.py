@@ -11,12 +11,19 @@ class LightSourceFromDistribution(BaseLightSource):
     Models a light source from a distribution. It emits rays in 4pi, with their origins sampled from the distribution.
     """
 
-    def __init__(self, distribution):
+    def __init__(self, distribution, bounding_shape=None):
         """
         :param distribution: Distribution from which photons will be sampled
                              (:py:class:`~diffoptics.distributions.BaseDistribution.BaseDistribution`)
+        :param bounding_shape: A bounding shape that bounds the light source
+                               (:py:class:`~diffoptics.optics.BoundingShape.BoundingShape`). Default is ``None``
+
+        .. note::
+             A bounding shape is required if this light source is used with backward ray tracing
+
         """
         self.distribution = distribution
+        self.bounding_shape = bounding_shape
 
     def sample_rays(self, nb_rays, device='cpu', sample_in_2pi=False):
 
@@ -40,3 +47,16 @@ class LightSourceFromDistribution(BaseLightSource):
 
     def plot(self, ax, **kwargs):
         return self.distribution.plot(ax, **kwargs)
+
+    def pdf(self, x):
+        """
+        Returns the pdf function of the distribution evaluated at ``x``
+
+        .. warning::
+           The pdf may be unnormalized
+
+        :param x: Value where the pdf should be evaluated (:obj:`torch.tensor`)
+
+        :return: The pdf function evaluated at ``x`` (:obj:`torch.tensor`)
+        """
+        return self.distribution.pdf(x)
