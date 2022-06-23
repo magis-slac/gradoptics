@@ -68,7 +68,6 @@ def _test_atom_cloud(nb_atoms=int(1e4)):
 
 
 def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, position=torch.tensor([0., 0., 0.])):
-
     lens = optics.PerfectLens(f=f, m=m, position=position)
 
     # Create rays parallel to the optical axis
@@ -480,6 +479,75 @@ def _test_grad_sensor_wrt_self_parameters():
     return 0
 
 
+def _test_forward_ray_tracing(f=0.05, m=0.15, device='cpu'):
+
+    # Creating a scene
+    image_pof = -f * (1 + m)
+    object_pof = f * (1 + m) / m
+    lens = optics.PerfectLens(f=f, na=1 / 1.4, position=[0., 0., 0.], m=m)
+    sensor = optics.Sensor(resolution=(9600, 9600), pixel_size=(3.76e-6, 3.76e-6), position=(image_pof, 0, 0),
+                           poisson_noise_mean=2, quantum_efficiency=0.8)
+    atom_cloud = optics.AtomCloud(n=int(1e6), f=2, position=[object_pof, 0., 0.], phi=0.1)
+    light_source = optics.LightSourceFromDistribution(atom_cloud)
+    scene = optics.Scene(light_source)
+    scene.add_object(lens)
+    scene.add_object(sensor)
+
+    # Using the built-in function forward_ray_tracing
+    rays = light_source.sample_rays(10_000_000, device=device)
+    optics.forward_ray_tracing(rays, scene, max_iterations=2)
+
+    # Readout the sensor
+    produced_image = sensor.readout(add_poisson_noise=False).data.cpu().numpy()
+
+    c = (4800, 4800)
+    w = 40
+    plt.imshow(produced_image[c[0] - w: c[0] + w, c[1] - w: c[1] + w], cmap='Blues')
+    plt.savefig('test_forward_ray_tracing.pdf')
+    plt.close()
+
+    return 0
+
+
+def _test_backward_ray_tracing(f=0.05, m=0.15, device='cpu'):
+    # Creating a scene
+    image_pof = -f * (1 + m)
+    object_pof = f * (1 + m) / m
+    lens = optics.PerfectLens(f=f, na=1 / 1.4, position=[0., 0., 0.], m=m)
+    sensor = optics.Sensor(resolution=(9600, 9600), pixel_size=(3.76e-6, 3.76e-6), position=(image_pof, 0, 0),
+                           poisson_noise_mean=2, quantum_efficiency=0.8)
+    atom_cloud = optics.AtomCloud(n=int(1e6), f=2, position=[object_pof, 0., 0.], phi=0.1)
+    light_source_bounding_shape = optics.BoundingSphere(radii=1e-3, xc=f * (1 + m) / m, yc=0.0, zc=0.0)
+    light_source = optics.LightSourceFromDistribution(atom_cloud, bounding_shape=light_source_bounding_shape)
+    scene = optics.Scene(light_source)
+    scene.add_object(lens)
+    scene.add_object(sensor)
+
+    # Computing incident rays (assuming pinhole camera)
+    N = 40
+    px_j, px_i = torch.meshgrid(torch.linspace(N, -N + 1, steps=N * 2), torch.linspace(N, -N + 1, steps=N * 2))
+    px_j = px_j.reshape(-1, 1).type(torch.long)
+    px_i = px_i.reshape(-1, 1).type(torch.long)
+    pos_x = (px_i - 0.5) * sensor.pixel_size[0]
+    pos_y = (px_j - 0.5) * sensor.pixel_size[1]
+    pos_z = torch.zeros(pos_x.shape)
+    origins = torch.cat((pos_x, pos_y, pos_z), dim=1)
+    origins = sensor.c2w.apply_transform_(origins)
+    directions = optics.batch_vector(- origins[:, 0], - origins[:, 1], - origins[:, 2])
+    incident_rays = optics.Rays(origins, directions, device=device)
+
+    # Producing an image with backward ray tracing
+    integrator = optics.StratifiedSamplingIntegrator(100)
+    image = optics.backward_ray_tracing(incident_rays, scene, light_source, integrator, max_iterations=2)
+    image = image.reshape(2 * N, 2 * N).data.cpu().numpy()
+
+    plt.imshow(image)
+    plt.savefig('test_backward_ray_tracing.pdf')
+    plt.close()
+
+    return 0
+
+
 """
             Tests for pytest
 """
@@ -530,7 +598,7 @@ def test_gradients_wrt_incident_rays():
     assert _test_grad_rays() == 0
     assert _test_grad_mirror_wrt_incident_rays() == 0
     assert _test_grad_lens_wrt_incident_rays() == 0
-    #assert _test_grad_sensor_wrt_incident_rays() == 0
+    # assert _test_grad_sensor_wrt_incident_rays() == 0
 
 
 def test_gradients_wrt_self_parameters():
@@ -552,3 +620,11 @@ def test_transforms():
 
 def test_bounding_sphere():
     assert _test_bounding_sphere() == 0
+
+
+def test_forward_ray_tracing():
+    assert _test_forward_ray_tracing() == 0
+
+
+def test_backward_ray_tracing():
+    assert _test_backward_ray_tracing() == 0

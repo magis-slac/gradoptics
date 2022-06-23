@@ -74,5 +74,43 @@ def forward_ray_tracing(incident_rays, scene, max_iterations=2, ax=None):
                       "bouncing in the scene. incident_rays.shape[0]: " + str(incident_rays.origins.shape[0]))
 
 
-def backward_ray_tracing(incident_rays, scene):
-    raise NotImplemented
+def backward_ray_tracing(incident_rays, scene, light_source, integrator, max_iterations=2):
+    """
+    Performs backward ray tracing, i.e. computes the path taken by the rays ``incident_rays`` in the scene ``scene``
+    until the maximum number of bounces ``max_iterations`` is reached, or until the rays hit the light source
+    ``light_source``
+
+    :param incident_rays: Rays that should be traced in the scene (:py:class:`~diffoptics.optics.Ray.Rays`)
+    :param scene: Scene in which the rays are travelling (:py:class:`~diffoptics.ray_tracing.Scene.Scene`)
+    :param light_source: Light source (:py:class:`~diffoptics.light_sources.BaseLightSource.BaseLightSource`)
+    :param integrator: An integrator to compute line integrals
+                       (:py:class:`~diffoptics.integrator.BaseIntegrator.BaseIntegrator`)
+    :param max_iterations: Maximum number of bounces in the ``scene`` (:obj:`int`)
+
+    :return: the intensity carried by the rays ``incident_rays`` (:py:class:`~diffoptics.optics.Ray.Rays`)
+    """
+
+    intensities = torch.zeros(incident_rays.get_size(), dtype=torch.double)
+
+    # Labelling the rays
+    incident_rays.meta['track_idx'] = torch.linspace(0, incident_rays.get_size() - 1, incident_rays.get_size(),
+                                                     dtype=torch.long)
+
+    for i in range(max_iterations):
+        outgoing_rays, t, mask = trace_rays(incident_rays, scene)
+
+        # Potential intersection with the light source
+        t_min, t_max = light_source.bounding_shape.get_ray_intersection_(incident_rays)
+
+        # Mask for the rays that hit the light source rather than the object found in trace_rays
+        new_mask = (t_min < t) & (t_min < t_max)
+
+        # Computing the intensities for the rays that have hit the light source
+        if new_mask.sum() > 0:
+            intensities[incident_rays.meta['track_idx'][new_mask]] = integrator.compute_integral(
+                incident_rays[new_mask], light_source.pdf, t_min[new_mask], t_max[new_mask])
+
+        # Rays that are still in the scene, and have not hit the light source
+        incident_rays = outgoing_rays[mask & (~new_mask)]
+
+    return intensities
