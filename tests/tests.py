@@ -82,7 +82,7 @@ def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, position=torch.te
 
     rays = optics.Rays(origins, directions)
     t = lens.get_ray_intersection(rays)
-    refracted_rays = lens.intersect(rays, t)
+    refracted_rays, _ = lens.intersect(rays, t)
 
     # Computes the time t at which the rays will intersect with the image focal plane
     o = refracted_rays.origins
@@ -139,7 +139,7 @@ def _test_lens_transform(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, positio
 
     rays = optics.Rays(origins, directions)
     t = lens.get_ray_intersection(rays)
-    refracted_rays = lens.intersect(rays, t)
+    refracted_rays, _ = lens.intersect(rays, t)
 
     # Computes the time t at which the rays will intersect with the image focal plane
     o = refracted_rays.origins
@@ -227,7 +227,7 @@ def _test_window():
     t = window.get_ray_intersection(rays)
     r = rays[~torch.isnan(t)]
     t = t[~torch.isnan(t)]
-    rays = window.intersect(r, t)
+    rays, _ = window.intersect(r, t)
 
     fig = plt.figure(figsize=(12, 12))
     ax = fig.gca(projection='3d')
@@ -355,14 +355,14 @@ def _test_bounding_sphere(nb_rays=1000):
     # Second intersection with the sphere
     for i, cloud_envelope in enumerate(cloud_envelopes):
         cond = ~torch.isnan(t_s[i])
-        outgoing_rays = cloud_envelope.intersect(rays[cond], t_s[i][cond])
+        outgoing_rays, _ = cloud_envelope.intersect(rays[cond], t_s[i][cond])
         t_ = cloud_envelope.get_ray_intersection(outgoing_rays)
         outgoing_rays.plot(ax, t_, color='r')
         cond_ = torch.isnan(t_)
         assert cond_.sum() == 0  # In this setup, All the rays should make it to the second intersection
         assert torch.allclose(rays[cond].directions,
                               outgoing_rays.directions)  # The sphere should not modify the directions
-        outgoing_rays = cloud_envelope.intersect(outgoing_rays, t_)
+        outgoing_rays, _ = cloud_envelope.intersect(outgoing_rays, t_)
         assert torch.allclose(rays[cond].directions,
                               outgoing_rays.directions)  # The sphere should not modify the directions
 
@@ -386,7 +386,7 @@ def _test_grad_mirror_wrt_incident_rays(mirror_position=torch.ones(3),
     rays = optics.Rays(ray_origins, directions)
     t = mirror.get_ray_intersection(rays)
 
-    outgoing_rays = mirror.intersect(rays, t)
+    outgoing_rays, _ = mirror.intersect(rays, t)
 
     loss = (outgoing_rays.origins * outgoing_rays.directions).sum()
     loss.backward()
@@ -408,7 +408,7 @@ def _test_grad_lens_wrt_incident_rays(lens_position=torch.ones(3), ray_origins=t
     rays = optics.Rays(ray_origins, directions)
     t = lens.get_ray_intersection(rays)
 
-    outgoing_rays = lens.intersect(rays, t)
+    outgoing_rays, _ = lens.intersect(rays, t)
 
     loss = (outgoing_rays.origins * outgoing_rays.directions).sum()
     loss.backward()
@@ -458,7 +458,7 @@ def _test_grad_mirror_wrt_self_parameters():
     directions = torch.cat(directions, dim=1)
     rays = optics.Rays(origins, directions)
     t = mirror.get_ray_intersection(rays)
-    outgoing_rays = mirror.intersect(rays, t)
+    outgoing_rays, _ = mirror.intersect(rays, t)
 
     # Toy loss
     loss = (outgoing_rays.origins * outgoing_rays.directions).sum()

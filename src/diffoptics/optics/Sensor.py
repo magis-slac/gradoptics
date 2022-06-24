@@ -105,7 +105,8 @@ class Sensor(BaseOptics):
             else:
                 self.pixelize(0, hit_positions, quantum_efficiency=quantum_efficiency)
 
-        return None
+        # No rays reflected or refracted
+        return None, torch.zeros(origins.shape[0], dtype=torch.bool, device=origins.device)
 
     def pixelize(self, depth_id, hit_positions, quantum_efficiency=True):
         """

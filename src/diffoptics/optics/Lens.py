@@ -91,8 +91,9 @@ class PerfectLens(Lens):
         x_v = x_star + t.unsqueeze(1) * d
         _d_out = batch_vector(x_v[:, 0] - x_0[:, 0], x_v[:, 1] - x_0[:, 1], x_v[:, 2] - x_0[:, 2])
 
-        return self.transform.apply_transform(Rays(x_0, _d_out, luminosities=incident_rays.luminosities,
-                                                   meta=incident_rays.meta, device=incident_rays.device))
+        return (self.transform.apply_transform(Rays(x_0, _d_out, luminosities=incident_rays.luminosities,
+                                                   meta=incident_rays.meta, device=incident_rays.device)),
+                torch.ones(x_0.shape[0], dtype=torch.bool, device=x_0.device))
 
     def sample_points_on_lens(self, nb_points, device='cpu'):
 

@@ -39,7 +39,7 @@ def trace_rays(incident_rays, scene):
     for idx, o in enumerate(scene.objects):
         condition = (obj_indices == idx)
 
-        tmp = o.intersect(incident_rays[condition], t[condition])
+        tmp, mask_ = o.intersect(incident_rays[condition], t[condition])
 
         if tmp is None:  # Some optical element may not reflect or refract rays (e.g. sensor)
             mask[condition] = 0  # No rays returned

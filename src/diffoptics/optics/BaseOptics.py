@@ -27,7 +27,11 @@ class BaseOptics(abc.ABC):
         :param incident_rays: The incident rays (:py:class:`~diffoptics.optics.Ray.Rays`)
         :param t: The times at which the incident rays will intersect the optical element (:obj:`torch.tensor`)
 
-        :return: Reflected or refracted rays (:py:class:`~diffoptics.optics.Ray.Rays`)
+        :return: (:obj:`tuple`)
+                 - Reflected or refracted rays (:py:class:`~diffoptics.optics.Ray.Rays`)
+                 - A boolean mask that indicates which incident rays were reflected or refracted ― some rays may not be
+                   reflected or refracted for example, due to total internal reflection, which is not modelled at this
+                   point (:obj:`torch.tensor`)
         """
         return NotImplemented
 

@@ -144,8 +144,9 @@ class Window(BaseOptics):
         direction_refracted_rays = torch.sqrt(tmp).unsqueeze(1) * window_normal + mu * (
                 directions - c.unsqueeze(1) * window_normal)
 
-        return Rays(origin_refracted_rays, direction_refracted_rays, luminosities=incident_rays.luminosities,
-                    meta=incident_rays.meta, device=incident_rays.device)
+        return (Rays(origin_refracted_rays, direction_refracted_rays, luminosities=incident_rays.luminosities,
+                    meta=incident_rays.meta, device=incident_rays.device),
+                torch.ones(origin_refracted_rays.shape[0], dtype=torch.bool, device=origin_refracted_rays.device))
 
     def plot(self, ax, s=0.1, color='lightblue', resolution=100):
         # @Todo, change this to plot_surface

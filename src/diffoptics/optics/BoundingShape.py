@@ -1,44 +1,23 @@
 import abc  # Abstract Base Classes
 import torch
 
+from diffoptics.optics import BaseOptics
 
-class BoundingShape(abc.ABC):
+
+class BoundingShape(BaseOptics):
     """
-    Base class for optical elements.
+    Base class for bounding shapes.
     """
 
     @abc.abstractmethod
-    def get_ray_intersection(self, incident_rays):
-        """
-        Computes the times t at which the incident rays will intersect the object.
-
-        :param incident_rays: The incident rays (:py:class:`~diffoptics.optics.Ray.Rays`)
-
-        :return: Times t (:obj:`torch.tensor`)
-        """
-        return NotImplemented
-
     def get_ray_intersection_(self, incident_rays):
-        return NotImplemented
-
-    @abc.abstractmethod
-    @torch.no_grad()
-    def intersect(self, incident_rays, t):
         """
-        Returns the rays reflected or refracted by the optical element.
+        Computes the times t_min and t_max at which the incident rays will intersect the bounding shape
 
         :param incident_rays: The incident rays (:py:class:`~diffoptics.optics.Ray.Rays`)
-        :param t: The times at which the incident rays will intersect the optical element (:obj:`torch.tensor`)
 
-        :return: Reflected or refracted rays (:py:class:`~diffoptics.optics.Ray.Rays`)
-        """
-        return NotImplemented
-
-    @abc.abstractmethod
-    def plot(self, ax):
-        """
-        Plots the optical element on the provided axes.
-
-        :param ax: 3d axes (:py:class:`mpl_toolkits.mplot3d.axes3d.Axes3D`)
+        :return: (:obj:`tuple`)
+                 - Times t_min (:obj:`torch.tensor`)
+                 - Times t_max (:obj:`torch.tensor`)
         """
         return NotImplemented

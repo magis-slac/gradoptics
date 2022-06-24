@@ -74,8 +74,8 @@ class BoundingSphere(BoundingShape):
         # Update the origin of the incoming rays
         origins = origins + t.unsqueeze(1) * directions
 
-        return Rays(origins, directions, luminosities=incident_rays.luminosities, device=incident_rays.device,
-                    meta=incident_rays.meta)
+        return (Rays(origins, directions, luminosities=incident_rays.luminosities, device=incident_rays.device,
+                meta=incident_rays.meta), torch.ones(origins.shape[0], dtype=torch.bool, device=origins.device))
 
     def plot(self, ax, color='grey', alpha=0.4):
         u = np.linspace(0, 2 * np.pi, 100)

@@ -39,7 +39,8 @@ class Camera(BaseOptics):
         meta = {}
         for key in incident_rays.meta.keys():
             meta[key] = torch.zeros_like(incident_rays.meta[key]) + float('nan')
-        return Rays(origins, directions, luminosities=luminosities, device=incident_rays.device, meta=meta)
+        return (Rays(origins, directions, luminosities=luminosities, device=incident_rays.device, meta=meta),
+                torch.zeros(origins.shape[0], dtype=torch.bool, device=origins.device)) # No rays reflected or refracted
 
     def plot(self, ax):
         self.lens.plot(ax)

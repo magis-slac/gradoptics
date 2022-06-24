@@ -81,7 +81,7 @@ class Mirror(BaseOptics):
                                                 scaling * n[:, 2] - directions[:, 2])
         reflected_ray = Rays(collision_points, direction_reflected_rays, luminosities=incident_rays.luminosities,
                              meta=incident_rays.meta, device=incident_rays.device)
-        return reflected_ray
+        return reflected_ray, torch.ones(collision_points.shape[0], dtype=torch.bool, device=collision_points.device)
 
     def plot(self, ax, show_normal=False, s=0.1, color='lightblue', resolution=100):
         y = torch.arange(-self.mirror_radii, self.mirror_radii, 2 * self.mirror_radii / resolution)
