@@ -7,7 +7,7 @@ from diffoptics.distributions.AtomCloud import AtomCloud
 from diffoptics.inference.RejectionSampling import rejection_sampling
 
 from diffoptics.optics.Lens import PerfectLens
-from diffoptics.optics.Mirror import Mirror
+from diffoptics.optics.Mirror import FlatMirror
 from diffoptics.optics.Ray import Ray, Rays, empty_like, cat
 from diffoptics.optics.Sensor import Sensor
 from diffoptics.optics.Window import Window

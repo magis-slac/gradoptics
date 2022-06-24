@@ -376,7 +376,7 @@ def _test_bounding_sphere(nb_rays=1000):
 
 def _test_grad_mirror_wrt_incident_rays(mirror_position=torch.ones(3),
                                         ray_origins=torch.randn(2, 3, requires_grad=True)):
-    mirror = optics.Mirror(mirror_position[0], mirror_position[1], mirror_position[2], torch.tensor([.2, .2, .6]), .005)
+    mirror = optics.FlatMirror(mirror_position[0], mirror_position[1], mirror_position[2], torch.tensor([.2, .2, .6]), .005)
 
     directions = [(mirror_position[0] - ray_origins[:, 0]).reshape(-1, 1),
                   (mirror_position[1] - ray_origins[:, 1]).reshape(-1, 1),
@@ -449,7 +449,7 @@ def _test_grad_lens_wrt_incident_rays(lens_position=torch.ones(3), ray_origins=t
 def _test_grad_mirror_wrt_self_parameters():
     mirror_normal = torch.tensor([.2, .2, .6], requires_grad=True)
     mirror_position = torch.tensor([1., 1., 1.], requires_grad=True)
-    mirror = optics.Mirror(mirror_position[0], mirror_position[1], mirror_position[2], mirror_normal, .005)
+    mirror = optics.FlatMirror(mirror_position[0], mirror_position[1], mirror_position[2], mirror_normal, .005)
 
     origins = torch.randn(2, 3)
     directions = [(mirror_position[0].item() - origins[:, 0]).reshape(-1, 1),
