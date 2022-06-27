@@ -65,9 +65,9 @@ def forward_ray_tracing(incident_rays, scene, max_iterations=2, ax=None):
         outgoing_rays, t, mask = trace_rays(incident_rays, scene)
 
         if ax is not None:
-            for ray_idx in range(mask.sum()):
-                origins = incident_rays.origins[mask].data.cpu().numpy()
-                destinations = incident_rays[mask](t[mask]).data.cpu().numpy()
+            origins = incident_rays.origins[mask].data.cpu().numpy()
+            destinations = incident_rays[mask](t[mask]).data.cpu().numpy()
+            for ray_idx in range(origins.shape[0]):
                 ax.plot([origins[ray_idx, 0], destinations[ray_idx, 0]],
                         [origins[ray_idx, 1], destinations[ray_idx, 1]],
                         [origins[ray_idx, 2], destinations[ray_idx, 2]])
