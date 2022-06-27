@@ -2,6 +2,7 @@ import math
 import abc
 
 import torch
+import numpy as np
 import diffoptics as optics
 from diffoptics.optics.BaseOptics import BaseOptics
 from diffoptics.optics.Ray import Rays
@@ -139,3 +140,76 @@ class FlatMirror(BaseMirror):
 
         if show_normal:  # @Todo
             pass
+
+
+class CurvedMirror(BaseMirror):
+
+    def __init__(self, R, width, height, transform):
+        super().__init__(transform)
+        self.R = R
+        self.width = width
+        self.height = height
+
+    def _get_normal(self, x):
+        sphere_center = torch.tensor([-self.R, 0, 0])
+
+        return optics.normalize_batch_vector(sphere_center - x)
+
+    def get_ray_intersection(self, incident_rays, eps=1e-15):
+        incident_rays = self.transform.apply_inverse_transform(incident_rays)  # World space to object space
+        origins, directions = incident_rays.get_origin_and_direction()
+
+        sphere_center = torch.tensor([-self.R, 0, 0])
+
+        # Solves a quadratic equation in t (intersection between the incident_rays and the sphere)
+        a = directions[:, 0] ** 2 + directions[:, 1] ** 2 + directions[:, 2] ** 2
+        b = 2 * (((origins[:, 0] - sphere_center[0]) * directions[:, 0]) + (
+                    (origins[:, 1] - sphere_center[1]) * directions[:, 1]) + (
+                             (origins[:, 2] - sphere_center[2]) * directions[:, 2]))
+        c = (origins[:, 0] - sphere_center[0]) ** 2 + (origins[:, 1] - sphere_center[1]) ** 2 + (
+                    origins[:, 2] - sphere_center[2]) ** 2 - self.R ** 2
+
+        pho = b ** 2 - 4 * a * c
+        mask = pho > 0
+        sqrt_pho = np.sqrt(pho[mask])
+
+        # Roots of the quadratic equation
+        t1 = torch.zeros(origins.shape[0])
+        t2 = torch.zeros(origins.shape[0])
+        t1[~mask] = float('Inf')
+        t2[~mask] = float('Inf')
+        t1[mask] = (-b[mask] + sqrt_pho) / (2 * a[mask])
+        t2[mask] = (-b[mask] - sqrt_pho) / (2 * a[mask])
+
+        # Makes sure the rays hit the sphere within the mirror width and height
+        position_on_sphere = incident_rays[mask](t1[mask])
+        new_mask = mask.clone()
+        new_mask[mask] = (position_on_sphere[:, 1].abs() < (self.width / 2)) & (
+                    position_on_sphere[:, 2].abs() < (self.height / 2))
+        t1[~new_mask] = float('Inf')
+        position_on_sphere = incident_rays[mask](t2[mask])
+        new_mask = mask.clone()
+        new_mask[mask] = (position_on_sphere[:, 1].abs() < (self.width / 2)) & (
+                    position_on_sphere[:, 2].abs() < (self.height / 2))
+        t2[~new_mask] = float('Inf')
+
+        # Removes virtual intersections
+        t1[t1 < 0] = float('Inf')
+        t2[t2 < 0] = float('Inf')
+        t = torch.min(t1, t2)
+        t[torch.isinf(t)] = float('nan')
+
+        return t
+
+    def plot(self, ax, show_normal=False, s=0.1, color='lightblue', resolution=100):
+        Y = torch.arange(-self.width / 2, self.width / 2, self.width / resolution)
+        Z = torch.arange(-self.height / 2, self.height / 2, self.height / resolution)
+        Y, Z = torch.meshgrid(Y, Z)
+        X = torch.sqrt(self.R ** 2 - Y ** 2 - Z ** 2) - self.R
+
+        # coordinates to world space
+        xyz = self.transform.apply_transform_(torch.cat((X.reshape(-1, 1), Y.reshape(-1, 1), Z.reshape(-1, 1)), dim=1))
+
+        # Plot the surface.
+        ax.plot_surface(xyz[:, 0].reshape(X.shape).numpy(), xyz[:, 1].reshape(X.shape).numpy(),
+                        xyz[:, 2].reshape(X.shape).numpy())

@@ -548,6 +548,38 @@ def _test_backward_ray_tracing(f=0.05, m=0.15, device='cpu'):
     return 0
 
 
+def _test_curved_mirrors():
+
+    # Creating a scene
+    f = 0.05
+    m = 0.15
+    lens = optics.PerfectLens(f=f, na=1 / 1.4, position=[0., 0., 0.], m=m)
+    sensor = optics.Sensor(position=(-f * (1 + m), 0, 0))
+    atom_cloud = optics.AtomCloud(n=int(1e6), f=2, position=[f * (1 + m) / m / 2, 0., 0.], phi=0.1)
+    mirror = optics.CurvedMirror(40, .05, .05, optics.SimpleTransform.SimpleTransform(
+        0., 0., 0., torch.tensor([f * (1 + m) / m * 3 / 4, 0, 0])))
+    light_source = optics.LightSourceFromDistribution(atom_cloud)
+    scene = optics.Scene(light_source)
+    scene.add_object(lens)
+    scene.add_object(sensor)
+    scene.add_object(mirror)
+
+    # Producing an image
+    device = 'cpu'
+    rays = light_source.sample_rays(10_00_000, device=device)
+    rays.directions[:, 0] = rays.directions[:, 0].abs()
+    optics.forward_ray_tracing(rays, scene, max_iterations=3)
+
+    # Readout the sensor
+    c = (4800, 4800)
+    w = 40
+    produced_image = sensor.readout(add_poisson_noise=False).data.cpu().numpy()
+    plt.imshow(produced_image[c[0] - w: c[0] + w, c[1] - w: c[1] + w], cmap='Blues')
+    plt.savefig('test_curved_mirrors.pdf')
+    plt.close()
+    return 0
+
+
 """
             Tests for pytest
 """
@@ -628,3 +660,6 @@ def test_forward_ray_tracing():
 
 def test_backward_ray_tracing():
     assert _test_backward_ray_tracing() == 0
+
+def test_curved_mirrors():
+    assert _test_curved_mirrors() == 0
