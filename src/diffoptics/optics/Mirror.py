@@ -2,12 +2,24 @@ import math
 import abc
 
 import torch
+import diffoptics as optics
 from diffoptics.optics.BaseOptics import BaseOptics
 from diffoptics.optics.Ray import Rays
 from diffoptics.optics.Vector import batch_vector
 
 
 class BaseMirror(BaseOptics):
+
+    def __init__(self, transform=None):
+        """
+        :param transform: Transform to orient the mirror
+                          (:py:class:`~diffoptics.transforms.BaseTransform.BaseTransform`)
+        """
+        # Identity transform
+        if transform is None:
+            transform = optics.SimpleTransform.SimpleTransform(0., 0., 0., torch.tensor([0, 0, 0]))
+
+        self.transform = transform
 
     @abc.abstractmethod
     def _get_normal(self, x):
@@ -20,6 +32,8 @@ class BaseMirror(BaseOptics):
         :param t:
         :return:
         """
+
+        incident_rays = self.transform.apply_inverse_transform(incident_rays)  # World space to object space
         directions = incident_rays.directions
         collision_points = incident_rays(t)
 
@@ -41,8 +55,9 @@ class BaseMirror(BaseOptics):
         direction_reflected_rays = batch_vector(scaling * normal[:, 0] - directions[:, 0],
                                                 scaling * normal[:, 1] - directions[:, 1],
                                                 scaling * normal[:, 2] - directions[:, 2])
-        reflected_ray = Rays(collision_points, direction_reflected_rays, luminosities=incident_rays.luminosities,
-                             meta=incident_rays.meta, device=incident_rays.device)
+        reflected_ray = self.transform.apply_transform(
+            Rays(collision_points, direction_reflected_rays, luminosities=incident_rays.luminosities,
+                 meta=incident_rays.meta, device=incident_rays.device))
         return reflected_ray, torch.ones(collision_points.shape[0], dtype=torch.bool, device=collision_points.device)
 
 
@@ -59,7 +74,7 @@ class FlatMirror(BaseMirror):
         :param normal: Normal of the mirror (:obj:`torch.tensor`)
         :param mirror_radii: Radii of the mirror (:obj:`float`)
         """
-        super(BaseMirror, self).__init__()
+        super().__init__()
         self.x_mirror = x_mirror
         self.y_mirror = y_mirror
         self.z_mirror = z_mirror
