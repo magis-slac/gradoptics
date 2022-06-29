@@ -125,7 +125,7 @@ class Rays:
         """
         return self.origins.shape[0]
 
-    def plot(self, ax, t, color='C0', line_width=None):
+    def plot(self, ax, t, **kwargs):
         """
         Plots the rays at times ``t``
 
@@ -138,7 +138,7 @@ class Rays:
             ax.plot([self.origins[i, 0], point[0]],
                     [self.origins[i, 1], point[1]],
                     [self.origins[i, 2], point[2]],
-                    color=color, linewidth=line_width)
+                    **kwargs)
 
 
 def empty_like(rays):
