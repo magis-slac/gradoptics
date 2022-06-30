@@ -170,6 +170,36 @@ def _test_lens_transform(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, positio
     return 0
 
 
+def _test_thick_lens(nb_rays=64):
+
+    position = torch.tensor([0., 0., 0.])
+    transform = optics.SimpleTransform.SimpleTransform(0, 0, 0, position)
+    lens = optics.ThickLens(1.5, 1., 1, 1e-1, transform)
+
+    # Create rays parallel to the optical axis
+    y_pos = torch.linspace(-.1, .1, int(np.sqrt(nb_rays)))
+    z_pos = torch.linspace(-.1, .1, int(np.sqrt(nb_rays)))
+    y_pos, z_pos = torch.meshgrid((y_pos, z_pos))
+
+    origins = optics.batch_vector(torch.zeros(nb_rays) + 2, y_pos + position[1], z_pos + position[2])
+    directions = optics.batch_vector(torch.ones(nb_rays) * -1, torch.zeros(nb_rays), torch.zeros(nb_rays))
+    rays = optics.Rays(origins, directions)
+
+    t = lens.get_ray_intersection(rays)
+    mask = ~torch.isnan(t)
+    refracted_rays, _ = lens.intersect(rays[mask], t[mask])
+
+    fig = plt.figure(figsize=(12, 12))
+    ax = fig.gca(projection='3d')
+    rays[mask].plot(ax, t[mask])
+    refracted_rays.plot(ax, [1.2 for _ in range(refracted_rays.origins.shape[0])], color='k', linestyle='--')
+    ax.view_init(elev=30., azim=70)
+    plt.savefig('test_thick_lens.pdf')
+    plt.close()
+
+    return 0
+
+
 def _ray_marching_test_sensor(eps=1e-3):
     f = 0.05
     m = 0.15
@@ -376,7 +406,8 @@ def _test_bounding_sphere(nb_rays=1000):
 
 def _test_grad_mirror_wrt_incident_rays(mirror_position=torch.ones(3),
                                         ray_origins=torch.randn(2, 3, requires_grad=True)):
-    mirror = optics.FlatMirror(mirror_position[0], mirror_position[1], mirror_position[2], torch.tensor([.2, .2, .6]), .005)
+    mirror = optics.FlatMirror(mirror_position[0], mirror_position[1], mirror_position[2], torch.tensor([.2, .2, .6]),
+                               .005)
 
     directions = [(mirror_position[0] - ray_origins[:, 0]).reshape(-1, 1),
                   (mirror_position[1] - ray_origins[:, 1]).reshape(-1, 1),
@@ -480,7 +511,6 @@ def _test_grad_sensor_wrt_self_parameters():
 
 
 def _test_forward_ray_tracing(f=0.05, m=0.15, device='cpu'):
-
     # Creating a scene
     image_pof = -f * (1 + m)
     object_pof = f * (1 + m) / m
@@ -549,7 +579,6 @@ def _test_backward_ray_tracing(f=0.05, m=0.15, device='cpu'):
 
 
 def _test_curved_mirrors():
-
     # Creating a scene
     f = 0.05
     m = 0.15
@@ -614,6 +643,10 @@ def test_lens():
     assert _test_lens_transform(f=0.05, m=0.15, position=torch.tensor([0., 0., 0.])) == 0
 
 
+def test_thick_lens():
+    assert _test_thick_lens() == 0
+
+
 def test_ray_marching():
     assert _ray_marching_test_sensor() == 0
     assert _ray_marching_test_lens() == 0
@@ -660,6 +693,7 @@ def test_forward_ray_tracing():
 
 def test_backward_ray_tracing():
     assert _test_backward_ray_tracing() == 0
+
 
 def test_curved_mirrors():
     assert _test_curved_mirrors() == 0

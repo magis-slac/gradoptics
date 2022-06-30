@@ -1,4 +1,4 @@
-from diffoptics.optics.Vector import vector, batch_vector, normalize_batch_vector, normalize_vector
+from diffoptics.optics.Vector import vector, batch_vector, normalize_batch_vector, normalize_vector, dot_product
 
 from diffoptics.distributions.GaussianDistribution import GaussianDistribution
 from diffoptics.distributions.BaseDistribution import BaseDistribution
@@ -6,7 +6,7 @@ from diffoptics.distributions.AtomCloud import AtomCloud
 
 from diffoptics.inference.RejectionSampling import rejection_sampling
 
-from diffoptics.optics.Lens import PerfectLens
+from diffoptics.optics.Lens import PerfectLens, ThickLens
 from diffoptics.optics.Mirror import FlatMirror, CurvedMirror
 from diffoptics.optics.Ray import Ray, Rays, empty_like, cat
 from diffoptics.optics.Sensor import Sensor
