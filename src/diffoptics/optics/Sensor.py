@@ -119,13 +119,6 @@ class Sensor(BaseOptics):
 
         self.depth_images[depth_id] = self.depth_images[depth_id].to(hit_positions.device)
 
-        # Only keep the rays that make it to the sensor
-        mask = (hit_positions[:, 0] < (self.resolution[1] * self.psf_ratio)) & (
-                hit_positions[:, 1] < (self.resolution[0] * self.psf_ratio)) & \
-               (hit_positions[:, 0] >= 0) & (hit_positions[:, 1] >= 0)
-        hit_positions = hit_positions[mask]
-        del mask
-
         if quantum_efficiency:  # Throw out some of the rays
             mask = torch.bernoulli(
                 torch.zeros(hit_positions.shape[0], device=hit_positions.device) + self.quantum_efficiency,
