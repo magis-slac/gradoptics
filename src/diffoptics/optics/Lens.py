@@ -291,8 +291,8 @@ class ThickLens(Lens):
             assert ((torch.sin(theta_1) * self.n_ext - torch.sin(theta_2) * self.n_lens).abs().mean()) < 1e-5
 
         return (Rays(origin_refracted_rays[mask], direction_refracted_rays,
-                     luminosities=incident_rays.luminosities[mask] if incident_rays.luminosities is not None else None,
-                     device=incident_rays.device), mask)
+                     luminosities=incident_rays.luminosities[mask], device=incident_rays.device),
+                mask)
 
     def get_ray_intersection(self, incident_rays):
 

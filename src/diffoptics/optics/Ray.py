@@ -52,17 +52,17 @@ class Rays:
         """
         self.origins = origins.to(device)
         self.directions = normalize_batch_vector(directions).to(device)
-        self.luminosities = luminosities.to(device) if luminosities is not None else None
+        self.luminosities = luminosities.to(device) if luminosities is not None else torch.ones(origins.shape[0],
+                                                                                                device=device)
         self.meta = meta if meta is not None else {}
         self.device = device
 
-        assert origins.dtype == directions.dtype
+        assert self.origins.dtype == self.directions.dtype
         # Sanity check: dimensionality consistency
-        assert origins.shape == directions.shape
-        if luminosities is not None:
-            assert origins.shape[0] == luminosities.shape[0]
+        assert self.origins.shape == self.directions.shape
+        assert self.origins.shape[0] == self.luminosities.shape[0]
         for key in self.meta.keys():
-            assert meta[key].shape[0] == origins.shape[0]
+            assert self.meta[key].shape[0] == self.origins.shape[0]
 
     def __getitem__(self, condition):
         """
@@ -76,8 +76,7 @@ class Rays:
         for key in self.meta.keys():
             meta[key] = self.meta[key][condition]
 
-        return Rays(self.origins[condition], self.directions[condition],
-                    luminosities=self.luminosities[condition] if self.luminosities is not None else None,
+        return Rays(self.origins[condition], self.directions[condition], luminosities=self.luminosities[condition],
                     meta=meta, device=self.device)
 
     def __setitem__(self, condition, value):
@@ -90,9 +89,7 @@ class Rays:
 
         self.origins[condition] = value.origins
         self.directions[condition] = value.directions
-
-        if self.luminosities is not None:
-            self.luminosities[condition] = value.luminosities
+        self.luminosities[condition] = value.luminosities
 
         assert len(self.meta.keys()) == len(value.meta.keys())
 
@@ -135,9 +132,7 @@ class Rays:
         for i in range(len(t)):  # @Todo, parallelize
             point = self.origins[i] + t[i] * self.directions[i]
 
-            ax.plot([self.origins[i, 0], point[0]],
-                    [self.origins[i, 1], point[1]],
-                    [self.origins[i, 2], point[2]],
+            ax.plot([self.origins[i, 0], point[0]], [self.origins[i, 1], point[1]], [self.origins[i, 2], point[2]],
                     **kwargs)
 
 
@@ -152,7 +147,7 @@ def empty_like(rays):
     """
     origins = torch.empty_like(rays.origins)
     directions = torch.empty_like(rays.directions)
-    luminosities = (torch.empty_like(rays.luminosities)) if rays.luminosities is not None else None
+    luminosities = torch.empty_like(rays.luminosities)
     meta = {}
     for key in rays.meta.keys():
         meta[key] = torch.empty_like(rays.meta[key])
@@ -171,9 +166,7 @@ def cat(rays1, rays2):
     """
     rays1.origins = torch.cat((rays1.origins, rays2.origins))
     rays1.directions = torch.cat((rays1.directions, rays2.directions))
-
-    if rays1.luminosities is not None:
-        rays1.luminosities = torch.cat((rays1.luminosities, rays2.luminosities))
+    rays1.luminosities = torch.cat((rays1.luminosities, rays2.luminosities))
 
     for key in rays1.meta.keys():
         rays1.meta[key] = torch.cat((rays1.meta[key], rays2.meta[key]), dim=0)
