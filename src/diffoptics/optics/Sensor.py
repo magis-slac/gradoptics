@@ -95,7 +95,8 @@ class Sensor(BaseOptics):
                     # Get the mask for the rays at the depths in [low_bounds, high_bounds]
                     mask = (incident_rays.meta['depth'] < high_bounds) & (incident_rays.meta['depth'] > low_bounds)
                     hit_positions_psf = hit_positions[mask] * self.psf_ratio
-                    self.pixelize(depth_id, hit_positions_psf, quantum_efficiency=quantum_efficiency)
+                    self.pixelize(depth_id, hit_positions_psf, incident_rays.luminosities[mask],
+                                  quantum_efficiency=quantum_efficiency)
                     nb_processed_rays += mask.sum()
 
                 if not (nb_processed_rays == hit_positions.shape[0]):
@@ -103,39 +104,50 @@ class Sensor(BaseOptics):
                         "Some rays were not processed: their origins' depths were not included in the psfs.")
 
             else:
-                self.pixelize(0, hit_positions, quantum_efficiency=quantum_efficiency)
+                self.pixelize(0, hit_positions, incident_rays.luminosities, quantum_efficiency=quantum_efficiency)
 
         # No rays reflected or refracted
         return None, torch.zeros(origins.shape[0], dtype=torch.bool, device=origins.device)
 
-    def pixelize(self, depth_id, hit_positions, quantum_efficiency=True):
+    def pixelize(self, depth_id, hit_positions, luminosities, quantum_efficiency=True):
         """
         Accumulates photons at the pixels hit by some rays at the positions ``hit_positions``
 
         :param depth_id: index of the depth (encoded in the PSF) from where the rays come from (:obj:`int`)
         :param hit_positions: The positions at which the rays hit the sensor (:obj:`torch.tensor`)
+        :param luminosities: The luminosities of the rays  (:obj:`torch.tensor`)
         :param quantum_efficiency: Whether to use quantum efficiency or no (:obj:`bool`)
         """
 
         self.depth_images[depth_id] = self.depth_images[depth_id].to(hit_positions.device)
+
+        if hit_positions.shape[0] == 0:
+            return
 
         if quantum_efficiency:  # Throw out some of the rays
             mask = torch.bernoulli(
                 torch.zeros(hit_positions.shape[0], device=hit_positions.device) + self.quantum_efficiency,
                 generator=None, out=None).type(torch.bool)
             hit_positions = hit_positions[mask]
+            luminosities = luminosities[mask]
             del mask
 
         # Update pixel values
         indices = torch.floor(hit_positions[:, 1]).type(torch.int64) * (self.resolution[1] * self.psf_ratio) + \
-                  torch.floor(hit_positions[:, 0]).type(torch.int64)
-        indices_and_counts = indices.unique(return_counts=True)
-        tmp = torch.zeros(self.depth_images[depth_id].shape, device=self.depth_images[depth_id].device)
-        for cnt in indices_and_counts[1].unique():
-            ind = indices_and_counts[0][indices_and_counts[1] == cnt]
-            tmp[ind % (self.resolution[1] * self.psf_ratio), ind // (self.resolution[1] * self.psf_ratio)] += cnt
+            torch.floor(hit_positions[:, 0]).type(torch.int64)
+        max_nb_identical_indices = indices.unique(return_counts=True)[1].max()
+        sorted_indices, arg_sorted_indices = torch.sort(indices)
 
-        self.depth_images[depth_id] = self.depth_images[depth_id] + tmp
+        for i in range(max_nb_identical_indices):
+            ind = sorted_indices[i::max_nb_identical_indices]
+            arg_ind = arg_sorted_indices[i::max_nb_identical_indices]
+
+            # Sanity check, should be removed
+            cond = (ind[1:] == ind[:-1])
+            assert cond.sum().item() == 0, "Should not happen"
+
+            self.depth_images[depth_id][ind % (self.resolution[1] * self.psf_ratio),
+                                        ind // (self.resolution[1] * self.psf_ratio)] += luminosities[arg_ind, None]
 
     def readout(self, add_poisson_noise=True, destructive_readout=True):
         """
