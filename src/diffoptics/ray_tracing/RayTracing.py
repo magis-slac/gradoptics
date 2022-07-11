@@ -42,7 +42,7 @@ def trace_rays(incident_rays, scene):
         tmp, mask[condition] = o.intersect(incident_rays[condition], t[condition])
 
         if tmp is not None:
-            outgoing_rays[condition] = tmp
+            outgoing_rays[condition & mask] = tmp
 
     return outgoing_rays, t, mask
 
