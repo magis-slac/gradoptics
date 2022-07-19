@@ -174,7 +174,7 @@ class Sensor(BaseOptics):
         if destructive_readout:
             # Reinitialize depth images
             for i in range(len(self.depth_images)):
-                self.depth_images[i] *= 0
+                self.depth_images[i] = self.depth_images[i].detach() * 0
 
         # Add readout noise
         if add_poisson_noise:
