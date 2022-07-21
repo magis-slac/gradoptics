@@ -14,9 +14,9 @@ class LightSourceFromDistribution(BaseLightSource):
     def __init__(self, distribution, bounding_shape=None):
         """
         :param distribution: Distribution from which photons will be sampled
-                             (:py:class:`~gradoptics.distributions.BaseDistribution.BaseDistribution`)
+                             (:py:class:`~gradoptics.distributions.base_distribution.BaseDistribution`)
         :param bounding_shape: A bounding shape that bounds the light source
-                               (:py:class:`~gradoptics.optics.BoundingShape.BoundingShape`). Default is ``None``
+                               (:py:class:`~gradoptics.optics.bounding_shape.BoundingShape`). Default is ``None``
 
         .. note::
              A bounding shape is required if this light source is used with backward ray tracing

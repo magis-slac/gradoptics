@@ -14,7 +14,7 @@ class BaseMirror(BaseOptics):
     def __init__(self, transform=None):
         """
         :param transform: Transform to orient the mirror
-                          (:py:class:`~gradoptics.transforms.BaseTransform.BaseTransform`)
+                          (:py:class:`~gradoptics.transforms.base_transform.BaseTransform`)
         """
         # Identity transform
         if transform is None:

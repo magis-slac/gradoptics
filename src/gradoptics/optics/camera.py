@@ -10,10 +10,10 @@ class Camera(BaseOptics):
 
     def __init__(self, lens, sensor, intermediate_objects=[]):
         """
-        :param lens: External lens - interface with the world (:py:class:`~gradoptics.optics.Lens.Lens`)
-        :param sensor: Sensor (:py:class:`~gradoptics.optics.Sensor.Sensor`)
+        :param lens: External lens - interface with the world (:py:class:`~gradoptics.optics.lens.Lens`)
+        :param sensor: Sensor (:py:class:`~gradoptics.optics.sensor.Sensor`)
         :param intermediate_objects: list of optical elements between the external lens and the sensor
-                                     (:obj:`list` of :py:class:`~gradoptics.optics.BaseOptics.BaseOptics`)
+                                     (:obj:`list` of :py:class:`~gradoptics.optics.base_optics.BaseOptics`)
         """
         super(Camera, self).__init__()
         self.lens = lens

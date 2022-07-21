@@ -6,7 +6,7 @@ class Scene:
 
     def __init__(self, light_source):
         """
-        :param light_source: A light source (:py:class:`~gradoptics.light_sources.BaseLightSource.BaseLightSource`)
+        :param light_source: A light source (:py:class:`~gradoptics.light_sources.base_light_source.BaseLightSource`)
         """
         self.light_source = light_source
         self.objects = []
@@ -15,7 +15,7 @@ class Scene:
         """
         Adds an optical element to the scene
 
-        :param obj: An optical element (:py:class:`~gradoptics.optics.BaseOptics.BaseOptics`)
+        :param obj: An optical element (:py:class:`~gradoptics.optics.base_optics.BaseOptics`)
         """
         self.objects.append(obj)
 

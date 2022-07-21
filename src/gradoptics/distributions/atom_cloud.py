@@ -20,7 +20,7 @@ class AtomCloud(BaseDistribution):
         :param phi: Phase of the sine-wave density modulation fringe pattern (:obj:`float`)
         :param proposal_distribution: Proposal distribution used in rejection sampling for sampling from the
                                       unnormalized cloud distribution
-                                      (:py:class:`~gradoptics.distributions.BaseDistribution.BaseDistribution`)
+                                      (:py:class:`~gradoptics.distributions.base_distribution.BaseDistribution`)
         """
         super().__init__()
         self.n = n

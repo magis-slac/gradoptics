@@ -1,7 +1,7 @@
-diffoptics.optics.Sensor
+gradoptics.optics.sensor
 ========================
 
-.. automodule:: diffoptics.optics.Sensor
+.. automodule:: gradoptics.optics.sensor
    :members:
    :undoc-members:
    :show-inheritance:

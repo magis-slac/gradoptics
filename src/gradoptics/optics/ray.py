@@ -70,7 +70,7 @@ class Rays:
 
         :param condition: Boolean tensor (:obj:`torch.tensor`)
 
-        :return: A batch of rays where the ``condition`` is true (:py:class:`~gradoptics.optics.Ray.Rays`)
+        :return: A batch of rays where the ``condition`` is true (:py:class:`~gradoptics.optics.ray.Rays`)
         """
         meta = {}
         for key in self.meta.keys():
@@ -84,7 +84,7 @@ class Rays:
         Update the rays where the ``condition`` is true
 
         :param condition: Boolean tensor (:obj:`torch.tensor`)
-        :param value: The new rays (:py:class:`~gradoptics.optics.Ray.Rays`)
+        :param value: The new rays (:py:class:`~gradoptics.optics.ray.Rays`)
         """
 
         self.origins[condition] = value.origins
@@ -141,9 +141,9 @@ def empty_like(rays):
     Returns an uninitialized batch of rays with the same size as ``rays``
 
     :param rays: the size of ``rays`` will determine the size of the new batch of rays
-                 (:py:class:`~gradoptics.optics.Ray.Rays`)
+                 (:py:class:`~gradoptics.optics.ray.Rays`)
 
-    :return: A new batch of rays (:py:class:`~gradoptics.optics.Ray.Rays`)
+    :return: A new batch of rays (:py:class:`~gradoptics.optics.ray.Rays`)
     """
     origins = torch.empty_like(rays.origins)
     directions = torch.empty_like(rays.directions)
@@ -159,10 +159,10 @@ def cat(rays1, rays2):
     """
     Concatenates the two batch of rays
 
-    :param rays1: First batch of rays (:py:class:`~gradoptics.optics.Ray.Rays`)
-    :param rays2: Second batch of rays (:py:class:`~gradoptics.optics.Ray.Rays`)
+    :param rays1: First batch of rays (:py:class:`~gradoptics.optics.ray.Rays`)
+    :param rays2: Second batch of rays (:py:class:`~gradoptics.optics.ray.Rays`)
 
-    :return New batch of rays (:py:class:`~gradoptics.optics.Ray.Rays`)
+    :return New batch of rays (:py:class:`~gradoptics.optics.ray.Rays`)
     """
     rays1.origins = torch.cat((rays1.origins, rays2.origins))
     rays1.directions = torch.cat((rays1.directions, rays2.directions))

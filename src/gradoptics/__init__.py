@@ -1,4 +1,4 @@
-from gradoptics.optics.vector import vector, batch_vector, normalize_batch_vector, normalize_vector, dot_product
+from gradoptics.optics.vector import vector3d, batch_vector, normalize_batch_vector, normalize_vector, dot_product
 
 from gradoptics.distributions.gaussian_distribution import GaussianDistribution
 from gradoptics.distributions.base_distribution import BaseDistribution

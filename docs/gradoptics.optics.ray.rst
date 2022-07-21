@@ -1,7 +1,7 @@
-diffoptics.optics.Ray
+gradoptics.optics.ray
 =====================
 
-.. automodule:: diffoptics.optics.Ray
+.. automodule:: gradoptics.optics.ray
    :members:
    :undoc-members:
    :show-inheritance:

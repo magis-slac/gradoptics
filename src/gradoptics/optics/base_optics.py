@@ -12,7 +12,7 @@ class BaseOptics(abc.ABC):
         """
         Computes the times t at which the incident rays will intersect the object.
 
-        :param incident_rays: The incident rays (:py:class:`~gradoptics.optics.Ray.Rays`)
+        :param incident_rays: The incident rays (:py:class:`~gradoptics.optics.ray.Rays`)
 
         :return: Times t (:obj:`torch.tensor`)
         """
@@ -24,11 +24,11 @@ class BaseOptics(abc.ABC):
         """
         Returns the rays reflected or refracted by the optical element.
 
-        :param incident_rays: The incident rays (:py:class:`~gradoptics.optics.Ray.Rays`)
+        :param incident_rays: The incident rays (:py:class:`~gradoptics.optics.ray.Rays`)
         :param t: The times at which the incident rays will intersect the optical element (:obj:`torch.tensor`)
 
         :return: (:obj:`tuple`)
-                 - Reflected or refracted rays (:py:class:`~gradoptics.optics.Ray.Rays`)
+                 - Reflected or refracted rays (:py:class:`~gradoptics.optics.ray.Rays`)
                  - A boolean mask that indicates which incident rays were reflected or refracted ― some rays may not be
                    reflected or refracted for example, due to total internal reflection, which is not modelled at this
                    point (:obj:`torch.tensor`)

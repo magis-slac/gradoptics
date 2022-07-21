@@ -71,7 +71,7 @@ def cross_product(vector1, vector2):
     return torch.tensor([x, y, z])
 
 
-def vector(x, y, z):
+def vector3d(x, y, z):
     """
     Returns a 3d vector
 
@@ -106,4 +106,4 @@ def get_perpendicular_vector(input_vector, eps=1e-15):
     y1 = 1.
     # x1 * input_vector[0] + y1 * input_vector[1] + z1 * input_vector[2] = 0
     z1 = - (x1 * input_vector[0] + y1 * input_vector[1]) / (input_vector[2] + eps)
-    return vector(x1, y1, z1)
+    return vector3d(x1, y1, z1)

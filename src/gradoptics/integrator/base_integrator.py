@@ -12,7 +12,7 @@ class BaseIntegrator(abc.ABC):
         Computes the line integral between ``t_min`` and ``t_max`` of the incident rays through the density ``pdf``
 
         :param incident_rays: The rays for which the line integrals should be computed
-                              (:py:class:`~gradoptics.optics.Ray.Rays`)
+                              (:py:class:`~gradoptics.optics.ray.Rays`)
         :param pdf: The pdf for which line integrals should be computed
         :param t_min: Lower integration bounds (:obj:`torch.tensor`)
         :param t_max: Higher integration bounds (:obj:`torch.tensor`)

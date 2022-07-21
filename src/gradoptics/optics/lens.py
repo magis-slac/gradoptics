@@ -38,7 +38,7 @@ class PerfectLens(Lens):
         :param na: Inverse of the f-number (:obj:`float`)
         :param position: Position of the lens (:obj:`list`)
         :param m: Lens magnification  (:obj:`float`)
-        :param transform: Transform to orient the lens (:py:class:`~gradoptics.transforms.BaseTransform.BaseTransform`)
+        :param transform: Transform to orient the lens (:py:class:`~gradoptics.transforms.base_transform.BaseTransform`)
         :param eps: Parameter used for numerical stability in the different class methods (:obj:`float`). Default
                     is ``'1e-15'``
         """
@@ -144,7 +144,7 @@ class ThickLens(Lens):
         :param n_ext: Index of refraction of the external medium (:obj:`float`)
         :param R: Radius of curvature of the lens (:obj:`float`)
         :param d: Thickness of the lens (:obj:`float`)
-        :param transform: Transform to orient the lens (:py:class:`~gradoptics.transforms.BaseTransform.BaseTransform`)
+        :param transform: Transform to orient the lens (:py:class:`~gradoptics.transforms.base_transform.BaseTransform`)
         """
         super(ThickLens, self).__init__()
         self.n_lens = n_lens
@@ -222,7 +222,7 @@ class ThickLens(Lens):
         """
         Computes the times t at which the incident rays will intersect the left surface of the lens
 
-        :param incident_rays: The incident rays (:py:class:`~gradoptics.optics.Ray.Rays`)
+        :param incident_rays: The incident rays (:py:class:`~gradoptics.optics.ray.Rays`)
 
         :return: Times t (:obj:`torch.tensor`)
         """
@@ -238,7 +238,7 @@ class ThickLens(Lens):
         """
         Computes the times t at which the incident rays will intersect the right surface of the lens
 
-        :param incident_rays: The incident rays (:py:class:`~gradoptics.optics.Ray.Rays`)
+        :param incident_rays: The incident rays (:py:class:`~gradoptics.optics.ray.Rays`)
 
         :return: Times t (:obj:`torch.tensor`)
         """
@@ -255,11 +255,11 @@ class ThickLens(Lens):
         """
         Computes the rays refracted by the first surface
 
-        :param incident_rays: The incident rays (:py:class:`~gradoptics.optics.Ray.Rays`)
+        :param incident_rays: The incident rays (:py:class:`~gradoptics.optics.ray.Rays`)
         :param t: The times at which the incident rays will intersect the optical element (:obj:`torch.tensor`)
 
         :return: (:obj:`tuple`)
-                 - Reflected or refracted rays (:py:class:`~gradoptics.optics.Ray.Rays`)
+                 - Reflected or refracted rays (:py:class:`~gradoptics.optics.ray.Rays`)
                  - A boolean mask that indicates which incident rays were refracted ― some rays may not be
                    refracted (:obj:`torch.tensor`)
         """
