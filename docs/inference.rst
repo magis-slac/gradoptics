@@ -3,4 +3,4 @@ Inference
 
 .. toctree::
 
-    diffoptics.inference.RejectionSampling
+    gradoptics.inference.rejection_sampling

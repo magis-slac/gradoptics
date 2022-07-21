@@ -1,7 +1,7 @@
-diffoptics.ray\_tracing.RayTracing
+gradoptics.ray\_tracing.ray\_tracing
 ==================================
 
-.. automodule:: diffoptics.ray_tracing.RayTracing
+.. automodule:: gradoptics.ray_tracing.ray_tracing
    :members:
    :undoc-members:
    :show-inheritance:

@@ -1,7 +1,7 @@
-diffoptics.transforms.BaseTransform
+gradoptics.transforms.base\_transform
 ===================================
 
-.. automodule:: diffoptics.transforms.BaseTransform
+.. automodule:: gradoptics.transforms.base_transform
    :members:
    :undoc-members:
    :show-inheritance:

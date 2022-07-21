@@ -5,7 +5,7 @@
 
 Differentiable Optics via Ray Tracing
 =====================================
-`diffoptics <https://github.com/magis-slac/differentiable-optics>`__ is a ray tracing based optical simulator built using PyTorch [1] to enable automatic differentiation.
+`gradoptics <https://github.com/magis-slac/gradoptics>`__ is a ray tracing based optical simulator built using PyTorch [1] to enable automatic differentiation.
 
 The API is designed similar to rendering softwares, and has been heavily inspired by Physically Based Rendering (Pharr, Jakob, Humphreys) [2].
 
@@ -14,12 +14,11 @@ Installation
 
 .. code-block:: console
 
-	pip install diffoptics
+	pip install gradoptics
 
 Work in progress
 ----------------
 
-- Currently using ideal lenses (thin lens approximation) -> thick and compound lenses in progress
 - Currently the lens and window normals are aligned with the optical axis -> more general orientations in progress
 - Currently monochromatic -> no chromatic abberations
 - Adding PSF to imaging -> in progress
@@ -35,12 +34,12 @@ Feedback and Contributions
 
 Please use issues on GitHub for reporting bugs and suggesting features (including better documentation).
 
-We appreciate all contributions. In general, we recommend using pull requests to make changes to diffoptics.
+We appreciate all contributions. In general, we recommend using pull requests to make changes to gradoptics.
 
 Support
 -------
 
-`diffoptics <https://github.com/magis-slac/differentiable-optics>`__ was developed in the context of the MAGIS-100 experiment
+`gradoptics <https://github.com/magis-slac/gradoptics>`__ was developed in the context of the MAGIS-100 experiment
 
 References
 ----------

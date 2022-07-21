@@ -1,7 +1,7 @@
-diffoptics.distributions.GaussianDistribution
+gradoptics.distributions.gaussian\_distribution
 =============================================
 
-.. automodule:: diffoptics.distributions.GaussianDistribution
+.. automodule:: gradoptics.distributions.gaussian_distribution
    :members:
    :undoc-members:
    :show-inheritance:

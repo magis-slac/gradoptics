@@ -3,6 +3,6 @@ Transforms
 
 .. toctree::
 
-    diffoptics.transforms.BaseTransform
-    diffoptics.transforms.LookAtTransform
-    diffoptics.transforms.SimpleTransform
+    gradoptics.transforms.base_transform
+    gradoptics.transforms.look_at_transform
+    gradoptics.transforms.simple_transform

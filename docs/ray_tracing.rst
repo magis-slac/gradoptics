@@ -3,5 +3,5 @@ Ray Tracing
 
 .. toctree::
 
-    diffoptics.ray_tracing.RayTracing
-    diffoptics.ray_tracing.Scene
+    gradoptics.ray_tracing.ray_tracing
+    gradoptics.ray_tracing.scene

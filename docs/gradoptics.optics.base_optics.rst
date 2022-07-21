@@ -1,7 +1,7 @@
-diffoptics.optics.BaseOptics
+gradoptics.optics.base\_optics
 ============================
 
-.. automodule:: diffoptics.optics.BaseOptics
+.. automodule:: gradoptics.optics.base_optics
    :members:
    :undoc-members:
    :show-inheritance:

@@ -1,7 +1,7 @@
-diffoptics.optics.BoundingSphere
+gradoptics.optics.bounding\_sphere
 ================================
 
-.. automodule:: diffoptics.optics.BoundingSphere
+.. automodule:: gradoptics.optics.bounding_sphere
    :members:
    :undoc-members:
    :show-inheritance:

@@ -1,4 +1,4 @@
-gradoptics.transforms.simple_transform
+gradoptics.transforms.simple\_transform
 =====================================
 
 .. automodule:: gradoptics.transforms.simple_transform

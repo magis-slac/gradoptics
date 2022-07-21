@@ -1,7 +1,7 @@
-diffoptics.optics.Camera
+gradoptics.optics.camera
 ========================
 
-.. automodule:: diffoptics.optics.Camera
+.. automodule:: gradoptics.optics.camera
    :members:
    :undoc-members:
    :show-inheritance:

@@ -5,13 +5,13 @@ Optical Elements
 
 .. toctree::
 
-    diffoptics.optics.BaseOptics
-    diffoptics.optics.Camera
-    diffoptics.optics.Lens
-    diffoptics.optics.Mirror
-    diffoptics.optics.Sensor
-    diffoptics.optics.Ray
-    diffoptics.optics.Window
-    diffoptics.optics.PSF
-    diffoptics.optics.BoundingSphere
-    diffoptics.optics.Vector
+    gradoptics.optics.base_optics
+    gradoptics.optics.camera
+    gradoptics.optics.lens
+    gradoptics.optics.mirror
+    gradoptics.optics.sensor
+    gradoptics.optics.ray
+    gradoptics.optics.window
+    gradoptics.optics.psf
+    gradoptics.optics.bounding_sphere
+    gradoptics.optics.vector

@@ -1,7 +1,7 @@
-diffoptics.distributions.BaseDistribution
+gradoptics.distributions.base\_distribution
 =========================================
 
-.. automodule:: diffoptics.distributions.BaseDistribution
+.. automodule:: gradoptics.distributions.base_distribution
    :members:
    :undoc-members:
    :show-inheritance:

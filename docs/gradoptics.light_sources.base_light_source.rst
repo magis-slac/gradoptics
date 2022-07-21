@@ -1,7 +1,7 @@
-diffoptics.light\_sources.BaseLightSource
+gradoptics.light\_sources.base\_light\_source
 =========================================
 
-.. automodule:: diffoptics.light_sources.BaseLightSource
+.. automodule:: gradoptics.light_sources.base_light_source
    :members:
    :undoc-members:
    :show-inheritance:

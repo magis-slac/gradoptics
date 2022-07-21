@@ -1,7 +1,7 @@
-diffoptics.distributions.AtomCloud
+gradoptics.distributions.atom\_cloud
 ==================================
 
-.. automodule:: diffoptics.distributions.AtomCloud
+.. automodule:: gradoptics.distributions.atom_cloud
    :members:
    :undoc-members:
    :show-inheritance:

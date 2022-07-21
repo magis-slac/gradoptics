@@ -1,7 +1,7 @@
-diffoptics.transforms.LookAtTransform
+gradoptics.transforms.look\_at\_transform
 =====================================
 
-.. automodule:: diffoptics.transforms.LookAtTransform
+.. automodule:: gradoptics.transforms.look_at_transform
    :members:
    :undoc-members:
    :show-inheritance:

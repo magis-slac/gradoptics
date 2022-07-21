@@ -3,5 +3,5 @@ Integrators
 
 .. toctree::
 
-    diffoptics.integrator.BaseIntegrator
-    diffoptics.integrator.StratifiedSamplingIntegrator
+    gradoptics.integrator.base_integrator
+    gradoptics.integrator.stratified_sampling_integrator

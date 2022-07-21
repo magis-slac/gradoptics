@@ -1,7 +1,7 @@
-diffoptics.optics.Mirror
+gradoptics.optics.mirror
 ========================
 
-.. automodule:: diffoptics.optics.Mirror
+.. automodule:: gradoptics.optics.mirror
    :members:
    :undoc-members:
    :show-inheritance:

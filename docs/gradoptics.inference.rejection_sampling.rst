@@ -1,7 +1,7 @@
-diffoptics.inference.RejectionSampling
+gradoptics.inference.rejection\_sampling
 ======================================
 
-.. automodule:: diffoptics.inference.RejectionSampling
+.. automodule:: gradoptics.inference.rejection_sampling
    :members:
    :undoc-members:
    :show-inheritance:

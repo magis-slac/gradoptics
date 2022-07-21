@@ -1,7 +1,7 @@
-diffoptics.integrator.BaseIntegrator
+gradoptics.integrator.base\_integrator
 ==================================
 
-.. automodule:: diffoptics.integrator.BaseIntegrator
+.. automodule:: gradoptics.integrator.base_integrator
    :members:
    :undoc-members:
    :show-inheritance:

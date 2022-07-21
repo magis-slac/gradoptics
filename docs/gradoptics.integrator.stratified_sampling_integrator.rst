@@ -1,7 +1,7 @@
-diffoptics.integrator.StratifiedSamplingIntegrator
+gradoptics.integrator.stratified\_sampling\_integrator
 ==================================
 
-.. automodule:: diffoptics.integrator.StratifiedSamplingIntegrator
+.. automodule:: gradoptics.integrator.stratified_sampling_integrator
    :members:
    :undoc-members:
    :show-inheritance:

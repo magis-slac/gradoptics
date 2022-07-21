@@ -1,7 +1,7 @@
-diffoptics.ray\_tracing.Scene
+gradoptics.ray\_tracing.scene
 =============================
 
-.. automodule:: diffoptics.ray_tracing.Scene
+.. automodule:: gradoptics.ray_tracing.scene
    :members:
    :undoc-members:
    :show-inheritance:

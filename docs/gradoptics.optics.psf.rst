@@ -1,7 +1,7 @@
-diffoptics.optics.PSF
+gradoptics.optics.psf
 =====================
 
-.. automodule:: diffoptics.optics.PSF
+.. automodule:: gradoptics.optics.psf
    :members:
    :undoc-members:
    :show-inheritance:

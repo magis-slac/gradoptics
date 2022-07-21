@@ -7,28 +7,28 @@ Probability Distributions
 
 .. toctree::
 
-    diffoptics.distributions.BaseDistribution
-    diffoptics.distributions.GaussianDistribution
-    diffoptics.distributions.AtomCloud
+    gradoptics.distributions.base_distribution
+    gradoptics.distributions.gaussian_distribution
+    gradoptics.distributions.atom_cloud
 
 
 Optical Elements
 ----------------
 
-.. currentmodule:: diffoptics.optics
+.. currentmodule:: gradoptics.optics
 
 .. toctree::
 
-    diffoptics.optics.BaseOptics
-    diffoptics.optics.Camera
-    diffoptics.optics.Lens
-    diffoptics.optics.Mirror
-    diffoptics.optics.Sensor
-    diffoptics.optics.Ray
-    diffoptics.optics.Window
-    diffoptics.optics.PSF
-    diffoptics.optics.BoundingSphere
-    diffoptics.optics.Vector
+    gradoptics.optics.base_optics
+    gradoptics.optics.camera
+    gradoptics.optics.lens
+    gradoptics.optics.mirror
+    gradoptics.optics.sensor
+    gradoptics.optics.ray
+    gradoptics.optics.window
+    gradoptics.optics.psf
+    gradoptics.optics.bounding_sphere
+    gradoptics.optics.vector
 
 
 Transforms
@@ -36,9 +36,9 @@ Transforms
 
 .. toctree::
 
-    diffoptics.transforms.BaseTransform
-    diffoptics.transforms.LookAtTransform
-    diffoptics.transforms.SimpleTransform
+    gradoptics.transforms.base_transform
+    gradoptics.transforms.look_at_transform
+    gradoptics.transforms.simple_transform
 
 
 Ray Tracing
@@ -46,8 +46,8 @@ Ray Tracing
 
 .. toctree::
 
-    diffoptics.ray_tracing.RayTracing
-    diffoptics.ray_tracing.Scene
+    gradoptics.ray_tracing.ray_tracing
+    gradoptics.ray_tracing.scene
 
 
 Light Sources
@@ -55,8 +55,8 @@ Light Sources
 
 .. toctree::
 
-    diffoptics.light_sources.BaseLightSource
-    diffoptics.light_sources.LightSourceFromDistribution
+    gradoptics.light_sources.base_light_source
+    gradoptics.light_sources.lightSource_from_distribution
 
 
 Inference
@@ -64,4 +64,4 @@ Inference
 
 .. toctree::
 
-    diffoptics.inference.RejectionSampling
+    gradoptics.inference.rejection_sampling

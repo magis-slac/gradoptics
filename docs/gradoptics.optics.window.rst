@@ -1,7 +1,7 @@
-diffoptics.optics.Window
+gradoptics.optics.window
 ========================
 
-.. automodule:: diffoptics.optics.Window
+.. automodule:: gradoptics.optics.window
    :members:
    :undoc-members:
    :show-inheritance:

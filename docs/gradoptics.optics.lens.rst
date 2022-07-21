@@ -1,7 +1,7 @@
-diffoptics.optics.Lens
+gradoptics.optics.lens
 ======================
 
-.. automodule:: diffoptics.optics.Lens
+.. automodule:: gradoptics.optics.lens
    :members:
    :undoc-members:
    :show-inheritance:

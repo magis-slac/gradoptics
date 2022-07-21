@@ -1,7 +1,7 @@
-diffoptics.optics.Vector
+gradoptics.optics.vector
 ========================
 
-.. automodule:: diffoptics.optics.Vector
+.. automodule:: gradoptics.optics.vector
    :members:
    :undoc-members:
    :show-inheritance:
