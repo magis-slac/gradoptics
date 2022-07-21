@@ -1,6 +1,6 @@
 import torch
 
-from gradoptics.transforms.BaseTransform import BaseTransform
+from gradoptics.transforms.base_transform import BaseTransform
 
 
 class SimpleTransform(BaseTransform):

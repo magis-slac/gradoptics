@@ -1,8 +1,8 @@
 import numpy as np
 import torch
 
-from gradoptics.optics.Ray import Rays
-from gradoptics.optics.BoundingShape import BoundingShape
+from gradoptics.optics.ray import Rays
+from gradoptics.optics.bounding_shape import BoundingShape
 
 
 class BoundingSphere(BoundingShape):

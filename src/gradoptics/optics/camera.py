@@ -1,5 +1,5 @@
-from gradoptics.optics.BaseOptics import BaseOptics
-from gradoptics.optics.Ray import Rays
+from gradoptics.optics.base_optics import BaseOptics
+from gradoptics.optics.ray import Rays
 import torch
 
 

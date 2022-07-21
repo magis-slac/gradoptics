@@ -2,7 +2,7 @@ import torch
 import math
 import numpy as np
 
-from gradoptics.distributions.BaseDistribution import BaseDistribution
+from gradoptics.distributions.base_distribution import BaseDistribution
 
 
 class GaussianDistribution(BaseDistribution):

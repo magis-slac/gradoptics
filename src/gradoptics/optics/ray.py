@@ -1,6 +1,6 @@
 import torch
 
-from gradoptics.optics.Vector import normalize_vector, normalize_batch_vector
+from gradoptics.optics.vector import normalize_vector, normalize_batch_vector
 
 
 class Ray:

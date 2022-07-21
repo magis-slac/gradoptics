@@ -1,5 +1,5 @@
 import torch
-from gradoptics.integrator.BaseIntegrator import BaseIntegrator
+from gradoptics.integrator.base_integrator import BaseIntegrator
 
 
 class StratifiedSamplingIntegrator(BaseIntegrator):

@@ -1,9 +1,9 @@
 import torch
 import math
 
-from gradoptics.distributions.BaseDistribution import BaseDistribution
-from gradoptics.distributions.GaussianDistribution import GaussianDistribution
-from gradoptics.inference.RejectionSampling import rejection_sampling
+from gradoptics.distributions.base_distribution import BaseDistribution
+from gradoptics.distributions.gaussian_distribution import GaussianDistribution
+from gradoptics.inference.rejection_sampling import rejection_sampling
 
 
 class AtomCloud(BaseDistribution):

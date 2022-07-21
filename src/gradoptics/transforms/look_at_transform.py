@@ -1,8 +1,8 @@
 import torch
 
-from gradoptics.optics.Vector import normalize_vector
-from gradoptics.optics.Vector import cross_product
-from gradoptics.transforms.BaseTransform import BaseTransform
+from gradoptics.optics.vector import normalize_vector
+from gradoptics.optics.vector import cross_product
+from gradoptics.transforms.base_transform import BaseTransform
 
 
 class LookAtTransform(BaseTransform):

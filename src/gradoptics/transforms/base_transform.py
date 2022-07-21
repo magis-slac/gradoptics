@@ -1,6 +1,6 @@
 import abc  # Abstract Base Classes
 import torch
-from gradoptics.optics.Ray import Rays
+from gradoptics.optics.ray import Rays
 
 
 class BaseTransform(abc.ABC):

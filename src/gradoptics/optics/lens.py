@@ -3,10 +3,10 @@ import torch
 import numpy as np
 import gradoptics as optics
 
-from gradoptics.optics.BaseOptics import BaseOptics
-from gradoptics.optics.Ray import Rays
-from gradoptics.optics.Vector import batch_vector
-from gradoptics.transforms.SimpleTransform import SimpleTransform
+from gradoptics.optics.base_optics import BaseOptics
+from gradoptics.optics.ray import Rays
+from gradoptics.optics.vector import batch_vector
+from gradoptics.transforms.simple_transform import SimpleTransform
 
 
 class Lens(BaseOptics, abc.ABC):

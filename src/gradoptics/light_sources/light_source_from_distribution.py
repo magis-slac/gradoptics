@@ -2,7 +2,7 @@ import math
 import torch
 
 from gradoptics import Rays
-from gradoptics.light_sources.BaseLightSource import BaseLightSource
+from gradoptics.light_sources.base_light_source import BaseLightSource
 from gradoptics.optics import batch_vector
 
 

@@ -4,9 +4,9 @@ import abc
 import torch
 import numpy as np
 import gradoptics as optics
-from gradoptics.optics.BaseOptics import BaseOptics
-from gradoptics.optics.Ray import Rays
-from gradoptics.optics.Vector import batch_vector
+from gradoptics.optics.base_optics import BaseOptics
+from gradoptics.optics.ray import Rays
+from gradoptics.optics.vector import batch_vector
 
 
 class BaseMirror(BaseOptics):
@@ -18,7 +18,7 @@ class BaseMirror(BaseOptics):
         """
         # Identity transform
         if transform is None:
-            transform = optics.SimpleTransform.SimpleTransform(0., 0., 0., torch.tensor([0, 0, 0]))
+            transform = optics.simple_transform.SimpleTransform(0., 0., 0., torch.tensor([0, 0, 0]))
 
         self.transform = transform
 

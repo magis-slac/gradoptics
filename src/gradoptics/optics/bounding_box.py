@@ -1,4 +1,4 @@
-from gradoptics.optics.Ray import Rays
+from gradoptics.optics.ray import Rays
 from gradoptics.optics import BaseOptics
 
 
