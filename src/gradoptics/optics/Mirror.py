@@ -3,10 +3,10 @@ import abc
 
 import torch
 import numpy as np
-import diffoptics as optics
-from diffoptics.optics.BaseOptics import BaseOptics
-from diffoptics.optics.Ray import Rays
-from diffoptics.optics.Vector import batch_vector
+import gradoptics as optics
+from gradoptics.optics.BaseOptics import BaseOptics
+from gradoptics.optics.Ray import Rays
+from gradoptics.optics.Vector import batch_vector
 
 
 class BaseMirror(BaseOptics):
@@ -14,7 +14,7 @@ class BaseMirror(BaseOptics):
     def __init__(self, transform=None):
         """
         :param transform: Transform to orient the mirror
-                          (:py:class:`~diffoptics.transforms.BaseTransform.BaseTransform`)
+                          (:py:class:`~gradoptics.transforms.BaseTransform.BaseTransform`)
         """
         # Identity transform
         if transform is None:

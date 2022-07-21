@@ -13,7 +13,7 @@ install:
 # command to run tests
 
 script: 
-  - pytest --cov=diffoptics tests/tests.py
+  - pytest --cov=gradoptics tests/tests.py
   
 notifications:
   email: false

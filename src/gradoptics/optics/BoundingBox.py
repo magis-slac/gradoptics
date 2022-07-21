@@ -1,5 +1,5 @@
-from diffoptics.optics.Ray import Rays
-from diffoptics.optics import BaseOptics
+from gradoptics.optics.Ray import Rays
+from gradoptics.optics import BaseOptics
 
 
 class BoundingBox(BaseOptics):

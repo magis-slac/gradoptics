@@ -6,28 +6,28 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Differentiable Optics via Ray Tracing
-[*diffoptics*](https://github.com/magis-slac/differentiable-optics) is a ray tracing based optical simulator built using PyTorch [[1]](#1) to enable automatic differentiation. 
+[*gradoptics*](https://github.com/magis-slac/gradoptics) is a ray tracing based optical simulator built using PyTorch [[1]](#1) to enable automatic differentiation. 
 
 The API is designed similar to rendering softwares, and has been heavily inspired by *Physically Based Rendering* (Pharr, Jakob, Humphreys) [[2]](#2). 
 
 
 ## Getting Started
-[Getting Started](https://github.com/magis-slac/differentiable-optics/blob/main/docs/tutorials/Quick-Start.ipynb)
+[Getting Started](https://github.com/magis-slac/gradoptics/blob/main/docs/tutorials/Quick-Start.ipynb)
 
 
 ## Installation
 
 
 ```commandline
-git clone https://github.com/magis-slac/differentiable-optics.git
-cd differentiable-optics
+git clone https://github.com/magis-slac/gradoptics.git
+cd gradoptics
 pip install -r requirements.txt
 pip install -e .
 ```
 
 Then, you should be ready to go!
 ```python
-import diffoptics as optics
+import gradoptics as optics
 ```
 
 ## Work in progress
@@ -44,11 +44,11 @@ This project was started in 2020 by Michael Kagan and Maxime Vandegar at SLAC Na
 
 Please use issues on GitHub for reporting bugs and suggesting features (including better documentation).
 
-We appreciate all contributions. In general, we recommend using pull requests to make changes to [*diffoptics*](https://github.com/magis-slac/differentiable-optics).  
+We appreciate all contributions. In general, we recommend using pull requests to make changes to [*gradoptics*](https://github.com/magis-slac/gradoptics).  
 
 #### Testing
 
-If you modify [*diffoptics*](https://github.com/magis-slac/differentiable-optics), please use pytest for checking your code.
+If you modify [*gradoptics*](https://github.com/magis-slac/gradoptics), please use pytest for checking your code.
 
 ```commandline
 pytest tests/tests.py 
@@ -57,7 +57,7 @@ pytest tests/tests.py
 
 ## Support
 
-[*diffoptics*](https://github.com/magis-slac/differentiable-optics) was developed in the context of the MAGIS-100 experiment 
+[*gradoptics*](https://github.com/magis-slac/gradoptics) was developed in the context of the MAGIS-100 experiment 
 
 ## References
 <a id="1">[1]</a> 

@@ -1,7 +1,7 @@
 import abc  # Abstract Base Classes
 import torch
 
-from diffoptics.optics import BaseOptics
+from gradoptics.optics import BaseOptics
 
 
 class BoundingShape(BaseOptics):
@@ -14,7 +14,7 @@ class BoundingShape(BaseOptics):
         """
         Computes the times t_min and t_max at which the incident rays will intersect the bounding shape
 
-        :param incident_rays: The incident rays (:py:class:`~diffoptics.optics.Ray.Rays`)
+        :param incident_rays: The incident rays (:py:class:`~gradoptics.optics.Ray.Rays`)
 
         :return: (:obj:`tuple`)
                  - Times t_min (:obj:`torch.tensor`)

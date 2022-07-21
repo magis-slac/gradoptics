@@ -9,7 +9,7 @@ class BaseLightSource(abc.ABC):
     def __init__(self, bounding_shape=None):
         """
         :param bounding_shape: A bounding shape that bounds the light source
-                               (:py:class:`~diffoptics.optics.BoundingShape.BoundingShape`). Default is ``None``
+                               (:py:class:`~gradoptics.optics.BoundingShape.BoundingShape`). Default is ``None``
 
         .. note::
              A bounding shape is required if this light source is used with backward ray tracing
@@ -25,7 +25,7 @@ class BaseLightSource(abc.ABC):
         :param nb_rays: Number of rays to sample (:obj:`int`)
         :param device: The desired device of returned tensor (:obj:`str`). Default is ``'cpu'``
 
-        :return: Sampled rays (:py:class:`~diffoptics.optics.Ray.Rays`)
+        :return: Sampled rays (:py:class:`~gradoptics.optics.Ray.Rays`)
         """
         return NotImplemented
 

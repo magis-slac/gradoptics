@@ -1,12 +1,12 @@
 import torch
 import numpy as np
-import diffoptics as optics
+import gradoptics as optics
 import matplotlib.pyplot as plt
-from diffoptics.optics import batch_vector
-from diffoptics.optics.Vector import cross_product
-from diffoptics.optics.BoundingSphere import BoundingSphere
-from diffoptics.transforms.LookAtTransform import LookAtTransform
-from diffoptics.transforms.SimpleTransform import SimpleTransform
+from gradoptics.optics import batch_vector
+from gradoptics.optics.Vector import cross_product
+from gradoptics.optics.BoundingSphere import BoundingSphere
+from gradoptics.transforms.LookAtTransform import LookAtTransform
+from gradoptics.transforms.SimpleTransform import SimpleTransform
 
 
 def _test_ray(dim=1000):

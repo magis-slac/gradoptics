@@ -1,9 +1,9 @@
 import torch
 import math
 
-from diffoptics.distributions.BaseDistribution import BaseDistribution
-from diffoptics.distributions.GaussianDistribution import GaussianDistribution
-from diffoptics.inference.RejectionSampling import rejection_sampling
+from gradoptics.distributions.BaseDistribution import BaseDistribution
+from gradoptics.distributions.GaussianDistribution import GaussianDistribution
+from gradoptics.inference.RejectionSampling import rejection_sampling
 
 
 class AtomCloud(BaseDistribution):
@@ -20,7 +20,7 @@ class AtomCloud(BaseDistribution):
         :param phi: Phase of the sine-wave density modulation fringe pattern (:obj:`float`)
         :param proposal_distribution: Proposal distribution used in rejection sampling for sampling from the
                                       unnormalized cloud distribution
-                                      (:py:class:`~diffoptics.distributions.BaseDistribution.BaseDistribution`)
+                                      (:py:class:`~gradoptics.distributions.BaseDistribution.BaseDistribution`)
         """
         super().__init__()
         self.n = n

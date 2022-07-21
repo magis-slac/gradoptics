@@ -1,8 +1,8 @@
 import torch
 import warnings
 
-from diffoptics.optics.BaseOptics import BaseOptics
-from diffoptics.transforms.LookAtTransform import LookAtTransform
+from gradoptics.optics.BaseOptics import BaseOptics
+from gradoptics.transforms.LookAtTransform import LookAtTransform
 
 
 class Sensor(BaseOptics):

@@ -1,6 +1,6 @@
 import abc  # Abstract Base Classes
 import torch
-from diffoptics.optics.Ray import Rays
+from gradoptics.optics.Ray import Rays
 
 
 class BaseTransform(abc.ABC):
@@ -12,9 +12,9 @@ class BaseTransform(abc.ABC):
         """
         Transform the coordinates of ``rays`` in world-space to coordinates in object-space
 
-        :param rays: Rays in world-space (:py:class:`~diffoptics.optics.Ray.Rays`)
+        :param rays: Rays in world-space (:py:class:`~gradoptics.optics.Ray.Rays`)
 
-        :return: New rays in object-space (:py:class:`~diffoptics.optics.Ray.Rays`)
+        :return: New rays in object-space (:py:class:`~gradoptics.optics.Ray.Rays`)
         """
         new_o = torch.matmul(self.transform.to(rays.device),
                              torch.cat((rays.origins.type(torch.double), torch.ones((rays.origins.shape[0], 1),
@@ -31,9 +31,9 @@ class BaseTransform(abc.ABC):
         """
         Transform the coordinates of ``rays`` in object-space to coordinates in world-space
 
-        :param rays: Rays in object-space (:py:class:`~diffoptics.optics.Ray.Rays`)
+        :param rays: Rays in object-space (:py:class:`~gradoptics.optics.Ray.Rays`)
 
-        :return: New rays in world-space (:py:class:`~diffoptics.optics.Ray.Rays`)
+        :return: New rays in world-space (:py:class:`~gradoptics.optics.Ray.Rays`)
         """
         new_o = torch.matmul(self.inverse_transform.to(rays.device),
                              torch.cat((rays.origins.type(torch.double),

@@ -1,6 +1,6 @@
 import torch
 
-from diffoptics.transforms.BaseTransform import BaseTransform
+from gradoptics.transforms.BaseTransform import BaseTransform
 
 
 class SimpleTransform(BaseTransform):

@@ -1,9 +1,9 @@
 import math
 import torch
 
-from diffoptics import Rays
-from diffoptics.light_sources.BaseLightSource import BaseLightSource
-from diffoptics.optics import batch_vector
+from gradoptics import Rays
+from gradoptics.light_sources.BaseLightSource import BaseLightSource
+from gradoptics.optics import batch_vector
 
 
 class LightSourceFromDistribution(BaseLightSource):
@@ -14,9 +14,9 @@ class LightSourceFromDistribution(BaseLightSource):
     def __init__(self, distribution, bounding_shape=None):
         """
         :param distribution: Distribution from which photons will be sampled
-                             (:py:class:`~diffoptics.distributions.BaseDistribution.BaseDistribution`)
+                             (:py:class:`~gradoptics.distributions.BaseDistribution.BaseDistribution`)
         :param bounding_shape: A bounding shape that bounds the light source
-                               (:py:class:`~diffoptics.optics.BoundingShape.BoundingShape`). Default is ``None``
+                               (:py:class:`~gradoptics.optics.BoundingShape.BoundingShape`). Default is ``None``
 
         .. note::
              A bounding shape is required if this light source is used with backward ray tracing

@@ -1,5 +1,5 @@
-from diffoptics.optics.BaseOptics import BaseOptics
-from diffoptics.optics.Ray import Rays
+from gradoptics.optics.BaseOptics import BaseOptics
+from gradoptics.optics.Ray import Rays
 import torch
 
 
@@ -10,10 +10,10 @@ class Camera(BaseOptics):
 
     def __init__(self, lens, sensor, intermediate_objects=[]):
         """
-        :param lens: External lens - interface with the world (:py:class:`~diffoptics.optics.Lens.Lens`)
-        :param sensor: Sensor (:py:class:`~diffoptics.optics.Sensor.Sensor`)
+        :param lens: External lens - interface with the world (:py:class:`~gradoptics.optics.Lens.Lens`)
+        :param sensor: Sensor (:py:class:`~gradoptics.optics.Sensor.Sensor`)
         :param intermediate_objects: list of optical elements between the external lens and the sensor
-                                     (:obj:`list` of :py:class:`~diffoptics.optics.BaseOptics.BaseOptics`)
+                                     (:obj:`list` of :py:class:`~gradoptics.optics.BaseOptics.BaseOptics`)
         """
         super(Camera, self).__init__()
         self.lens = lens

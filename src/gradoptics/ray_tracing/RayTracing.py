@@ -1,6 +1,6 @@
 import torch
 import warnings
-import diffoptics as optics
+import gradoptics as optics
 
 
 def trace_rays(incident_rays, scene):
@@ -9,11 +9,11 @@ def trace_rays(incident_rays, scene):
     computes the reflected or refracted rays. Rays with ``nan`` components are returned for rays that do not have
     intersections
 
-    :param incident_rays: Batch of incident rays (:py:class:`~diffoptics.optics.Ray.Rays`)
-    :param scene: Scene in which the rays are travelling (:py:class:`~diffoptics.ray_tracing.Scene.Scene`)
+    :param incident_rays: Batch of incident rays (:py:class:`~gradoptics.optics.Ray.Rays`)
+    :param scene: Scene in which the rays are travelling (:py:class:`~gradoptics.ray_tracing.Scene.Scene`)
 
     :return: (:obj:`tuple`)
-             - Reflected or refracted rays after one iteration of ray tracing (:py:class:`~diffoptics.optics.Ray.Rays`)
+             - Reflected or refracted rays after one iteration of ray tracing (:py:class:`~gradoptics.optics.Ray.Rays`)
              - Times at which the rays intersect the closest object to them and ``nan`` for rays that have no
                intersection (:obj:`torch.tensor`)
              - Boolean tensor that indicates if the ``incident_rays`` have been reflected/refracted or no
@@ -52,8 +52,8 @@ def forward_ray_tracing(incident_rays, scene, max_iterations=2, ax=None):
     Performs forward ray tracing, i.e. computes the path taken by the rays ``incident_rays`` in the scene ``scene``
     until the maximum number of bounces ``max_iterations`` is reached, or until the rays hit a sensor
 
-    :param incident_rays: Rays that should be traced in the scene (:py:class:`~diffoptics.optics.Ray.Rays`)
-    :param scene: Scene in which the rays are travelling (:py:class:`~diffoptics.ray_tracing.Scene.Scene`)
+    :param incident_rays: Rays that should be traced in the scene (:py:class:`~gradoptics.optics.Ray.Rays`)
+    :param scene: Scene in which the rays are travelling (:py:class:`~gradoptics.ray_tracing.Scene.Scene`)
     :param max_iterations: Maximum number of bounces in the ``scene`` (:obj:`int`)
     :param ax: 3d axes in which the rays are plotted (if ``ax`` is not ``None``) as they traverse the scene
                (:py:class:`mpl_toolkits.mplot3d.axes3d.Axes3D`). Default is ``None``
@@ -86,14 +86,14 @@ def backward_ray_tracing(incident_rays, scene, light_source, integrator, max_ite
     until the maximum number of bounces ``max_iterations`` is reached, or until the rays hit the light source
     ``light_source``
 
-    :param incident_rays: Rays that should be traced in the scene (:py:class:`~diffoptics.optics.Ray.Rays`)
-    :param scene: Scene in which the rays are travelling (:py:class:`~diffoptics.ray_tracing.Scene.Scene`)
-    :param light_source: Light source (:py:class:`~diffoptics.light_sources.BaseLightSource.BaseLightSource`)
+    :param incident_rays: Rays that should be traced in the scene (:py:class:`~gradoptics.optics.Ray.Rays`)
+    :param scene: Scene in which the rays are travelling (:py:class:`~gradoptics.ray_tracing.Scene.Scene`)
+    :param light_source: Light source (:py:class:`~gradoptics.light_sources.BaseLightSource.BaseLightSource`)
     :param integrator: An integrator to compute line integrals
-                       (:py:class:`~diffoptics.integrator.BaseIntegrator.BaseIntegrator`)
+                       (:py:class:`~gradoptics.integrator.BaseIntegrator.BaseIntegrator`)
     :param max_iterations: Maximum number of bounces in the ``scene`` (:obj:`int`)
 
-    :return: the intensity carried by the rays ``incident_rays`` (:py:class:`~diffoptics.optics.Ray.Rays`)
+    :return: the intensity carried by the rays ``incident_rays`` (:py:class:`~gradoptics.optics.Ray.Rays`)
     """
 
     intensities = torch.zeros(incident_rays.get_size(), dtype=torch.double)

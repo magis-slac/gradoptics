@@ -1,5 +1,5 @@
 import torch
-import diffoptics as optics
+import gradoptics as optics
 
 
 def rejection_sampling(pdf, nb_point, proposal_distribution, m=None, batch_size=int(1e6), eps=1e-15, device='cpu'):
@@ -8,7 +8,7 @@ def rejection_sampling(pdf, nb_point, proposal_distribution, m=None, batch_size=
 
     :param pdf: Function that evaluates the unnormalized pdf of a data point (:py:class:`~Callable`)
     :param nb_point: Number of points to sample (:obj:`int`)
-    :param proposal_distribution: Proposal distribution (:py:class:`~diffoptics.optics.distributions.BaseDistribution`)
+    :param proposal_distribution: Proposal distribution (:py:class:`~gradoptics.optics.distributions.BaseDistribution`)
     :param m: M (:obj:`float`)
     :param batch_size: Batch size (:obj:`int`)
     :param eps: Parameter used for numerical stability (:obj:`float`). Default

@@ -1,8 +1,8 @@
 import torch
 
-from diffoptics.optics.BaseOptics import BaseOptics
-from diffoptics.optics.Ray import Rays
-from diffoptics.optics.Vector import dot_product
+from gradoptics.optics.BaseOptics import BaseOptics
+from gradoptics.optics.Ray import Rays
+from gradoptics.optics.Vector import dot_product
 
 
 class Window(BaseOptics):
