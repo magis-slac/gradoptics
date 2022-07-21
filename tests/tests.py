@@ -3,10 +3,10 @@ import numpy as np
 import gradoptics as optics
 import matplotlib.pyplot as plt
 from gradoptics.optics import batch_vector
-from gradoptics.optics.Vector import cross_product
-from gradoptics.optics.BoundingSphere import BoundingSphere
-from gradoptics.transforms.LookAtTransform import LookAtTransform
-from gradoptics.transforms.SimpleTransform import SimpleTransform
+from gradoptics.optics.vector import cross_product
+from gradoptics.optics.bounding_sphere import BoundingSphere
+from gradoptics.transforms.look_at_transform import LookAtTransform
+from gradoptics.transforms.simple_transform import SimpleTransform
 
 
 def _test_ray(dim=1000):
@@ -173,7 +173,7 @@ def _test_lens_transform(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, positio
 def _test_thick_lens(nb_rays=64):
 
     position = torch.tensor([0., 0., 0.])
-    transform = optics.SimpleTransform.SimpleTransform(0, 0, 0, position)
+    transform = optics.simple_transform.SimpleTransform(0, 0, 0, position)
     lens = optics.ThickLens(1.5, 1., 1, 1e-1, transform)
 
     # Create rays parallel to the optical axis
@@ -585,7 +585,7 @@ def _test_curved_mirrors():
     lens = optics.PerfectLens(f=f, na=1 / 1.4, position=[0., 0., 0.], m=m)
     sensor = optics.Sensor(position=(-f * (1 + m), 0, 0))
     atom_cloud = optics.AtomCloud(n=int(1e6), f=2, position=[f * (1 + m) / m / 2, 0., 0.], phi=0.1)
-    mirror = optics.CurvedMirror(40, .05, .05, optics.SimpleTransform.SimpleTransform(
+    mirror = optics.CurvedMirror(40, .05, .05, optics.simple_transform.SimpleTransform(
         0., 0., 0., torch.tensor([f * (1 + m) / m * 3 / 4, 0, 0])))
     light_source = optics.LightSourceFromDistribution(atom_cloud)
     scene = optics.Scene(light_source)
