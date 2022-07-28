@@ -67,7 +67,7 @@ def _test_atom_cloud(nb_atoms=int(1e4)):
     return 0
 
 
-def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, position=torch.tensor([0., 0., 0.])):
+def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, position=[0., 0., 0.]):
     lens = optics.PerfectLens(f=f, m=m, position=position)
 
     # Create rays parallel to the optical axis
@@ -122,7 +122,7 @@ def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, position=torch.te
         return -1
 
 
-def _test_lens_transform(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, position=torch.tensor([0., 0., 0.])):
+def _test_lens_transform(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, position=[0., 0., 0.]):
     transform = SimpleTransform(0., 45 / 180 * np.pi, 0., position)
 
     lens = optics.PerfectLens(f=f, m=m, position=position, transform=transform)
@@ -250,7 +250,7 @@ def _test_window():
     left_interface_x_position = obj_x_pos + .056
     right_interface_x_position = left_interface_x_position + .05
     window = optics.Window(left_interface_x_position, right_interface_x_position)
-    atom_cloud = optics.LightSourceFromDistribution(optics.AtomCloud(position=torch.tensor([obj_x_pos, 0., 0.])))
+    atom_cloud = optics.LightSourceFromDistribution(optics.AtomCloud(position=[obj_x_pos, 0., 0.]))
     nb_atoms = int(1e5)
 
     rays = atom_cloud.sample_rays(nb_atoms)
@@ -429,7 +429,7 @@ def _test_grad_mirror_wrt_incident_rays(mirror_position=torch.ones(3),
     return 0
 
 
-def _test_grad_lens_wrt_incident_rays(lens_position=torch.ones(3), ray_origins=torch.randn(2, 3, requires_grad=True)):
+def _test_grad_lens_wrt_incident_rays(lens_position=[1., 1., 1.], ray_origins=torch.randn(2, 3, requires_grad=True)):
     lens = optics.PerfectLens(position=lens_position)
     directions = [(lens_position[0] - ray_origins[:, 0]).reshape(-1, 1),
                   (lens_position[1] - ray_origins[:, 1]).reshape(-1, 1),
@@ -628,7 +628,7 @@ def test_atom_cloud():
 
 
 def test_lens():
-    for lens_position in [torch.tensor([0., 0., 0.]), torch.tensor([-0.1, 0., 0.]), torch.tensor([0.1, 0.1, 0.1])]:
+    for lens_position in [[0., 0., 0.], [-0.1, 0., 0.], [0.1, 0.1, 0.1]]:
         assert _test_lens(f=0.05, m=0.15, position=lens_position) == 0
         assert _test_lens(f=0.04, m=0.15, position=lens_position) == 0
         assert _test_lens(f=0.01, m=0.15, position=lens_position) == 0
@@ -640,7 +640,7 @@ def test_lens():
         assert _test_lens(f=0.01, m=0.15, right_of_lens=False, position=lens_position) == 0
         assert _test_lens(f=0.05, m=0.1, right_of_lens=False, position=lens_position) == 0
 
-    assert _test_lens_transform(f=0.05, m=0.15, position=torch.tensor([0., 0., 0.])) == 0
+    assert _test_lens_transform(f=0.05, m=0.15, position=[0., 0., 0.]) == 0
 
 
 def test_thick_lens():
