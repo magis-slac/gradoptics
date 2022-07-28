@@ -215,12 +215,10 @@ class Sensor(BaseOptics):
 
         :return: Sampled points (:obj:`torch.tensor`)
         """
-        warnings.warn("Function not stable yet. Requires to be adapted with respect to transform.")
 
         points = torch.zeros((nb_points, 3), device=device)
-        points[:, 0] = self.position[0]
+        points[:, 0] = torch.rand(nb_points, device=device) * (self.pixel_size[0] * self.resolution[0]) - (
+                self.pixel_size[0] * self.resolution[0] / 2)
         points[:, 1] = torch.rand(nb_points, device=device) * (self.pixel_size[1] * self.resolution[1]) - (
-                self.pixel_size[1] * self.resolution[1] / 2 - self.position[1])
-        points[:, 2] = torch.rand(nb_points, device=device) * (self.pixel_size[0] * self.resolution[0]) - (
-                self.pixel_size[0] * self.resolution[0] / 2 - self.position[2])
-        return points
+                self.pixel_size[1] * self.resolution[1] / 2)
+        return self.c2w.apply_transform_(points)
