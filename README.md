@@ -31,10 +31,8 @@ import gradoptics as optics
 ```
 
 ## Work in progress
-- Currently using ideal lenses (thin lens approximation) -> thick and compound lenses in progress
-- Currently the lens and window normals are aligned with the optical axis -> more general orientations in progress
+- Currently some optical element normals are aligned with the optical axis -> more general orientations in progress
 - Currently monochromatic -> no chromatic abberations
-- Adding PSF to imaging -> in progress 
 
 ## Project History
 
