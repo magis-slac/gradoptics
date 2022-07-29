@@ -39,6 +39,9 @@ def trace_rays(incident_rays, scene):
     for idx, o in enumerate(scene.objects):
         condition = (obj_indices == idx)
 
+        if condition.sum() == 0:
+            continue
+
         tmp, mask[condition] = o.intersect(incident_rays[condition], t[condition])
 
         if tmp is not None:
