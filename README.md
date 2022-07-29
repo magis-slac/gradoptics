@@ -31,8 +31,8 @@ import gradoptics as optics
 ```
 
 ## Work in progress
-- Currently some optical element normals are aligned with the optical axis -> more general orientations in progress
-- Currently monochromatic -> no chromatic abberations
+- Currently, some optical element normals are aligned with the optical axis -> more general orientations in progress
+- Currently, monochromatic -> no chromatic aberrations
 
 ## Project History
 

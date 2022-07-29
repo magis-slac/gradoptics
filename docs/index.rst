@@ -19,9 +19,8 @@ Installation
 Work in progress
 ----------------
 
-- Currently the lens and window normals are aligned with the optical axis -> more general orientations in progress
-- Currently monochromatic -> no chromatic abberations
-- Adding PSF to imaging -> in progress
+- Currently, some optical element normals are aligned with the optical axis -> more general orientations in progress
+- Currently, monochromatic -> no chromatic aberrations
 
 Project History
 ---------------
