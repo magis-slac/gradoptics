@@ -124,13 +124,8 @@ class Sensor(BaseOptics):
         if hit_positions.shape[0] == 0:
             return
 
-        if quantum_efficiency:  # Throw out some of the rays
-            mask = torch.bernoulli(
-                torch.zeros(hit_positions.shape[0], device=hit_positions.device) + self.quantum_efficiency,
-                generator=None, out=None).type(torch.bool)
-            hit_positions = hit_positions[mask]
-            luminosities = luminosities[mask]
-            del mask
+        if quantum_efficiency:
+            luminosities *= self.quantum_efficiency
 
         # Update pixel values
         indices = torch.floor(hit_positions[:, 1]).type(torch.int64) * (self.resolution[1] * self.psf_ratio) + \
