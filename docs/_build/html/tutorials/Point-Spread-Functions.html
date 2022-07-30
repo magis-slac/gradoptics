@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Point Spread Functions &mdash; gradoptics  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Beautiful GIF" href="Beautiful-GIF.html" />
+    <link rel="prev" title="Creating a custom optical element" href="Custom-Optical-Element.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gradoptics
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Quick-Start.html">Creating a scene, and producing an image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Custom-Optical-Element.html">Creating a custom optical element</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Point Spread Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Beautiful-GIF.html">Beautiful GIF</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../citations.html">Use and citations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optical_elements.html">Optical Elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distributions.html">Probability Distributions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../light_sources.html">Light Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ray_tracing.html">Ray Tracing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transforms.html">Transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../inference.html">Inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../integrator.html">Integrators</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gradoptics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../tutorial.html">Tutorial</a> &raquo;</li>
+      <li>Point Spread Functions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/Point-Spread-Functions.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">gradoptics</span> <span class="k">as</span> <span class="nn">optics</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="point-spread-functions">
+<h1>Point Spread Functions<a class="headerlink" href="#point-spread-functions" title="Permalink to this headline"></a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Helpers</span>
+
+<span class="k">def</span> <span class="nf">gaussian_kernel_1d</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">size</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">gaussian_kernel_2d</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">gaussian_kernel_1d</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">),</span>
+                       <span class="n">gaussian_kernel_1d</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Toy gaussian Psfs</span>
+
+<span class="k">for</span> <span class="n">sigma</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">18</span><span class="p">]:</span>
+    <span class="n">kernel</span> <span class="o">=</span> <span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">kernel</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/db73d8566c13c997dbdfa9ba236e8fe377cbca0f31db831ea8c1fffec3bfc5cc.png" src="../_images/db73d8566c13c997dbdfa9ba236e8fe377cbca0f31db831ea8c1fffec3bfc5cc.png" />
+<img alt="../_images/62b3158ded8c43d14c4d094e1175304a0a02d19986a34085174d9636b84690ad.png" src="../_images/62b3158ded8c43d14c4d094e1175304a0a02d19986a34085174d9636b84690ad.png" />
+<img alt="../_images/f999c83cc810a160969f008fceeee5d72d5d61ce559d62f114fb5bde76057ada.png" src="../_images/f999c83cc810a160969f008fceeee5d72d5d61ce559d62f114fb5bde76057ada.png" />
+<img alt="../_images/d301258a185e8d57c908257286557d362a98d480da4245b770df01f7844079f1.png" src="../_images/d301258a185e8d57c908257286557d362a98d480da4245b770df01f7844079f1.png" />
+</div>
+</div>
+<p>In diffoptics, psfs are depth-dependent (position along the optical axis), and height-dependent (vertical position on the sensor).</p>
+<p>Point spread functions are represented by dictionaries where the primary keys are tuple that indicate the depth at which the psfs apply, while the secondary keys indicate the height on the sensor on which the psfs apply.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inf</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1e15</span><span class="p">)</span>
+
+<span class="c1"># No psf</span>
+<span class="n">no_psfs</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># A psf that applies to all depth and all the sensor</span>
+<span class="n">psfs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span> <span class="p">:</span> <span class="p">{(</span><span class="o">-</span><span class="n">inf</span><span class="p">,</span> <span class="n">inf</span><span class="p">)</span> <span class="p">:</span> <span class="p">{(</span><span class="mi">0</span><span class="p">,</span> <span class="n">inf</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">))}}}</span>
+
+<span class="c1"># A psf that is depth-dependent</span>
+<span class="n">psfs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span> <span class="p">:</span> <span class="p">{(</span><span class="o">-</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">:</span> <span class="p">{(</span><span class="mi">0</span><span class="p">,</span> <span class="n">inf</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">))},</span>
+                  <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">:</span> <span class="p">{(</span><span class="mi">0</span><span class="p">,</span> <span class="n">inf</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">))},</span>
+                  <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">inf</span><span class="p">)</span> <span class="p">:</span> <span class="p">{(</span><span class="mi">0</span><span class="p">,</span> <span class="n">inf</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">))}}}</span>
+
+<span class="c1"># A psf that is height-dependent</span>
+<span class="n">psfs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span> <span class="p">:</span> <span class="p">{(</span><span class="o">-</span><span class="n">inf</span><span class="p">,</span> <span class="n">inf</span><span class="p">)</span> <span class="p">:</span> <span class="p">{(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">)),</span>
+                                 <span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">4</span><span class="p">)),</span>
+                                 <span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="n">inf</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">))}}}</span>
+
+<span class="c1"># A psf that is depth-dependent and height-dependent</span>
+<span class="n">psfs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span> <span class="p">:</span> <span class="p">{(</span><span class="o">-</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">:</span> <span class="p">{(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">)),</span>
+                                <span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">4</span><span class="p">)),</span>
+                                <span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="n">inf</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">))},</span>
+                  <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">:</span> <span class="p">{(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">)),</span>
+                             <span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">4</span><span class="p">)),</span>
+                             <span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="n">inf</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">))},</span>
+                  <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">inf</span><span class="p">)</span> <span class="p">:</span> <span class="p">{(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">)),</span>
+                              <span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">4</span><span class="p">)),</span>
+                              <span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="n">inf</span><span class="p">)</span> <span class="p">:</span> <span class="n">optics</span><span class="o">.</span><span class="n">PSF</span><span class="p">(</span><span class="n">gaussian_kernel_2d</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">))}}}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># No psfs</span>
+
+<span class="c1"># Creating a scene</span>
+<span class="n">f</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">m</span> <span class="o">=</span> <span class="mf">0.15</span>
+<span class="n">lens</span> <span class="o">=</span> <span class="n">optics</span><span class="o">.</span><span class="n">PerfectLens</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">na</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">1.4</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span> <span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">)</span>
+<span class="n">sensor</span> <span class="o">=</span> <span class="n">optics</span><span class="o">.</span><span class="n">Sensor</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="n">f</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">m</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">psfs</span><span class="o">=</span><span class="n">no_psfs</span><span class="p">)</span>
+<span class="n">atom_cloud</span> <span class="o">=</span> <span class="n">optics</span><span class="o">.</span><span class="n">AtomCloud</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">1e6</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">[</span><span class="n">f</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">m</span><span class="p">)</span> <span class="o">/</span> <span class="n">m</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span> <span class="n">phi</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">light_source</span> <span class="o">=</span> <span class="n">optics</span><span class="o">.</span><span class="n">LightSourceFromDistribution</span><span class="p">(</span><span class="n">atom_cloud</span><span class="p">)</span>
+<span class="n">scene</span> <span class="o">=</span> <span class="n">optics</span><span class="o">.</span><span class="n">Scene</span><span class="p">(</span><span class="n">light_source</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add_object</span><span class="p">(</span><span class="n">lens</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add_object</span><span class="p">(</span><span class="n">sensor</span><span class="p">)</span>
+
+<span class="c1"># Producing an image</span>
+<span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;cpu&#39;</span>
+<span class="n">rays</span> <span class="o">=</span> <span class="n">light_source</span><span class="o">.</span><span class="n">sample_rays</span><span class="p">(</span><span class="mi">10_000_000</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">optics</span><span class="o">.</span><span class="n">forward_ray_tracing</span><span class="p">(</span><span class="n">rays</span><span class="p">,</span> <span class="n">scene</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Readout the sensor</span>
+<span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4800</span><span class="p">,</span> <span class="mi">4800</span><span class="p">)</span>
+<span class="n">w</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">produced_image</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">readout</span><span class="p">(</span><span class="n">add_poisson_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">produced_image</span><span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/34b5e4b9412ef89852d052e7353b886fb33331e323d99a5cd54a5f124907e636.png" src="../_images/34b5e4b9412ef89852d052e7353b886fb33331e323d99a5cd54a5f124907e636.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Depth-dependent and height-dependent psfs</span>
+
+<span class="c1"># Creating a scene</span>
+<span class="n">lens</span> <span class="o">=</span> <span class="n">optics</span><span class="o">.</span><span class="n">PerfectLens</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">na</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">1.4</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span> <span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">)</span>
+<span class="n">sensor</span> <span class="o">=</span> <span class="n">optics</span><span class="o">.</span><span class="n">Sensor</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="n">f</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">m</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">psfs</span><span class="o">=</span><span class="n">psfs</span><span class="p">)</span>
+<span class="n">atom_cloud</span> <span class="o">=</span> <span class="n">optics</span><span class="o">.</span><span class="n">AtomCloud</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">1e6</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">[</span><span class="n">f</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">m</span><span class="p">)</span> <span class="o">/</span> <span class="n">m</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span> <span class="n">phi</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">light_source</span> <span class="o">=</span> <span class="n">optics</span><span class="o">.</span><span class="n">LightSourceFromDistribution</span><span class="p">(</span><span class="n">atom_cloud</span><span class="p">)</span>
+<span class="n">scene</span> <span class="o">=</span> <span class="n">optics</span><span class="o">.</span><span class="n">Scene</span><span class="p">(</span><span class="n">light_source</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add_object</span><span class="p">(</span><span class="n">lens</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add_object</span><span class="p">(</span><span class="n">sensor</span><span class="p">)</span>
+
+<span class="c1"># Producing an image</span>
+<span class="n">rays</span> <span class="o">=</span> <span class="n">light_source</span><span class="o">.</span><span class="n">sample_rays</span><span class="p">(</span><span class="mi">10_000_000</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">rays</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rays</span><span class="o">.</span><span class="n">origins</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="c1"># /!\ When using psfs, the depth of the incident rays should be specified!</span>
+<span class="n">optics</span><span class="o">.</span><span class="n">forward_ray_tracing</span><span class="p">(</span><span class="n">rays</span><span class="p">,</span> <span class="n">scene</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Readout the sensor</span>
+<span class="n">produced_image</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">readout</span><span class="p">(</span><span class="n">add_poisson_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">produced_image</span><span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Custom-Optical-Element.html" class="btn btn-neutral float-left" title="Creating a custom optical element" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Beautiful-GIF.html" class="btn btn-neutral float-right" title="Beautiful GIF" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Michael Kagan, Maxime Vandegar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

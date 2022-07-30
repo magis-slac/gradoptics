@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API &mdash; gradoptics  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/mystnb.css" type="text/css" />
+      <link rel="stylesheet" href="_static/togglebutton.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> gradoptics
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citations.html">Use and citations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optical_elements.html">Optical Elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="distributions.html">Probability Distributions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="light_sources.html">Light Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ray_tracing.html">Ray Tracing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforms.html">Transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inference.html">Inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrator.html">Integrators</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">gradoptics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline"></a></h1>
+<section id="probability-distributions">
+<h2>Probability Distributions<a class="headerlink" href="#probability-distributions" title="Permalink to this headline"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.distributions.base_distribution.html">gradoptics.distributions.base_distribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.distributions.gaussian_distribution.html">gradoptics.distributions.gaussian_distribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.distributions.atom_cloud.html">gradoptics.distributions.atom_cloud</a></li>
+</ul>
+</div>
+</section>
+<section id="optical-elements">
+<h2>Optical Elements<a class="headerlink" href="#optical-elements" title="Permalink to this headline"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.optics.base_optics.html">gradoptics.optics.base_optics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.optics.camera.html">gradoptics.optics.camera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.optics.lens.html">gradoptics.optics.lens</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.optics.mirror.html">gradoptics.optics.mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.optics.sensor.html">gradoptics.optics.sensor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.optics.ray.html">gradoptics.optics.ray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.optics.window.html">gradoptics.optics.window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.optics.psf.html">gradoptics.optics.psf</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.optics.bounding_sphere.html">gradoptics.optics.bounding_sphere</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.optics.vector.html">gradoptics.optics.vector</a></li>
+</ul>
+</div>
+</section>
+<section id="transforms">
+<h2>Transforms<a class="headerlink" href="#transforms" title="Permalink to this headline"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.transforms.base_transform.html">gradoptics.transforms.base_transform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.transforms.look_at_transform.html">gradoptics.transforms.look_at_transform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.transforms.simple_transform.html">gradoptics.transforms.simple_transform</a></li>
+</ul>
+</div>
+</section>
+<section id="ray-tracing">
+<h2>Ray Tracing<a class="headerlink" href="#ray-tracing" title="Permalink to this headline"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.ray_tracing.ray_tracing.html">gradoptics.ray_tracing.ray_tracing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.ray_tracing.scene.html">gradoptics.ray_tracing.scene</a></li>
+</ul>
+</div>
+</section>
+<section id="light-sources">
+<h2>Light Sources<a class="headerlink" href="#light-sources" title="Permalink to this headline"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.light_sources.base_light_source.html">gradoptics.light_sources.base_light_source</a></li>
+</ul>
+</div>
+</section>
+<section id="inference">
+<h2>Inference<a class="headerlink" href="#inference" title="Permalink to this headline"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gradoptics.inference.rejection_sampling.html">gradoptics.inference.rejection_sampling</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Michael Kagan, Maxime Vandegar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

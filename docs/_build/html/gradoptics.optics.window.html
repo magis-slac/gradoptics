@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gradoptics.optics.window &mdash; gradoptics  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/mystnb.css" type="text/css" />
+      <link rel="stylesheet" href="_static/togglebutton.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="gradoptics.optics.psf" href="gradoptics.optics.psf.html" />
+    <link rel="prev" title="gradoptics.optics.ray" href="gradoptics.optics.ray.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> gradoptics
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citations.html">Use and citations</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="optical_elements.html">Optical Elements</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="gradoptics.optics.base_optics.html">gradoptics.optics.base_optics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gradoptics.optics.camera.html">gradoptics.optics.camera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gradoptics.optics.lens.html">gradoptics.optics.lens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gradoptics.optics.mirror.html">gradoptics.optics.mirror</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gradoptics.optics.sensor.html">gradoptics.optics.sensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gradoptics.optics.ray.html">gradoptics.optics.ray</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">gradoptics.optics.window</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gradoptics.optics.psf.html">gradoptics.optics.psf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gradoptics.optics.bounding_sphere.html">gradoptics.optics.bounding_sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gradoptics.optics.vector.html">gradoptics.optics.vector</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="distributions.html">Probability Distributions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="light_sources.html">Light Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ray_tracing.html">Ray Tracing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforms.html">Transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inference.html">Inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrator.html">Integrators</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">gradoptics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="optical_elements.html">Optical Elements</a> &raquo;</li>
+      <li>gradoptics.optics.window</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/gradoptics.optics.window.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gradoptics.optics.window">
+<span id="gradoptics-optics-window"></span><h1>gradoptics.optics.window<a class="headerlink" href="#module-gradoptics.optics.window" title="Permalink to this headline"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="gradoptics.optics.window.Window">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gradoptics.optics.window.</span></span><span class="sig-name descname"><span class="pre">Window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_interface_x_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_interface_x_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.000293</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_glass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.494</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diameter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.137</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-15</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gradoptics.optics.window.Window" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="gradoptics.optics.base_optics.html#gradoptics.optics.base_optics.BaseOptics" title="gradoptics.optics.base_optics.BaseOptics"><code class="xref py py-class docutils literal notranslate"><span class="pre">gradoptics.optics.base_optics.BaseOptics</span></code></a></p>
+<p>Models a medium with a refractive index between two parallel surfaces. Refraction is modelled using Snell’s law.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gradoptics.optics.window.Window.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_interface_x_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_interface_x_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.000293</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_glass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.494</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diameter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.137</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-15</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gradoptics.optics.window.Window.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>left_interface_x_position</strong> – Position of the left interface along the x axis (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>)</p></li>
+<li><p><strong>right_interface_x_position</strong> – Position of the right interface along the x axis (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>)</p></li>
+<li><p><strong>n_ext</strong> – Refractive index of the external medium (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>)</p></li>
+<li><p><strong>n_glass</strong> – Refractive index of the medium (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>)</p></li>
+<li><p><strong>diameter</strong> – Diameter of the interfaces (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>)</p></li>
+<li><p><strong>eps</strong> – Parameter used for numerical stability in the different class methods (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>). Default
+is <code class="docutils literal notranslate"><span class="pre">'1e-15'</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gradoptics.optics.window.Window.get_ray_intersection">
+<span class="sig-name descname"><span class="pre">get_ray_intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incident_rays</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gradoptics.optics.window.Window.get_ray_intersection" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the times t at which the incident rays will intersect the object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>incident_rays</strong> – The incident rays (<a class="reference internal" href="gradoptics.optics.ray.html#gradoptics.optics.ray.Rays" title="gradoptics.optics.ray.Rays"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rays</span></code></a>)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Times t (<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.tensor</span></code>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gradoptics.optics.window.Window.intersect">
+<span class="sig-name descname"><span class="pre">intersect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incident_rays</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gradoptics.optics.window.Window.intersect" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the rays reflected or refracted by the optical element.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>incident_rays</strong> – The incident rays (<a class="reference internal" href="gradoptics.optics.ray.html#gradoptics.optics.ray.Rays" title="gradoptics.optics.ray.Rays"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rays</span></code></a>)</p></li>
+<li><p><strong>t</strong> – The times at which the incident rays will intersect the optical element (<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.tensor</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>(<code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code>)
+- Reflected or refracted rays (<a class="reference internal" href="gradoptics.optics.ray.html#gradoptics.optics.ray.Rays" title="gradoptics.optics.ray.Rays"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rays</span></code></a>)
+- A boolean mask that indicates which incident rays were reflected or refracted ― some rays may not be</p>
+<blockquote>
+<div><p>reflected or refracted for example, due to total internal reflection, which is not modelled at this
+point (<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.tensor</span></code>)</p>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gradoptics.optics.window.Window.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lightblue'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gradoptics.optics.window.Window.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Plots the optical element on the provided axes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ax</strong> – 3d axes (<code class="xref py py-class docutils literal notranslate"><span class="pre">mpl_toolkits.mplot3d.axes3d.Axes3D</span></code>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gradoptics.optics.ray.html" class="btn btn-neutral float-left" title="gradoptics.optics.ray" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gradoptics.optics.psf.html" class="btn btn-neutral float-right" title="gradoptics.optics.psf" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Michael Kagan, Maxime Vandegar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
