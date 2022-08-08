@@ -19,10 +19,7 @@ The API is designed similar to rendering softwares, and has been heavily inspire
 
 
 ```commandline
-git clone https://github.com/magis-slac/gradoptics.git
-cd gradoptics
-pip install -r requirements.txt
-pip install -e .
+pip install gradoptics
 ```
 
 Then, you should be ready to go!
