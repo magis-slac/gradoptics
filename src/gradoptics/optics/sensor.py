@@ -63,8 +63,9 @@ class Sensor(BaseOptics):
         x = origins[:, 0] + t * directions[:, 0]
         y = origins[:, 1] + t * directions[:, 1]
 
-        condition = (t > 0) & (torch.abs(x) <= self.resolution[0] / 2 * self.pixel_size[0]) & \
-                    (torch.abs(y) <= self.resolution[1] / 2 * self.pixel_size[1])
+        eps_x, eps_y = self.pixel_size[0] / 5, self.pixel_size[1] / 5
+        condition = (t > 0) & ((torch.abs(x) + eps_x) < self.resolution[0] / 2 * self.pixel_size[0]) & \
+                    ((torch.abs(y) + eps_y) < self.resolution[1] / 2 * self.pixel_size[1])
         t[~condition] = float('nan')
         return t
 
@@ -128,8 +129,9 @@ class Sensor(BaseOptics):
             luminosities *= self.quantum_efficiency
 
         # Update pixel values
-        indices = torch.floor(hit_positions[:, 1]).type(torch.int64) * (self.resolution[1] * self.psf_ratio) + \
-            torch.floor(hit_positions[:, 0]).type(torch.int64)
+        indices = torch.floor(hit_positions[:, 1].type(torch.float64)).type(torch.int64) * (
+                    self.resolution[1] * self.psf_ratio) + \
+                  torch.floor(hit_positions[:, 0].type(torch.float64)).type(torch.int64)
         max_nb_identical_indices = indices.unique(return_counts=True)[1].max()
         sorted_indices, arg_sorted_indices = torch.sort(indices)
 
