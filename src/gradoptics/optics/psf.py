@@ -23,7 +23,16 @@ class PSF(torch.nn.Module):
         """
         # Fourier convolution
         fft_x = torch.fft.fftn(x)
-        fft_kernel = torch.fft.fftn(self.kernel.to(x.device), s=fft_x.shape)
+
+        # Pad with zeros
+        sz = (x.shape[0] - self.kernel.shape[0], x.shape[1] - self.kernel.shape[1])
+        kernel_pad = torch.nn.functional.pad(self.kernel, ((sz[1]+1)//2, sz[1]//2, (sz[0]+1)//2, sz[0]//2))
+
+        # Adjust coordinates to have center of kernel at top left
+        kernel_shift = torch.fft.ifftshift(kernel_pad)
+
+        # Then transform into Fourier space
+        fft_kernel = torch.fft.fftn(kernel_shift.to(x.device))
 
         # Multiplication and inverse fourier transform
         output = torch.fft.ifftn(fft_x * fft_kernel)
