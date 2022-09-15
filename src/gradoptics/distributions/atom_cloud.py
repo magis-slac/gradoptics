@@ -8,18 +8,27 @@ from gradoptics.inference.rejection_sampling import rejection_sampling
 
 class AtomCloud(BaseDistribution):
     """
-    Atom cloud with a sine-wave density modulation fringe pattern
+    Atom cloud with a sine-wave density modulation fringe pattern. Form and defaults from studies for MAGIS experiment.
     """
 
-    def __init__(self, n=int(1e6), f=2, position=[0.31, 0., 0.], w0=0.002, h_bar=1.0546 * 1e-34, m=1.44 * 1e-25, x_a=0.,
-                 y_a=0., z_a=0., t_final_bs=3., t_extra=0.1, port_bvz=.15, k_fringe=1 / 0.0003, a_quad=1e-12, phi=0.1,
-                 phi2=math.pi / 2, proposal_distribution=GaussianDistribution(mean=0.0, std=0.0002)):
+    def __init__(self, n=int(1e6), f=2, position=[0.31, 0., 0.], w0=0.0005, h_bar=1.0546 * 1e-34, m=1.44 * 1e-25, x_a=0.,
+                 y_a=0., z_a=0., t_final_bs=3., t_extra=0.1, port_bvz=.15, k_fringe=1 / (0.00003*2), a_quad=1e-12, phi=0.1,
+                 phi2=math.pi / 2, proposal_distribution=GaussianDistribution(mean=0.0, std=0.0005)):
         """
         :param n: Number of atoms (:obj:`int`)
-        :param position: Position of the center of the atom cloud (:obj:`list`)
+        :param position: Position of the center of the atom cloud [m] (:obj:`list`)
         :param phi: Phase of the sine-wave density modulation fringe pattern (:obj:`float`)
+        :param w0: Beam width [m]. Roughly standard deviation of the atom cloud. (:obj:`float`)
+        :param h_bar: Planck's constant, [kg * m^2 / s] (:obj:`float`)
+        :param m: Strontium atom mass [kg] (:obj:`float`)
+        :param x_a: Atom cloud center, x [m] (:obj:`float`)
+        :param y_a: Atom cloud center, y [m] (:obj:`float`)
+        :param z_a: Atom cloud center, z [m] (:obj:`float`)
+        :param t_final_bs: Time until final beam splitter [s] (:obj:`float`)
+        :param k_fringe: Spatial frequency of fringe [1 / m] (:obj:`float`)
+        :param a_quad: Magnitude of quadratic term (:obj:`float`)
         :param proposal_distribution: Proposal distribution used in rejection sampling for sampling from the
-                                      unnormalized cloud distribution
+                                      unnormalized cloud distribution. Following units, mean, std in [m]
                                       (:py:class:`~gradoptics.distributions.base_distribution.BaseDistribution`)
         """
         super().__init__()
@@ -39,6 +48,7 @@ class AtomCloud(BaseDistribution):
         self.aQuad = a_quad
         self.phi2 = phi2
         self.phi = phi
+        self.proposal_distribution = proposal_distribution
 
         # Define a sampler to sample from the cloud density (using rejection sampling)
         self.density_samplers = [lambda pdf, nb_point, device: rejection_sampling(pdf, nb_point, proposal_distribution,
@@ -57,13 +67,12 @@ class AtomCloud(BaseDistribution):
         :return: The marginal pdf function evaluated at ``x`` (:obj:`torch.tensor`)
         """
         x = x.clone().type(torch.float64)
-        x *= 10  # x to dm
 
         dnr = ((-1. * ((2. * self.m * self.w0 * self.w0) + (1j * self.tFinalBS * self.h_bar)) ** 1.) ** .5)
         nrc = 1j * ((2. / math.pi) ** (1. / 4.)) * ((self.m * self.w0) ** (1. / 2.))
-        psi1_y = nrc * torch.exp(-1 * self.m * ((x - self.yA) ** 2) / (
+        psi1_x = nrc * torch.exp(-1 * self.m * ((x - self.xA) ** 2) / (
                 (4. * self.m * self.w0 * self.w0) + (2j * self.tFinalBS * self.h_bar))) / dnr
-        density = torch.abs(psi1_y) ** 2
+        density = torch.abs(psi1_x) ** 2
         return density
 
     def marginal_cloud_density_y(self, y):
@@ -79,15 +88,15 @@ class AtomCloud(BaseDistribution):
         """
 
         y = y.clone().type(torch.float64)
-        y *= 10  # m to dm
+
         dnr = ((-1. * ((2. * self.m * self.w0 * self.w0) + (1j * self.tFinalBS * self.h_bar)) ** 1.) ** .5)
         nrc = 1j * ((2. / math.pi) ** (1. / 4.)) * ((self.m * self.w0) ** (1. / 2.))
         psi1 = nrc * ((1. / (2 ** .5)) + (torch.exp(
             (1j * self.phi) + (1j * ((self.kFringe * y) + (self.aQuad * self.kFringe * self.kFringe * y * y)))) / (
                                                   2 ** .5)))
-        psi1_z = psi1 * torch.exp(-1 * self.m * ((y - self.zA) ** 2) / (
+        psi1_y = psi1 * torch.exp(-1 * self.m * ((y - self.yA) ** 2) / (
                 (4. * self.m * self.w0 * self.w0) + (2j * self.tFinalBS * self.h_bar))) / dnr
-        density = torch.abs(psi1_z) ** 2
+        density = torch.abs(psi1_y) ** 2
         return density
 
     def marginal_cloud_density_z(self, z):
@@ -103,13 +112,12 @@ class AtomCloud(BaseDistribution):
         """
 
         z = z.clone().type(torch.float64)
-        z *= 10  # x to dm
 
         dnr = ((-1. * ((2. * self.m * self.w0 * self.w0) + (1j * self.tFinalBS * self.h_bar)) ** 1.) ** .5)
         nrc = 1j * ((2. / math.pi) ** (1. / 4.)) * ((self.m * self.w0) ** (1. / 2.))
-        psi1_x = nrc * torch.exp(-1 * self.m * ((z - self.xA) ** 2) / (
+        psi1_z = nrc * torch.exp(-1 * self.m * ((z - self.zA) ** 2) / (
                 (4. * self.m * self.w0 * self.w0) + (2j * self.tFinalBS * self.h_bar))) / dnr
-        density = torch.abs(psi1_x) ** 2
+        density = torch.abs(psi1_z) ** 2
         return density
 
     def pdf(self, x):  # @Todo, refractor. x,y,z -> x

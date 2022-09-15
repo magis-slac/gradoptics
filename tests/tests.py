@@ -25,8 +25,8 @@ def _test_rejection_sampling():
     # Atom cloud
     atom_cloud = optics.AtomCloud()
 
-    # Define a sampler to sample from the cloud density
-    proposal_dist = optics.GaussianDistribution(mean=0., std=0.0002)
+    # Define a sampler to sample from the cloud density. Proposal is default from AtomCloud definition
+    proposal_dist = atom_cloud.proposal_distribution
     x = optics.rejection_sampling(atom_cloud.marginal_cloud_density_x, int(1e6), proposal_dist, m=None)
     y = optics.rejection_sampling(atom_cloud.marginal_cloud_density_y, int(1e6), proposal_dist, m=None)
     z = optics.rejection_sampling(atom_cloud.marginal_cloud_density_z, int(1e6), proposal_dist, m=None)
