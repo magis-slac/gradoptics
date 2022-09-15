@@ -16,7 +16,7 @@ class AtomCloud(BaseDistribution):
                  phi2=math.pi / 2, proposal_distribution=GaussianDistribution(mean=0.0, std=0.0005)):
         """
         :param n: Number of atoms (:obj:`int`)
-        :param position: Position of the center of the atom cloud, meters (:obj:`list`)
+        :param position: Position of the center of the atom cloud [m] (:obj:`list`)
         :param phi: Phase of the sine-wave density modulation fringe pattern (:obj:`float`)
         :param w0: Beam width [m]. Roughly standard deviation of the atom cloud. (:obj:`float`)
         :param h_bar: Planck's constant, [kg * m^2 / s] (:obj:`float`)
