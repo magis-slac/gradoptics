@@ -24,23 +24,17 @@ class Camera(BaseOptics):
         return self.lens.get_ray_intersection(incident_rays)
 
     def intersect(self, incident_rays, t):
-        rays = self.lens.intersect(incident_rays, t)
+        rays, _ = self.lens.intersect(incident_rays, t)
         for obj in self.intermediate_objects:
             t = obj.get_ray_intersection(rays)
-            rays = obj.intersect(rays, t)
+            cond = ~torch.isnan(t)
+            rays, _ = obj.intersect(rays[cond], t[cond])
         t = self.sensor.get_ray_intersection(rays)
-        self.sensor.intersect(rays, t, do_pixelize=True, quantum_efficiency=True)
+        cond = ~torch.isnan(t)
+        self.sensor.intersect(rays[cond], t[cond], do_pixelize=True, quantum_efficiency=True)
 
-        # Returns nan rays
-        origins = torch.zeros_like(incident_rays.origins) + float('nan')
-        directions = torch.zeros_like(incident_rays.directions) + float('nan')
-        luminosities = (torch.zeros_like(incident_rays.luminosities) + float('nan'))
-        meta = {}
-        for key in incident_rays.meta.keys():
-            meta[key] = torch.zeros_like(incident_rays.meta[key]) + float('nan')
-
-        mask = torch.zeros(origins.shape[0], dtype=torch.bool, device=origins.device)  # No rays reflected or refracted
-        return Rays(origins, directions, luminosities=luminosities, device=incident_rays.device, meta=meta), mask
+        mask = torch.zeros(incident_rays.origins.shape[0], dtype=torch.bool, device=incident_rays.origins.device)  # No rays reflected or refracted
+        return None, mask # No rays reflected / refracted
 
     def plot(self, ax):
         self.lens.plot(ax)
