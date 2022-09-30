@@ -226,6 +226,27 @@ point (<code class="xref py py-obj docutils literal notranslate"><span class="pr
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="gradoptics.optics.sensor.Sensor.sample_on_pixels">
+<span class="sig-name descname"><span class="pre">sample_on_pixels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_per_pixel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gradoptics.optics.sensor.Sensor.sample_on_pixels" title="Permalink to this definition"></a></dt>
+<dd><p>Sample data on the pixels whose id are provided</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples_per_pixel</strong> – Number of samples per pixel (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>)</p></li>
+<li><p><strong>idx</strong> – Pixel indices along the horizontal axis, assuming a coordinate system centered in the center of
+the image(<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.tensor</span></code>)</p></li>
+<li><p><strong>idy</strong> – Pixel indices along the vertical axis, assuming a coordinate system centered in the center of
+the image(<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.tensor</span></code>)</p></li>
+<li><p><strong>device</strong> – The desired device of returned tensor (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>). Default is <code class="docutils literal notranslate"><span class="pre">'cpu'</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(<code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code>) Sampled points (<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.tensor</span></code>) and p(A) (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>)</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>

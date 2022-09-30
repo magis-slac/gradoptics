@@ -219,3 +219,30 @@ class Sensor(BaseOptics):
         points[:, 1] = torch.rand(nb_points, device=device) * (self.pixel_size[1] * self.resolution[1]) - (
                 self.pixel_size[1] * self.resolution[1] / 2)
         return self.c2w.apply_transform_(points)
+
+    def sample_on_pixels(self, samples_per_pixel, idx, idy, device='cpu'):
+        """
+        Sample data on the pixels whose id are provided
+
+        :param samples_per_pixel: Number of samples per pixel (:obj:`int`)
+        :param idx: Pixel indices along the horizontal axis, assuming a coordinate system centered in the center of
+                    the image(:obj:`torch.tensor`)
+        :param idy: Pixel indices along the vertical axis, assuming a coordinate system centered in the center of
+                    the image(:obj:`torch.tensor`)
+        :param device: The desired device of returned tensor (:obj:`str`). Default is ``'cpu'``
+
+        :return: (:obj:`tuple`) Sampled points (:obj:`torch.tensor`) and p(A) (:obj:`float`)
+        """
+
+        assert idx.shape[0] == idy.shape[0]
+        nb_pixels = idx.shape[0]
+
+        samples = torch.zeros((nb_pixels, samples_per_pixel, 3), device=device)
+        samples[:, :, 0] = (idx.to(device)[..., None] - .5) * self.pixel_size[0]
+        samples[:, :, 1] = (idy.to(device)[..., None] - .5) * self.pixel_size[1]
+
+        return (self.c2w.apply_transform_(samples.reshape(-1, 3)).reshape((nb_pixels, samples_per_pixel, 3)),
+                1 / (self.resolution[0] * self.pixel_size[0] * self.resolution[1] * self.pixel_size[1]))
+
+
+
