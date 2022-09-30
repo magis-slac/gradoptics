@@ -37,7 +37,7 @@
             <a href="../index.html" class="icon icon-home"> gradoptics
           </a>
               <div class="version">
-                0.0.1
+                0.0.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -103,6 +103,11 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Matplotlib created a temporary config/cache directory at /var/folders/tg/2_q32n3x5q75j4ytd6n3kmvh0000gp/T/matplotlib-7t47ep4c because the default path (/Users/stanford/.matplotlib) is not a writable directory; it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+</pre></div>
+</div>
+</div>
 </div>
 <section id="creating-a-custom-optical-element">
 <h1>Creating a custom optical element<a class="headerlink" href="#creating-a-custom-optical-element" title="Permalink to this headline"></a></h1>
@@ -156,7 +161,7 @@
     <span class="c1"># Flip the normal for the rays coming from the right</span>
     <span class="n">normal</span><span class="p">[</span><span class="o">~</span><span class="n">condition</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
 
-    <span class="n">mu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">directions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">directions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">incident_rays</span><span class="o">.</span><span class="n">origins</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
     <span class="n">mu</span><span class="p">[</span><span class="n">condition</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_medium</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_ext</span> <span class="c1"># The rays coming from the left come from the medium</span>
     <span class="n">mu</span><span class="p">[</span><span class="o">~</span><span class="n">condition</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_ext</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_medium</span> <span class="c1"># The rays coming from the right come from the outside</span>
 
@@ -230,7 +235,7 @@
         <span class="c1"># Flip the normal for the rays coming from the right</span>
         <span class="n">normal</span><span class="p">[</span><span class="o">~</span><span class="n">condition</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
         
-        <span class="n">mu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">directions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">directions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">incident_rays</span><span class="o">.</span><span class="n">origins</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="n">mu</span><span class="p">[</span><span class="n">condition</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_medium</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_ext</span> <span class="c1"># The rays coming from the left come from the medium</span>
         <span class="n">mu</span><span class="p">[</span><span class="o">~</span><span class="n">condition</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_ext</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_medium</span> <span class="c1"># The rays coming from the right come from the outside</span>
         
@@ -326,7 +331,7 @@
 
     <span class="c1"># Readout the sensor</span>
     <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4800</span><span class="p">,</span> <span class="mi">4800</span><span class="p">)</span>
-    <span class="n">w</span> <span class="o">=</span> <span class="mi">40</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="mi">60</span>
     <span class="n">produced_image</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">readout</span><span class="p">(</span><span class="n">add_poisson_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">produced_image</span><span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -334,9 +339,14 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/34f11c01d54657590e12d1e8bd9c1ef7959c814947b426d0e2f3db4a72acf764.png" src="../_images/34f11c01d54657590e12d1e8bd9c1ef7959c814947b426d0e2f3db4a72acf764.png" />
-<img alt="../_images/73d8bd5226da915e202669e559a564452674d6dfb8dddddae082f91dba2f3238.png" src="../_images/73d8bd5226da915e202669e559a564452674d6dfb8dddddae082f91dba2f3238.png" />
-<img alt="../_images/ef2ad9b66fbaf248f8ba58919df96256d255e56fab20ed160791c1eb40eb3537.png" src="../_images/ef2ad9b66fbaf248f8ba58919df96256d255e56fab20ed160791c1eb40eb3537.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/stanford/Library/Python/3.8/lib/python/site-packages/torch/_tensor.py:575: UserWarning: floor_divide is deprecated, and will be removed in a future version of pytorch. It currently rounds toward 0 (like the &#39;trunc&#39; function NOT &#39;floor&#39;). This results in incorrect rounding for negative values.
+To keep the current behavior, use torch.div(a, b, rounding_mode=&#39;trunc&#39;), or for actual floor division, use torch.div(a, b, rounding_mode=&#39;floor&#39;). (Triggered internally at  ../aten/src/ATen/native/BinaryOps.cpp:467.)
+  return torch.floor_divide(self, other)
+</pre></div>
+</div>
+<img alt="../_images/70ff0bf122c7f696bc833cc27b07d560c0dbc7f6ce42c180b935049094ec0690.png" src="../_images/70ff0bf122c7f696bc833cc27b07d560c0dbc7f6ce42c180b935049094ec0690.png" />
+<img alt="../_images/da7c01fcb9dc433b690356e23901ad7b29300343f91ee3113263532863ccd7d1.png" src="../_images/da7c01fcb9dc433b690356e23901ad7b29300343f91ee3113263532863ccd7d1.png" />
+<img alt="../_images/5ac7b46fc609a869cbb60e1bbc88a78afc5d6147f3a197f82fd8f29eab2684e6.png" src="../_images/5ac7b46fc609a869cbb60e1bbc88a78afc5d6147f3a197f82fd8f29eab2684e6.png" />
 </div>
 </div>
 </section>
@@ -386,7 +396,7 @@
         <span class="c1"># Flip the normal for the rays coming from the right</span>
         <span class="n">normal</span><span class="p">[</span><span class="o">~</span><span class="n">condition</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
         
-        <span class="n">mu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">directions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">directions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">incident_rays</span><span class="o">.</span><span class="n">origins</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="n">mu</span><span class="p">[</span><span class="n">condition</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_medium</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_ext</span> <span class="c1"># The rays coming from the left come from the medium</span>
         <span class="n">mu</span><span class="p">[</span><span class="o">~</span><span class="n">condition</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_ext</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_medium</span> <span class="c1"># The rays coming from the right come from the outside</span>
         
@@ -468,7 +478,7 @@
 
     <span class="c1"># Readout the sensor</span>
     <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4800</span><span class="p">,</span> <span class="mi">4800</span><span class="p">)</span>
-    <span class="n">w</span> <span class="o">=</span> <span class="mi">40</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="mi">60</span>
     <span class="n">produced_image</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">readout</span><span class="p">(</span><span class="n">add_poisson_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">produced_image</span><span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -476,9 +486,9 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/1d967e17c0a6d78467c1f106cca322cfb999842f65924b99f385fa78eb2faefb.png" src="../_images/1d967e17c0a6d78467c1f106cca322cfb999842f65924b99f385fa78eb2faefb.png" />
-<img alt="../_images/efd446f061302c10f429afca3f9209af0edac034da2383cf027da536392086bd.png" src="../_images/efd446f061302c10f429afca3f9209af0edac034da2383cf027da536392086bd.png" />
-<img alt="../_images/db1d3fa94027655df959903147aed002a0987a52ed07a745a5ec452945e927ae.png" src="../_images/db1d3fa94027655df959903147aed002a0987a52ed07a745a5ec452945e927ae.png" />
+<img alt="../_images/a1a7e35b8b0fd8d4801f8523920a399e395b56d889b10a476deb70a8d3699756.png" src="../_images/a1a7e35b8b0fd8d4801f8523920a399e395b56d889b10a476deb70a8d3699756.png" />
+<img alt="../_images/7a9c8862d409cb5e459d8190dc949976ec07476a48fd4b1e9602a20f03ccbb3d.png" src="../_images/7a9c8862d409cb5e459d8190dc949976ec07476a48fd4b1e9602a20f03ccbb3d.png" />
+<img alt="../_images/43c495ba0cf1258f3c9ca9cd792b9a8fb6e2a79ed5a123e96a264382c1e606bc.png" src="../_images/43c495ba0cf1258f3c9ca9cd792b9a8fb6e2a79ed5a123e96a264382c1e606bc.png" />
 </div>
 </div>
 </section>
@@ -495,7 +505,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Michael Kagan, Maxime Vandegar.</p>
+    <p>&#169; Copyright 2022, Sean Gasiorowski, Michael Kagan, Maxime Vandegar.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -18,10 +18,10 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'gradoptics'
-copyright = '2022, Michael Kagan, Maxime Vandegar'
-author = 'Michael Kagan, Maxime Vandegar'
+copyright = '2022, Sean Gasiorowski, Michael Kagan, Maxime Vandegar'
+author = 'Sean Gasiorowski, Michael Kagan, Maxime Vandegar'
 
-version = '0.0.1'
+version = '0.0.2'
 
 # -- General configuration ---------------------------------------------------
 

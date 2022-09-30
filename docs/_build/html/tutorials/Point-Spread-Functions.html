@@ -37,7 +37,7 @@
             <a href="../index.html" class="icon icon-home"> gradoptics
           </a>
               <div class="version">
-                0.0.1
+                0.0.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -98,6 +98,11 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">gradoptics</span> <span class="k">as</span> <span class="nn">optics</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Matplotlib created a temporary config/cache directory at /var/folders/tg/2_q32n3x5q75j4ytd6n3kmvh0000gp/T/matplotlib-btxhw20h because the default path (/Users/stanford/.matplotlib) is not a writable directory; it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
 </pre></div>
 </div>
 </div>
@@ -195,7 +200,7 @@
 
 <span class="c1"># Readout the sensor</span>
 <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4800</span><span class="p">,</span> <span class="mi">4800</span><span class="p">)</span>
-<span class="n">w</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">w</span> <span class="o">=</span> <span class="mi">60</span>
 <span class="n">produced_image</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">readout</span><span class="p">(</span><span class="n">add_poisson_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">produced_image</span><span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -203,7 +208,12 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/34b5e4b9412ef89852d052e7353b886fb33331e323d99a5cd54a5f124907e636.png" src="../_images/34b5e4b9412ef89852d052e7353b886fb33331e323d99a5cd54a5f124907e636.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/stanford/Library/Python/3.8/lib/python/site-packages/torch/_tensor.py:575: UserWarning: floor_divide is deprecated, and will be removed in a future version of pytorch. It currently rounds toward 0 (like the &#39;trunc&#39; function NOT &#39;floor&#39;). This results in incorrect rounding for negative values.
+To keep the current behavior, use torch.div(a, b, rounding_mode=&#39;trunc&#39;), or for actual floor division, use torch.div(a, b, rounding_mode=&#39;floor&#39;). (Triggered internally at  ../aten/src/ATen/native/BinaryOps.cpp:467.)
+  return torch.floor_divide(self, other)
+</pre></div>
+</div>
+<img alt="../_images/085709b9ff75f118973ade5f4c76834f091a0cecb613650355f6d2100c9e4393.png" src="../_images/085709b9ff75f118973ade5f4c76834f091a0cecb613650355f6d2100c9e4393.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -227,9 +237,12 @@
 <span class="c1"># Readout the sensor</span>
 <span class="n">produced_image</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">readout</span><span class="p">(</span><span class="n">add_poisson_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">produced_image</span><span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/0e95fba28bb01295e6aad8efa1e0853c1ccc5dfd87b8af1389ea2a29b1f46133.png" src="../_images/0e95fba28bb01295e6aad8efa1e0853c1ccc5dfd87b8af1389ea2a29b1f46133.png" />
 </div>
 </div>
 </section>
@@ -245,7 +258,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Michael Kagan, Maxime Vandegar.</p>
+    <p>&#169; Copyright 2022, Sean Gasiorowski, Michael Kagan, Maxime Vandegar.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
