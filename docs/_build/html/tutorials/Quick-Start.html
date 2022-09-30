@@ -37,7 +37,7 @@
             <a href="../index.html" class="icon icon-home"> gradoptics
           </a>
               <div class="version">
-                0.0.1
+                0.0.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -107,6 +107,11 @@
 <span class="kn">import</span> <span class="nn">gradoptics</span> <span class="k">as</span> <span class="nn">optics</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">torch.distributions.multivariate_normal</span> <span class="kn">import</span> <span class="n">MultivariateNormal</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Matplotlib created a temporary config/cache directory at /var/folders/tg/2_q32n3x5q75j4ytd6n3kmvh0000gp/T/matplotlib-c47ulbe7 because the default path (/Users/stanford/.matplotlib) is not a writable directory; it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
 </pre></div>
 </div>
 </div>
@@ -186,20 +191,27 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/stanford/Library/Python/3.8/lib/python/site-packages/torch/_tensor.py:575: UserWarning: floor_divide is deprecated, and will be removed in a future version of pytorch. It currently rounds toward 0 (like the &#39;trunc&#39; function NOT &#39;floor&#39;). This results in incorrect rounding for negative values.
+To keep the current behavior, use torch.div(a, b, rounding_mode=&#39;trunc&#39;), or for actual floor division, use torch.div(a, b, rounding_mode=&#39;floor&#39;). (Triggered internally at  ../aten/src/ATen/native/BinaryOps.cpp:467.)
+  return torch.floor_divide(self, other)
+</pre></div>
+</div>
+</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4800</span><span class="p">,</span> <span class="mi">4800</span><span class="p">)</span>
-<span class="n">w</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">w</span> <span class="o">=</span> <span class="mi">60</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">produced_image</span><span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x12f9251f0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x135b34520&gt;
 </pre></div>
 </div>
-<img alt="../_images/f97ce7502d08ceb318e8aae18cc3af98ba959b9ace73476f6b5ee29a2c1533f0.png" src="../_images/f97ce7502d08ceb318e8aae18cc3af98ba959b9ace73476f6b5ee29a2c1533f0.png" />
+<img alt="../_images/799108c0881a49e55f338f8a2504e4c4efccd41367474cd559991b73efe2acb2.png" src="../_images/799108c0881a49e55f338f8a2504e4c4efccd41367474cd559991b73efe2acb2.png" />
 </div>
 </div>
 </section>
@@ -224,10 +236,10 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x12f98cd60&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x135b9e310&gt;
 </pre></div>
 </div>
-<img alt="../_images/aece4b66ee7bba2c7df28f40b713782c85ad50d12ea91dcf2808996eae66df63.png" src="../_images/aece4b66ee7bba2c7df28f40b713782c85ad50d12ea91dcf2808996eae66df63.png" />
+<img alt="../_images/5f762d2818bc37c5da319becedfcb0aae159f9a79b3a2bcce99ef2ec3bf42d93.png" src="../_images/5f762d2818bc37c5da319becedfcb0aae159f9a79b3a2bcce99ef2ec3bf42d93.png" />
 </div>
 </div>
 </section>
@@ -238,7 +250,7 @@
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proposal_distribution</span> <span class="o">=</span> <span class="n">MultivariateNormal</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">object_pof</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.0002</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proposal_distribution</span> <span class="o">=</span> <span class="n">MultivariateNormal</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">object_pof</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.0005</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">ray_origins</span> <span class="o">=</span> <span class="n">proposal_distribution</span><span class="o">.</span><span class="n">sample</span><span class="p">((</span><span class="mi">10_000_000</span><span class="p">,))</span>
 <span class="n">ray_luminosities</span> <span class="o">=</span> <span class="n">light_source</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">ray_origins</span><span class="p">)</span> <span class="o">/</span> <span class="n">proposal_distribution</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">ray_origins</span><span class="p">)</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span>
 <span class="c1"># Samples rays in 4 pi</span>
@@ -255,14 +267,12 @@
 <span class="n">produced_image</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">readout</span><span class="p">(</span><span class="n">add_poisson_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">produced_image</span><span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">w</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x12f9fa5b0&gt;
-</pre></div>
-</div>
-<img alt="../_images/8b0741727130f8f045ba9c2dc60d976b727f03120e9979396d002ffc25705d88.png" src="../_images/8b0741727130f8f045ba9c2dc60d976b727f03120e9979396d002ffc25705d88.png" />
+<img alt="../_images/fc274be16ffbf545096ca5e02d39d0f96001e41925e36adf6e7bacb7ff0079a2.png" src="../_images/fc274be16ffbf545096ca5e02d39d0f96001e41925e36adf6e7bacb7ff0079a2.png" />
 </div>
 </div>
 </section>
@@ -300,10 +310,10 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x12fa61550&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x135c59f10&gt;
 </pre></div>
 </div>
-<img alt="../_images/10bd7067b35a11b0e53b97a943619a35edcda6a2427c09fafd2a678d4171b4a6.png" src="../_images/10bd7067b35a11b0e53b97a943619a35edcda6a2427c09fafd2a678d4171b4a6.png" />
+<img alt="../_images/8b7280fb63eb4a42a60a20ad8cf60882c50221a6f97f4dfe46f8454ebd0c6654.png" src="../_images/8b7280fb63eb4a42a60a20ad8cf60882c50221a6f97f4dfe46f8454ebd0c6654.png" />
 </div>
 </div>
 </section>
@@ -320,7 +330,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Michael Kagan, Maxime Vandegar.</p>
+    <p>&#169; Copyright 2022, Sean Gasiorowski, Michael Kagan, Maxime Vandegar.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
