@@ -104,7 +104,6 @@ def backward_ray_tracing(incident_rays, scene, light_source, integrator, max_ite
     # Labelling the rays
     incident_rays.meta['track_idx'] = torch.linspace(0, incident_rays.get_size() - 1, incident_rays.get_size(),
                                                      dtype=torch.long)
-    incident_rays.meta['radiance_scaling'] = torch.ones(incident_rays.get_size(), device=incident_rays.device)
 
     for i in range(max_iterations):
         outgoing_rays, t, mask = trace_rays(incident_rays, scene)
@@ -119,7 +118,7 @@ def backward_ray_tracing(incident_rays, scene, light_source, integrator, max_ite
         if new_mask.sum() > 0:
             intensities[incident_rays.meta['track_idx'][new_mask]] = integrator.compute_integral(
                 incident_rays[new_mask], light_source.pdf, t_min[new_mask], t_max[new_mask]
-            ) * incident_rays.meta['radiance_scaling'][new_mask]
+            ) * incident_rays[new_mask].luminosities
 
         # Rays that are still in the scene, and have not hit the light source
         incident_rays = outgoing_rays[mask & (~new_mask)]

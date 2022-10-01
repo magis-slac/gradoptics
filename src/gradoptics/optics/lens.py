@@ -73,6 +73,9 @@ class PerfectLens(Lens):
     def intersect(self, incident_rays, t):
         incident_rays = self.transform.apply_inverse_transform(incident_rays)  # World space to lens space
 
+        sensor_normal = torch.tensor([1, 0, 0], device=incident_rays.device)
+        cos_theta_in = optics.optics.vector.cos_theta(sensor_normal[None, ...], incident_rays.directions).abs()
+
         x_objects = incident_rays.origins
         d_0 = incident_rays.directions
 
@@ -96,7 +99,11 @@ class PerfectLens(Lens):
         x_v = x_star + t.unsqueeze(1) * d
         _d_out = batch_vector(x_v[:, 0] - x_0[:, 0], x_v[:, 1] - x_0[:, 1], x_v[:, 2] - x_0[:, 2])
 
-        return (self.transform.apply_transform(Rays(x_0, _d_out, luminosities=incident_rays.luminosities,
+        sensor_normal = torch.tensor([1, 0, 0], device=incident_rays.device)
+        cos_theta_out = optics.optics.vector.cos_theta(sensor_normal[None, ...], _d_out).abs()
+
+        luminosities = incident_rays.luminosities * (cos_theta_out / cos_theta_in)**2
+        return (self.transform.apply_transform(Rays(x_0, _d_out, luminosities=luminosities,
                                                     meta=incident_rays.meta, device=incident_rays.device)),
                 torch.ones(x_0.shape[0], dtype=torch.bool, device=x_0.device))
 
