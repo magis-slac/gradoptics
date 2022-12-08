@@ -99,7 +99,7 @@ def backward_ray_tracing(incident_rays, scene, light_source, integrator, max_ite
     :return: the intensity carried by the rays ``incident_rays`` (:py:class:`~gradoptics.optics.ray.Rays`)
     """
 
-    intensities = torch.zeros(incident_rays.get_size(), dtype=torch.double)
+    intensities = torch.zeros(incident_rays.get_size(), dtype=torch.double, device=incident_rays.device)
 
     # Labelling the rays
     incident_rays.meta['track_idx'] = torch.linspace(0, incident_rays.get_size() - 1, incident_rays.get_size(),
@@ -119,7 +119,7 @@ def backward_ray_tracing(incident_rays, scene, light_source, integrator, max_ite
         if new_mask.sum() > 0:
             intensities[incident_rays.meta['track_idx'][new_mask]] = integrator.compute_integral(
                 incident_rays[new_mask], light_source.pdf, t_min[new_mask], t_max[new_mask]
-            ) * incident_rays.meta['radiance_scaling'][new_mask]
+            ).double() * incident_rays.meta['radiance_scaling'][new_mask].double()
 
         # Rays that are still in the scene, and have not hit the light source
         incident_rays = outgoing_rays[mask & (~new_mask)]
@@ -132,12 +132,12 @@ def render_pixels(sensor, lens, scene, light_source, samples_per_pixel, directio
 
     # Sampling on the sensor
     ray_origins, p_a1 = sensor.sample_on_pixels(samples_per_pixel, px_i, px_j, device=device)
-    ray_origins = ray_origins.reshape(-1, 3)
+    ray_origins = ray_origins.reshape(-1, 3).double()
     ray_origins = ray_origins.expand([directions_per_sample] + list(ray_origins.shape)
                                      ).transpose(0, 1).reshape(-1, 3)
 
     # Sampling directions
-    p_prime, p_a2 = lens.sample_points_on_lens(ray_origins.shape[0])
+    p_prime, p_a2 = lens.sample_points_on_lens(ray_origins.shape[0], device=device)
     ray_directions = optics.batch_vector(p_prime[:, 0] - ray_origins[:, 0], p_prime[:, 1] - ray_origins[:, 1],
                                          p_prime[:, 2] - ray_origins[:, 2])
 
@@ -145,7 +145,7 @@ def render_pixels(sensor, lens, scene, light_source, samples_per_pixel, directio
     sensor_normal = torch.tensor([1, 0, 0], device=device)
     cos_theta = optics.optics.vector.cos_theta(sensor_normal[None, ...], ray_directions)
 
-    rays = optics.Rays(ray_origins.type(torch.float).to(device), ray_directions.type(torch.float).to(device),
+    rays = optics.Rays(ray_origins.to(device), ray_directions.to(device),
                        meta={'cos_theta': cos_theta}, device=device)
 
     intensities = optics.backward_ray_tracing(rays, scene, light_source, integrator, max_iterations=max_iterations)

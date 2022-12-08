@@ -3,6 +3,7 @@ import torch
 from gradoptics.optics.base_optics import BaseOptics
 from gradoptics.optics.ray import Rays
 from gradoptics.optics.vector import dot_product
+from gradoptics.transforms.simple_transform import SimpleTransform
 
 
 class Window(BaseOptics):
@@ -11,7 +12,7 @@ class Window(BaseOptics):
     """
 
     def __init__(self, left_interface_x_position, right_interface_x_position, n_ext=1.000293, n_glass=1.494,
-                 diameter=0.137, eps=1e-15):
+                 diameter=0.137, eps=1e-15, orientation=None):
         """
         :param left_interface_x_position: Position of the left interface along the x axis (:obj:`float`)
         :param right_interface_x_position: Position of the right interface along the x axis (:obj:`float`)
@@ -31,6 +32,7 @@ class Window(BaseOptics):
         self.n_ext = n_ext
         self.n_glass = n_glass
         self.eps = eps
+        self.w2obj = SimpleTransform(*orientation, torch.zeros(3))
 
     def _get_ray_intersection_left_interface(self, incident_rays):
         """
@@ -38,6 +40,9 @@ class Window(BaseOptics):
         :param incident_rays:
         :return:
         """
+        # Rotate to coords with window along positive x
+        incident_rays = self.w2obj.apply_inverse_transform(incident_rays) 
+
         origins = incident_rays.origins
         directions = incident_rays.directions
         t = (self.left_interface_x_position - origins[:, 0]) / (directions[:, 0] + self.eps)
@@ -55,6 +60,9 @@ class Window(BaseOptics):
         :param incident_rays:
         :return:
         """
+        # Rotate to coords with window along positive x
+        incident_rays = self.w2obj.apply_inverse_transform(incident_rays) 
+
         origins = incident_rays.origins
         directions = incident_rays.directions
         t = (self.right_interface_x_position - origins[:, 0]) / (directions[:, 0] + self.eps)
@@ -66,6 +74,9 @@ class Window(BaseOptics):
         return t
 
     def _get_rays_inside_window(self, incident_rays, t):
+        
+        # Rotate to coords with window along positive x
+        incident_rays = self.w2obj.apply_inverse_transform(incident_rays)
 
         origins = incident_rays.origins
         directions = incident_rays.directions
@@ -85,8 +96,19 @@ class Window(BaseOptics):
         direction_refracted_rays = torch.sqrt(tmp).unsqueeze(1) * window_normal + mu * (
                 directions - c.unsqueeze(1) * window_normal)
 
-        return Rays(origin_refracted_rays, direction_refracted_rays, luminosities=incident_rays.luminosities,
-                    device=incident_rays.device), window_normal
+        output_rays = Rays(origin_refracted_rays, direction_refracted_rays, luminosities=incident_rays.luminosities,
+                    device=incident_rays.device)
+
+        # Rotate to back to world coords
+        output_rays = self.w2obj.apply_transform(output_rays) 
+
+        window_normal = torch.matmul(self.w2obj.transform.to(window_normal.device),
+                             torch.cat((window_normal.type(torch.double),
+                                        torch.zeros((window_normal.shape[0], 1), dtype=torch.double,
+                                                    device=window_normal.device)), dim=1).unsqueeze(-1))[:, :3, 0].type(
+                                    window_normal.dtype)
+                    
+        return output_rays, window_normal
 
     def _get_t_min(self, incident_rays):
         """
@@ -164,5 +186,7 @@ class Window(BaseOptics):
         y = y[indices]
         z = z[indices]
 
-        ax.scatter(x_left, y, z, s=s, c=color)
-        ax.scatter(x_right, y, z, s=s, c=color)
+        x_left, y_left, z_left = self.w2obj.apply_transform_(torch.cat((x_left[:, None], y[:, None], z[:, None]), dim=1)).T
+        x_right, y_right, z_right = self.w2obj.apply_transform_(torch.cat((x_right[:, None], y[:, None], z[:, None]), dim=1)).T
+        ax.scatter(x_left, y_left, z_left, s=s, c=color)
+        ax.scatter(x_right, y_right, z_right, s=s, c=color)
