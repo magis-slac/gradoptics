@@ -20,7 +20,7 @@ def trace_rays(incident_rays, scene):
                (:obj:`torch.tensor`)
     """
     device = incident_rays.device
-    t = torch.zeros(incident_rays.origins.shape[0], device=device) + float('Inf')
+    t = (torch.zeros(incident_rays.origins.shape[0], device=device) + float('Inf')).double()
     outgoing_rays = optics.empty_like(incident_rays)
     obj_indices = torch.zeros(incident_rays.origins.shape[0], device=device, dtype=torch.long) - 1
     mask = torch.zeros(incident_rays.origins.shape[0], device=device, dtype=torch.bool)
@@ -142,7 +142,8 @@ def render_pixels(sensor, lens, scene, light_source, samples_per_pixel, directio
                                          p_prime[:, 2] - ray_origins[:, 2])
 
     # @Todo, generalization needed
-    sensor_normal = torch.tensor([1, 0, 0], device=device)
+    sensor_normal = (lens.transform.transform[:-1, -1]-torch.tensor(sensor.position)).to(device)
+    sensor_normal*= 1./torch.norm(sensor_normal)
     cos_theta = optics.optics.vector.cos_theta(sensor_normal[None, ...], ray_directions)
 
     rays = optics.Rays(ray_origins.to(device), ray_directions.to(device),

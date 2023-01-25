@@ -12,7 +12,7 @@ class Window(BaseOptics):
     """
 
     def __init__(self, left_interface_x_position, right_interface_x_position, n_ext=1.000293, n_glass=1.494,
-                 diameter=0.137, eps=1e-15, orientation=None):
+                 diameter=0.137, eps=1e-15, orientation=(0., 0., 0.)):
         """
         :param left_interface_x_position: Position of the left interface along the x axis (:obj:`float`)
         :param right_interface_x_position: Position of the right interface along the x axis (:obj:`float`)
@@ -155,6 +155,9 @@ class Window(BaseOptics):
         ray_in_glass = ray_in_glass[~torch.isnan(t)]
         incident_rays.origins = incident_rays.origins[~torch.isnan(t)]
         incident_rays.directions = incident_rays.directions[~torch.isnan(t)]
+        incident_rays.luminosities = incident_rays.luminosities[~torch.isnan(t)]
+        for key in incident_rays.meta.keys():
+            incident_rays.meta[key] = incident_rays.meta[key][~torch.isnan(t)]
         window_normal = window_normal[~torch.isnan(t)]
         t = t[~torch.isnan(t)]
         origins = ray_in_glass.origins
