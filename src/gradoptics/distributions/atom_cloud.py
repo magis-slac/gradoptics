@@ -200,7 +200,7 @@ class AtomCloudDonut(BaseDistribution):
         if longitudinal_proposal:
             self.longitudinal_proposal = longitudinal_proposal
         else:
-            self.longitudinal_proposal = GaussianDistribution(mean=position[2], std=sigma_z)
+            self.longitudinal_proposal = GaussianDistribution(mean=0, std=sigma_z)
 
         # Define a sampler to sample from the cloud density (using rejection sampling)
         # self.density_samplers[0] is the transverse, radial sampler
@@ -257,8 +257,8 @@ class AtomCloudDonut(BaseDistribution):
         :param x: Value where the pdf should be evaluated (:obj:`torch.tensor`)
         :return: The pdf function evaluated at ``x`` (:obj:`torch.tensor`)
         """
-        r = torch.sqrt(x[:, 0] ** 2 + x[:, 1] ** 2)
-        phi = torch.atans2(x[:, 1], x[:, 0])
+        r = torch.sqrt((x[:, 0] - self.position[0]) ** 2 + (x[:, 1] - self.position[1]) ** 2)
+        phi = torch.atans2(x[:, 1] - self.position[1], x[:, 0] - self.position[0])
         return self.marginal_cloud_density_r(r) * \
                self.marginal_cloud_density_phi(phi) * \
                self.marginal_cloud_density_z(x[:, 2])
