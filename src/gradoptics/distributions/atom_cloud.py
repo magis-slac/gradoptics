@@ -247,7 +247,7 @@ class AtomCloudDonut(BaseDistribution):
 
         z = z.clone().type(torch.float64)
 
-        return GaussianDistribution(mean=self.position[2], std=self.sigma_z).pdf(z)
+        return GaussianDistribution(mean=0, std=self.sigma_z).pdf(z)
 
     def pdf(self, x):  # @Todo, refractor. x,y,z -> x
         """
