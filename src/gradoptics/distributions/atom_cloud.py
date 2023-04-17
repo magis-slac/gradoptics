@@ -11,8 +11,8 @@ class AtomCloud(BaseDistribution):
     Atom cloud with a sine-wave density modulation fringe pattern. Form and defaults from studies for MAGIS experiment.
     """
 
-    def __init__(self, n=int(1e6), f=2, position=[0.31, 0., 0.], w0=0.0005, h_bar=1.0546 * 1e-34, m=1.44 * 1e-25, x_a=0.,
-                 y_a=0., z_a=0., t_final_bs=3., t_extra=0.1, port_bvz=.15, k_fringe=1 / (0.00003*2), a_quad=1e-12, phi=0.1,
+    def __init__(self, n=int(1e6), f=2, position=[0.31, 0., 0.], w0=0.0005, h_bar=1.0546 * 1e-34, m=1.44 * 1e-25,
+                 t_final_bs=3., t_extra=0.1, port_bvz=.15, k_fringe=1 / (0.00003*2), a_quad=1e-12, phi=0.1,
                  phi2=math.pi / 2, proposal_distribution=GaussianDistribution(mean=0.0, std=0.0005)):
         """
         :param n: Number of atoms (:obj:`int`)
@@ -21,9 +21,6 @@ class AtomCloud(BaseDistribution):
         :param w0: Beam width [m]. Roughly standard deviation of the atom cloud. (:obj:`float`)
         :param h_bar: Planck's constant, [kg * m^2 / s] (:obj:`float`)
         :param m: Strontium atom mass [kg] (:obj:`float`)
-        :param x_a: Atom cloud center, x [m] (:obj:`float`)
-        :param y_a: Atom cloud center, y [m] (:obj:`float`)
-        :param z_a: Atom cloud center, z [m] (:obj:`float`)
         :param t_final_bs: Time until final beam splitter [s] (:obj:`float`)
         :param k_fringe: Spatial frequency of fringe [1 / m] (:obj:`float`)
         :param a_quad: Magnitude of quadratic term (:obj:`float`)
@@ -38,9 +35,6 @@ class AtomCloud(BaseDistribution):
         self.w0 = w0
         self.h_bar = h_bar
         self.m = m
-        self.xA = x_a
-        self.yA = y_a
-        self.zA = z_a
         self.tFinalBS = t_final_bs
         self.tExtra = t_extra
         self.portBvz = port_bvz
@@ -70,7 +64,7 @@ class AtomCloud(BaseDistribution):
 
         dnr = ((-1. * ((2. * self.m * self.w0 * self.w0) + (1j * self.tFinalBS * self.h_bar)) ** 1.) ** .5)
         nrc = 1j * ((2. / math.pi) ** (1. / 4.)) * ((self.m * self.w0) ** (1. / 2.))
-        psi1_x = nrc * torch.exp(-1 * self.m * ((x - self.xA) ** 2) / (
+        psi1_x = nrc * torch.exp(-1 * self.m * (x ** 2) / (
                 (4. * self.m * self.w0 * self.w0) + (2j * self.tFinalBS * self.h_bar))) / dnr
         density = torch.abs(psi1_x) ** 2
         return density
@@ -94,7 +88,7 @@ class AtomCloud(BaseDistribution):
         psi1 = nrc * ((1. / (2 ** .5)) + (torch.exp(
             (1j * self.phi) + (1j * ((self.kFringe * y) + (self.aQuad * self.kFringe * self.kFringe * y * y)))) / (
                                                   2 ** .5)))
-        psi1_y = psi1 * torch.exp(-1 * self.m * ((y - self.yA) ** 2) / (
+        psi1_y = psi1 * torch.exp(-1 * self.m * (y ** 2) / (
                 (4. * self.m * self.w0 * self.w0) + (2j * self.tFinalBS * self.h_bar))) / dnr
         density = torch.abs(psi1_y) ** 2
         return density
@@ -115,7 +109,7 @@ class AtomCloud(BaseDistribution):
 
         dnr = ((-1. * ((2. * self.m * self.w0 * self.w0) + (1j * self.tFinalBS * self.h_bar)) ** 1.) ** .5)
         nrc = 1j * ((2. / math.pi) ** (1. / 4.)) * ((self.m * self.w0) ** (1. / 2.))
-        psi1_z = nrc * torch.exp(-1 * self.m * ((z - self.zA) ** 2) / (
+        psi1_z = nrc * torch.exp(-1 * self.m * (z ** 2) / (
                 (4. * self.m * self.w0 * self.w0) + (2j * self.tFinalBS * self.h_bar))) / dnr
         density = torch.abs(psi1_z) ** 2
         return density
