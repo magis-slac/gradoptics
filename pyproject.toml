@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gradoptics"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
   { name="Sean Gasiorowski", email="sgaz@slac.stanford.edu" },
   { name="Michael Kagan", email="makagan@slac.stanford.edu" },

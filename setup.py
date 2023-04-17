@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setup(
   name='gradoptics',
-  version='0.0.2',
+  version='0.0.3',
   description='End-to-end differentiable optics',
   long_description=long_description,
   long_description_content_type="text/markdown",

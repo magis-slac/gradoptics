@@ -1,3 +1,7 @@
+# v0.0.3
+
+- Add atom cloud "donut"
+
 # v0.0.2
 
 - Fix convolution in the Frequency Domain
