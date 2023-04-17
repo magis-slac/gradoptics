@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.com/magis-slac/gradoptics.svg?token=LBAvFbnCy9PEgexzsTUS&branch=main)](https://travis-ci.com/magis-slac/gradoptics)
 [![Documentation Status](https://readthedocs.org/projects/gradoptics/badge/?version=latest)](https://gradoptics.readthedocs.io/en/latest/?badge=latest)
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/magis-slac/gradoptics/blob/master/README.md)
-![version](https://img.shields.io/badge/version-0.0.2-blue)
+![version](https://img.shields.io/badge/version-0.0.3-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Differentiable Optics via Ray Tracing
