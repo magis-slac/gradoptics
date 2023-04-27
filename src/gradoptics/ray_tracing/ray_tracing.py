@@ -49,6 +49,38 @@ def trace_rays(incident_rays, scene):
 
     return outgoing_rays, t, mask
 
+# Sanha's working code
+def chief_ray_tracing(incident_rays, scene, max_iterations=2, ax=None):
+    """
+    Performs forward ray tracing, i.e. computes the path taken by the rays ``incident_rays`` in the scene ``scene``
+    until the maximum number of bounces ``max_iterations`` is reached, or until the rays hit a sensor
+
+    :param incident_rays: Rays that should be traced in the scene (:py:class:`~gradoptics.optics.ray.Rays`)
+    :param scene: Scene in which the rays are travelling (:py:class:`~gradoptics.ray_tracing.scene.Scene`)
+    :param max_iterations: Maximum number of bounces in the ``scene`` (:obj:`int`)
+    :param ax: 3d axes in which the rays are plotted (if ``ax`` is not ``None``) as they traverse the scene
+               (:py:class:`mpl_toolkits.mplot3d.axes3d.Axes3D`). Default is ``None``
+    """
+
+    for i in range(max_iterations):
+        outgoing_rays, t, mask = trace_rays(incident_rays, scene)
+
+        if ax is not None:
+            origins = incident_rays.origins[mask].data.cpu().numpy()
+            destinations = incident_rays[mask](t[mask]).data.cpu().numpy()
+            for ray_idx in range(origins.shape[0]):
+                ax.plot([origins[ray_idx, 0], destinations[ray_idx, 0]],
+                        [origins[ray_idx, 1], destinations[ray_idx, 1]],
+                        [origins[ray_idx, 2], destinations[ray_idx, 2]])
+
+        # Only keep the rays that intersect with the system
+        incident_rays = outgoing_rays[mask]
+
+        torch.cuda.empty_cache()
+
+    if incident_rays.origins.shape[0] > 0:
+        warnings.warn("The maximum number of iteration has been reached and there are still rays"
+                      "bouncing in the scene. incident_rays.shape[0]: " + str(incident_rays.origins.shape[0]))
 
 def forward_ray_tracing(incident_rays, scene, max_iterations=2, ax=None):
     """
