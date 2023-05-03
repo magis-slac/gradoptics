@@ -3,7 +3,7 @@ import torch
 
 from gradoptics import Rays
 from gradoptics.light_sources.base_light_source import BaseLightSource
-from gradoptics.optics import batch_vector
+from gradoptics.optics import batch_vector, normalize_batch_vector
 
 
 class LightSourceFromDistribution(BaseLightSource):
@@ -43,6 +43,20 @@ class LightSourceFromDistribution(BaseLightSource):
         torch.cuda.empty_cache()
 
         return Rays(self.distribution.sample(nb_rays, device=device).type(emitted_direction.dtype), emitted_direction,
+                    device=device)
+
+    def get_pointed_rays(self, nb_rays, target_point, device='cpu'):
+        # Sample origins from underlying distribution
+        origins = self.distribution.sample(nb_rays, device=device)
+        directions = normalize_batch_vector(target_point - origins)
+
+        # TODO: implement intensity weights based on solid angle calculation
+        # Solid angle calculation reference: http://websites.umich.edu/~ners311/CourseLibrary/SolidAngleOfADiskOffAxis.pdf
+        weights = torch.ones(origins.shape[0])
+
+        torch.cuda.empty_cache()
+
+        return Rays(origins, directions, luminosities=weights,
                     device=device)
 
     def plot(self, ax, **kwargs):
