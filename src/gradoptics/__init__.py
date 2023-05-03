@@ -2,7 +2,9 @@ from gradoptics.optics.vector import vector3d, batch_vector, normalize_batch_vec
 
 from gradoptics.distributions.gaussian_distribution import GaussianDistribution
 from gradoptics.distributions.base_distribution import BaseDistribution
+from gradoptics.distributions.point_source import PointSource
 from gradoptics.distributions.atom_cloud import AtomCloud
+from gradoptics.distributions.simple_atom_cloud import SimpleAtomCloud
 from gradoptics.distributions.atom_cloud_donut import AtomCloudDonut
 
 from gradoptics.inference.rejection_sampling import rejection_sampling
