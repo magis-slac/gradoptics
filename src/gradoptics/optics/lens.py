@@ -22,7 +22,7 @@ class Lens(BaseOptics, abc.ABC):
         :param nb_points: Number of points to sample (:obj:`int`)
         :param device: The desired device of returned tensor (:obj:`str`). Default is ``'cpu'``
 
-        :return: Sampled points (:obj:`torch.tensor`)
+        :return: (:obj:`tuple`) Sampled points (:obj:`torch.tensor`) and p(A) (:obj:`float`)
         """
         raise NotImplemented
 
@@ -110,7 +110,8 @@ class PerfectLens(Lens):
         theta = torch.rand(nb_points, device=device) * 2 * np.pi
         points[:, 1] = torch.sqrt(r_squared) * torch.cos(theta)
         points[:, 2] = torch.sqrt(r_squared) * torch.sin(theta)
-        return self.transform.apply_transform_(points)
+        return self.transform.apply_transform_(points), 1 / (np.pi * lens_radius**2)
+
 
     def plot(self, ax, s=0.1, color='lightblue', resolution=100):
         # @Todo, change this to plot_surface

@@ -21,6 +21,7 @@ from gradoptics.ray_tracing.ray_tracing import forward_ray_tracing
 from gradoptics.ray_tracing.ray_tracing import backward_ray_tracing
 
 from gradoptics.light_sources.light_source_from_distribution import LightSourceFromDistribution
+from gradoptics.light_sources.light_source_from_neural_net import LightSourceFromNeuralNet
 
 from gradoptics.transforms import base_transform, look_at_transform, simple_transform
 

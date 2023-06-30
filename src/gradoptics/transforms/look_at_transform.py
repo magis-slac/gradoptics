@@ -25,6 +25,12 @@ class LookAtTransform(BaseTransform):
         """
         dir_ = normalize_vector(viewing_direction)
         left = normalize_vector(cross_product(normalize_vector(up), dir_))
+        if torch.allclose(left, torch.zeros(3)):
+            if torch.allclose(normalize_vector(up), torch.tensor([0., 0., 1.])):
+                left = torch.tensor([0., 1., 0.])
+            else:
+                raise NotImplementedError("Singular configuration!")
+                
         new_up = cross_product(dir_, left)
 
         self.transform = torch.tensor([[left[0], new_up[0], dir_[0], pos[0]],

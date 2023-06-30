@@ -1,2 +1,3 @@
 from .base_integrator import BaseIntegrator
 from .stratified_sampling_integrator import StratifiedSamplingIntegrator
+from .hierarchical_sampling_integrator import HierarchicalSamplingIntegrator

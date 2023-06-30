@@ -171,7 +171,6 @@ def _test_lens_transform(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, positio
 
 
 def _test_thick_lens(nb_rays=64):
-
     position = torch.tensor([0., 0., 0.])
     transform = optics.simple_transform.SimpleTransform(0, 0, 0, position)
     lens = optics.ThickLens(1.5, 1., 1, 1e-1, transform)
@@ -230,7 +229,7 @@ def _ray_marching_test_lens(eps=1e-3):
     na = 1 / 1.4
 
     lens = optics.PerfectLens(f=f, na=na)
-    pts = lens.sample_points_on_lens(1000000)
+    pts, _ = lens.sample_points_on_lens(1000000)
 
     plt.figure()
     plt.hist2d(pts[:, 1].numpy(), pts[:, 2].numpy(), bins=40)
@@ -578,6 +577,32 @@ def _test_backward_ray_tracing(f=0.05, m=0.15, device='cpu'):
     return 0
 
 
+def _test_render_pixel(f=0.05, m=0.15, N=60, device='cpu'):
+    # Creating a scene
+    lens = optics.PerfectLens(f=f, na=1 / 1.4, position=[0., 0., 0.], m=m)
+    sensor = optics.Sensor(resolution=(9600, 9600), pixel_size=(3.76e-6, 3.76e-6), position=(-f * (1 + m), 0, 0),
+                           poisson_noise_mean=2, quantum_efficiency=0.8)
+    atom_cloud = optics.AtomCloud(n=int(1e6), f=2, position=[f * (1 + m) / m, 0., 0.], phi=0.1)
+    light_source_bounding_shape = optics.BoundingSphere(radii=2e-3, xc=f * (1 + m) / m, yc=0.0, zc=0.0)
+    light_source = optics.LightSourceFromDistribution(atom_cloud, bounding_shape=light_source_bounding_shape)
+    scene = optics.Scene(light_source)
+    scene.add_object(lens)
+    scene.sensor = sensor
+
+    px_j, px_i = torch.meshgrid(torch.linspace(N, -N + 1, steps=N * 2), torch.linspace(N, -N + 1, steps=N * 2))
+    px_j = px_j.reshape(-1).type(torch.long)
+    px_i = px_i.reshape(-1).type(torch.long)
+
+    integrator = optics.StratifiedSamplingIntegrator(100)
+    img = optics.ray_tracing.ray_tracing.render_pixels(sensor, lens, scene, light_source, 5, 5, px_i, px_j,
+                                                       integrator, device='cpu', max_iterations=3)
+    img = img.reshape(2 * N, 2 * N)
+    plt.imshow(img.data.numpy())
+    plt.savefig('test_render_pixel.pdf')
+    plt.close()
+    return 0
+
+
 def _test_curved_mirrors():
     # Creating a scene
     f = 0.05
@@ -697,3 +722,7 @@ def test_backward_ray_tracing():
 
 def test_curved_mirrors():
     assert _test_curved_mirrors() == 0
+
+
+def test_render_pixel():
+    assert _test_render_pixel() == 0
