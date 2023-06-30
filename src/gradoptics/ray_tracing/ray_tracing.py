@@ -49,7 +49,6 @@ def trace_rays(incident_rays, scene):
 
     return outgoing_rays, t, mask
 
-
 def forward_ray_tracing(incident_rays, scene, max_iterations=2, ax=None):
     """
     Performs forward ray tracing, i.e. computes the path taken by the rays ``incident_rays`` in the scene ``scene``

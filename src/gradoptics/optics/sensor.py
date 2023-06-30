@@ -102,7 +102,9 @@ class Sensor(BaseOptics):
 
                 if not (nb_processed_rays == hit_positions.shape[0]):
                     raise Exception(
-                        "Some rays were not processed: their origins' depths were not included in the psfs.")
+                        f"Some rays were not processed. {nb_processed_rays} were processed, but {hit_positions.shape[0]} hit the sensor! Their origins' depths might not be included in the psfs.")
+                    # print(f"WARNING! Out of {nb_processed_rays} processed rays, only {hit_positions.shape[0]} hit the sensor!")
+                    # print("The ray origins' depths might not have been included in the PSF-defining bins!")
 
             else:
                 self.pixelize(0, hit_positions, incident_rays.luminosities, quantum_efficiency=quantum_efficiency)
@@ -128,23 +130,33 @@ class Sensor(BaseOptics):
         if quantum_efficiency:
             luminosities *= self.quantum_efficiency
 
-        # Update pixel values
-        indices = torch.floor(hit_positions[:, 1].type(torch.float64)).type(torch.int64) * (
-                    self.resolution[1] * self.psf_ratio) + \
-                  torch.floor(hit_positions[:, 0].type(torch.float64)).type(torch.int64)
-        max_nb_identical_indices = indices.unique(return_counts=True)[1].max()
-        sorted_indices, arg_sorted_indices = torch.sort(indices)
+        # Alternative implementation using `torch.histgoramdd()`
+        x_bins = torch.arange(self.resolution[0] * self.psf_ratio + 1).type(hit_positions.dtype)
+        y_bins = torch.arange(self.resolution[1] * self.psf_ratio + 1).type(hit_positions.dtype)
 
-        for i in range(max_nb_identical_indices):
-            ind = sorted_indices[i::max_nb_identical_indices]
-            arg_ind = arg_sorted_indices[i::max_nb_identical_indices]
+        # Image convention: vertical axis first, horizontal axis second
+        img, bins = torch.histogramdd(hit_positions[:, :2].cpu(), bins=(y_bins, x_bins), weight=luminosities.cpu())
+        img = torch.unsqueeze(img, -1)
 
-            # Sanity check, should be removed
-            cond = (ind[1:] == ind[:-1])
-            assert cond.sum().item() == 0, "Should not happen"
+        self.depth_images[depth_id] += img.to(hit_positions.device)
 
-            self.depth_images[depth_id][ind % (self.resolution[1] * self.psf_ratio),
-                                        ind // (self.resolution[1] * self.psf_ratio)] += luminosities[arg_ind, None]
+        # # Update pixel values
+        # indices = torch.floor(hit_positions[:, 1].type(torch.float64)).type(torch.int64) * (
+        #             self.resolution[1] * self.psf_ratio) + \
+        #           torch.floor(hit_positions[:, 0].type(torch.float64)).type(torch.int64)
+        # max_nb_identical_indices = indices.unique(return_counts=True)[1].max()
+        # sorted_indices, arg_sorted_indices = torch.sort(indices)
+
+        # for i in range(max_nb_identical_indices):
+        #     ind = sorted_indices[i::max_nb_identical_indices]
+        #     arg_ind = arg_sorted_indices[i::max_nb_identical_indices]
+
+        #     # Sanity check, should be removed
+        #     cond = (ind[1:] == ind[:-1])
+        #     assert cond.sum().item() == 0, "Should not happen"
+
+        #     self.depth_images[depth_id][ind % (self.resolution[1] * self.psf_ratio),
+        #                                 ind // (self.resolution[1] * self.psf_ratio)] += luminosities[arg_ind, None]
 
     def readout(self, add_poisson_noise=True, destructive_readout=True):
         """
