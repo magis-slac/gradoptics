@@ -1,3 +1,8 @@
+# v0.0.4
+- Improve backward ray tracing functionality
+- Add NN light source
+- Improvements to PSF/pixelization
+
 # v0.0.3
 
 - Add atom cloud "donut"

@@ -4,11 +4,12 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gradoptics"
-version = "0.0.3"
+version = "0.0.4"
 authors = [
   { name="Sean Gasiorowski", email="sgaz@slac.stanford.edu" },
   { name="Michael Kagan", email="makagan@slac.stanford.edu" },
   { name="Maxime Vandegar", email="maxime.vandegar@slac.stanford.edu" },
+  { name="Sanha Cheong", email="sanha@stanford.edu" }
 ]
 description = "Differentiable Optics via Ray Tracing"
 readme = "README.md"

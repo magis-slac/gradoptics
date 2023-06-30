@@ -7,12 +7,12 @@ with open("README.md", "r") as fh:
 
 setup(
   name='gradoptics',
-  version='0.0.3',
+  version='0.0.4',
   description='End-to-end differentiable optics',
   long_description=long_description,
   long_description_content_type="text/markdown",
-  author='Sean Gasiorowski, Michael Kagan, Maxime Vandegar',
-  author_email='sgaz@slac.stanford.edu, makagan@slac.stanford.edu, maxime.vandegar@slac.stanford.edu',
+  author='Sean Gasiorowski, Michael Kagan, Maxime Vandegar, Sanha Cheong',
+  author_email='sgaz@slac.stanford.edu, makagan@slac.stanford.edu, maxime.vandegar@slac.stanford.edu, sanha@stanford.edu',
   url="https://github.com/magis-slac/gradoptics",
   classifiers=[
         "Programming Language :: Python :: 3",
