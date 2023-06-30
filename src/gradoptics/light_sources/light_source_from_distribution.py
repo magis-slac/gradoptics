@@ -45,18 +45,17 @@ class LightSourceFromDistribution(BaseLightSource):
         return Rays(self.distribution.sample(nb_rays, device=device).type(emitted_direction.dtype), emitted_direction,
                     device=device)
 
-    def get_pointed_rays(self, nb_rays, target_point, device='cpu'):
+    def sample_pointed_rays(self, nb_rays, target_point, device='cpu'):
         # Sample origins from underlying distribution
         origins = self.distribution.sample(nb_rays, device=device)
         directions = normalize_batch_vector(target_point - origins)
 
         # TODO: implement intensity weights based on solid angle calculation
         # Solid angle calculation reference: http://websites.umich.edu/~ners311/CourseLibrary/SolidAngleOfADiskOffAxis.pdf
-        weights = torch.ones(origins.shape[0])
 
         torch.cuda.empty_cache()
 
-        return Rays(origins, directions, luminosities=weights,
+        return Rays(origins, directions,
                     device=device)
 
     def plot(self, ax, **kwargs):
