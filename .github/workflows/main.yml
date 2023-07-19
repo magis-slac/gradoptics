@@ -13,5 +13,4 @@ jobs:
       - name: run pytest
         run: |
           pip install -e .
-          pip install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
           pytest -v --tb=native -rA tests/tests.py
