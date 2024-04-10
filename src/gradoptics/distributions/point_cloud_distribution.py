@@ -6,6 +6,7 @@ Implements point atom source cloud to be used in gradoptics
 """
 
 import torch
+import math
 from gradoptics.distributions.base_distribution import BaseDistribution
 
 # following is a utility class. The main class to be used, PointCloudDistribution, is below
@@ -204,7 +205,7 @@ class PointCloudDistribution(BaseDistribution):
                 for k in range(-1,2):
                     d2, maskgood = self.pointcloudvoxel.get_d2_voxels_around(x, i, j, k)                    
                     if maskgood.sum()>0:
-                        intensity[maskgood] += torch.sum(torch.exp(-torch.sum(d2, dim=2) / (2.0*self.sigma**2)), dim=1)
+                        intensity[maskgood] +=  torch.sum(torch.exp(-torch.sum(d2, dim=2) / (2.0*self.sigma**2)), dim=1) / math.pow(2.0*math.pi*self.sigma**2, 1.5)
 
         return intensity
     
