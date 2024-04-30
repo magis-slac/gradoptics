@@ -224,7 +224,7 @@ class PointCloudDistribution(BaseDistribution):
         Returns:
             torch.Tensor: Position of nb_points atoms
         """        
-        idx = torch.randint(1, self.natoms+1, (nb_points, ), device=device) # 0th entry contains dummy atom, so skip that
+        idx = torch.randint(0, self.natoms, (nb_points, ), device=device) # 0th entry contains dummy atom, so skip that
         selatoms = self.atoms[idx,:]
         # use the following to use sample as smeared position
         #modpos = selatoms + self.sigma*torch.randn_like(selatoms, device=device) 
