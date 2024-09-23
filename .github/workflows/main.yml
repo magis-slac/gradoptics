@@ -16,7 +16,7 @@ jobs:
     container: seangaz/gradoptics
     steps:
       - name: checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: run pytest
         run: |

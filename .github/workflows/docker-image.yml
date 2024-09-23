@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main", "reco_updates" ]
+    branches: [ "main" ]
     paths:
       - 'Dockerfile'
       - 'build_docker.sh'
