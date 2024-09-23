@@ -55,7 +55,7 @@ def _test_atom_cloud(nb_atoms=int(1e4)):
 
     # Plot the origin of the rays (the cloud)
     fig = plt.figure(figsize=(12, 12))
-    ax = fig.gca(projection='3d')
+    ax = fig.add_subplot(projection='3d')
     ax.scatter(origins[:, 0], origins[:, 1], origins[:, 2], alpha=.3, s=0.5)
     ax.view_init(azim=0, elev=0)
     ax.set_zlim([origins[:, 2].mean() - 3 * origins[:, 2].std(), origins[:, 2].mean() + 3 * origins[:, 2].std()])
@@ -96,7 +96,7 @@ def _test_lens(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, position=[0., 0.,
     pt[:, 2] = o[:, 2] + t * d[:, 2]
 
     fig = plt.figure(figsize=(12, 12))
-    ax = fig.gca(projection='3d')
+    ax = fig.add_subplot(projection='3d')
     # Plot the incoming rays
     for i in range(o.shape[0]):
         ax.plot([o[i, 0] - directions[i, 0] / 10, o[i, 0]],
@@ -153,7 +153,7 @@ def _test_lens_transform(nb_rays=50, f=0.05, m=0.15, right_of_lens=True, positio
     pt[:, 2] = o[:, 2] + t * d[:, 2]
 
     fig = plt.figure(figsize=(12, 12))
-    ax = fig.gca(projection='3d')
+    ax = fig.add_subplot(projection='3d')
     # Plot the incoming rays
     for i in range(o.shape[0]):
         ax.plot([o[i, 0] - directions[i, 0] / 10, o[i, 0]],
@@ -189,7 +189,7 @@ def _test_thick_lens(nb_rays=64):
     refracted_rays, _ = lens.intersect(rays[mask], t[mask])
 
     fig = plt.figure(figsize=(12, 12))
-    ax = fig.gca(projection='3d')
+    ax = fig.add_subplot(projection='3d')
     rays[mask].plot(ax, t[mask])
     refracted_rays.plot(ax, [1.2 for _ in range(refracted_rays.origins.shape[0])], color='k', linestyle='--')
     ax.view_init(elev=30., azim=70)
@@ -259,7 +259,7 @@ def _test_window():
     rays, _ = window.intersect(r, t)
 
     fig = plt.figure(figsize=(12, 12))
-    ax = fig.gca(projection='3d')
+    ax = fig.add_subplot(projection='3d')
     n = 100
     window.plot(ax)
     rays.plot(ax, [.1 for _ in range(n)], color='k')
@@ -352,7 +352,7 @@ def _test_grad_rays():
 
 def _test_bounding_sphere(nb_rays=1000):
     fig = plt.figure(figsize=(12, 12))
-    ax = fig.gca(projection='3d')
+    ax = fig.add_subplot(projection='3d')
 
     cloud_envelopes = [BoundingSphere(xc=3e-3, radii=1e-3),
                        BoundingSphere(xc=-3e-3, radii=1e-3),
