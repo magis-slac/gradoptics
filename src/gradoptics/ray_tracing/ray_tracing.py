@@ -99,11 +99,12 @@ def backward_ray_tracing(incident_rays, scene, light_source, integrator, max_ite
     """
 
     intensities = torch.zeros(incident_rays.get_size(), dtype=torch.double, device=incident_rays.device)
+    if integrator.with_var:
+        variances = torch.zeros(incident_rays.get_size(), dtype=torch.double, device=incident_rays.device)
 
     # Labelling the rays
     incident_rays.meta['track_idx'] = torch.linspace(0, incident_rays.get_size() - 1, incident_rays.get_size(),
                                                      dtype=torch.long, device=incident_rays.device)
-    incident_rays.meta['radiance_scaling'] = torch.ones(incident_rays.get_size(), device=incident_rays.device)
 
     for i in range(max_iterations):
         outgoing_rays, t, mask = trace_rays(incident_rays, scene)
@@ -116,14 +117,27 @@ def backward_ray_tracing(incident_rays, scene, light_source, integrator, max_ite
 
         # Computing the intensities for the rays that have hit the light source
         if new_mask.sum() > 0:
-            intensities[incident_rays.meta['track_idx'][new_mask]] = integrator.compute_integral(
+            integral = integrator.compute_integral(
                 incident_rays[new_mask], light_source.pdf, t_min[new_mask], t_max[new_mask]
-            ).double() * incident_rays.meta['radiance_scaling'][new_mask].double()
+            )
+            
+            if integrator.with_var:
+                intensities[incident_rays.meta['track_idx'][new_mask]] = (integral[0].double() * 
+                                                                          incident_rays.luminosities[new_mask].double())
+                variances[incident_rays.meta['track_idx'][new_mask]] = (integral[1].double() * 
+                                                                        (incident_rays.luminosities[new_mask].double()**2))
+            else:
+                intensities[incident_rays.meta['track_idx'][new_mask]] = (integral.double() * 
+                                                                          incident_rays.luminosities[new_mask].double())
+                
 
         # Rays that are still in the scene, and have not hit the light source
         incident_rays = outgoing_rays[mask & (~new_mask)]
 
-    return intensities
+    if integrator.with_var:
+        return intensities, variances
+    else:
+        return intensities
 
 
 def render_pixels(sensor, lens, scene, light_source, samples_per_pixel, directions_per_sample, px_i, px_j, integrator,
@@ -148,13 +162,24 @@ def render_pixels(sensor, lens, scene, light_source, samples_per_pixel, directio
     rays = optics.Rays(ray_origins.to(device), ray_directions.to(device),
                        meta={'cos_theta': cos_theta}, device=device)
 
-    intensities = optics.backward_ray_tracing(rays, scene, light_source, integrator, max_iterations=max_iterations)
+    if integrator.with_var:
+        intensities, variances = optics.backward_ray_tracing(rays, scene, light_source, integrator, max_iterations=max_iterations)
 
-    # Computing rendering integral
-    z = ((lens.transform.transform[:3, -1] - sensor.c2w.transform[:3, -1])**2).sum().sqrt()
-    intensities = (cos_theta**4 * intensities).reshape(px_i.shape[0], samples_per_pixel, directions_per_sample
-                                                       ).mean(-1).mean(-1) / z**2 / p_a1 / p_a2
-    return intensities
+        # Computing rendering integral
+        z = ((lens.transform.transform[:3, -1] - sensor.c2w.transform[:3, -1])**2).sum().sqrt()
+        intensities = (cos_theta**4 * intensities).reshape(px_i.shape[0], samples_per_pixel, directions_per_sample
+                                                            ).mean(-1).mean(-1) / z**2 / p_a1 / p_a2
+        variances = (cos_theta**8 * variances).reshape(px_i.shape[0], samples_per_pixel, directions_per_sample
+                                                            ).mean(-1).mean(-1) / z**4 / p_a1**2 / p_a2**2
+        return intensities, variances
+    else:
+        intensities = optics.backward_ray_tracing(rays, scene, light_source, integrator, max_iterations=max_iterations)
+
+        # Computing rendering integral
+        z = ((lens.transform.transform[:3, -1] - sensor.c2w.transform[:3, -1])**2).sum().sqrt()
+        intensities = (cos_theta**4 * intensities).reshape(px_i.shape[0], samples_per_pixel, directions_per_sample
+                                                            ).mean(-1).mean(-1) / z**2 / p_a1 / p_a2
+        return intensities
 
 def generate_rays_at_pixels(sensor, lens, samples_per_pixel, directions_per_sample, px_i, px_j,
                             device='cpu'):

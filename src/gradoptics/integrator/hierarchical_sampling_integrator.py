@@ -6,13 +6,16 @@ class HierarchicalSamplingIntegrator(BaseIntegrator):
     Computes line integrals using hierarchical sampling
     """
 
-    def __init__(self, nb_mc_steps, nb_importance_samples, stratify=True):
+    def __init__(self, nb_mc_steps, nb_importance_samples, stratify=True, 
+                 with_color=False, with_var=False):
         """
         :param nb_mc_steps: Number of Monte Carlo integration steps used for approximating the integral (:obj:`int`)
         """
         self.nb_mc_steps = nb_mc_steps
         self.nb_importance_samples = nb_importance_samples
         self.stratify = stratify
+        self.with_color = with_color
+        self.with_var = with_var
         
     def sample_pdf(self, bins, weights, n_samples, det=False):
         # This implementation is from NeRF
@@ -86,6 +89,14 @@ class HierarchicalSamplingIntegrator(BaseIntegrator):
         x = incident_rays.origins.expand(z_vals_mid.shape[-1], -1, -1).transpose(0, 1) + z_vals_mid.unsqueeze(
             -1) * incident_rays.directions.expand(z_vals_mid.shape[-1], -1, -1).transpose(0, 1)
 
-        densities = pdf(x.reshape(-1, 3)).reshape((x.shape[:2]))
-            
-        return (densities * deltas).sum(dim=1)
+        if self.with_color:
+            directions = incident_rays.directions.expand(z_vals_mid.shape[-1], -1, -1).transpose(0, 1)
+            densities = pdf(x.reshape(-1, 3), directions.reshape(-1, 3)).reshape((x.shape[:2]))
+        else:
+            densities = pdf(x.reshape(-1, 3)).reshape((x.shape[:2]))
+
+        if self.with_var:
+            variances = pdf(x.reshape(-1, 3), return_var=True).reshape((x.shape[:2]))
+            return (densities * deltas).sum(dim=1), (variances * (deltas**2)).sum(dim=1)
+        else:
+            return (densities * deltas).sum(dim=1)

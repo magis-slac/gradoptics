@@ -53,7 +53,7 @@ class Rays:
         self.origins = origins.to(device)
         self.directions = normalize_batch_vector(directions).to(device)
         self.luminosities = luminosities.to(device) if luminosities is not None else torch.ones(origins.shape[0],
-                                                                                                device=device)
+                                                                                                device=device, dtype=self.origins.dtype)
         self.meta = meta if meta is not None else {}
         self.device = device
 
