@@ -15,9 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     container: seangaz/gradoptics
     steps:
-      - name: update env
-        run: export ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true
-
       - name: checkout repository
         uses: actions/checkout@v4
 
