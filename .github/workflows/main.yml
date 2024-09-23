@@ -16,7 +16,7 @@ jobs:
     container: ${{ secrets.DOCKER_HUB_USERNAME }}/gradoptics
     steps:
       - name: checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: run pytest
         run: |
