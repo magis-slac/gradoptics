@@ -18,7 +18,7 @@ class BaseMirror(BaseOptics):
         """
         # Identity transform
         if transform is None:
-            transform = optics.simple_transform.SimpleTransform(0., 0., 0., torch.tensor([0, 0, 0]))
+            transform = optics.simple_transform.SimpleTransform(0., 0., 0., torch.tensor([0, 0, 0], dtype=torch.double))
 
         self.transform = transform
 
@@ -56,8 +56,9 @@ class BaseMirror(BaseOptics):
         direction_reflected_rays = batch_vector(scaling * normal[:, 0] - directions[:, 0],
                                                 scaling * normal[:, 1] - directions[:, 1],
                                                 scaling * normal[:, 2] - directions[:, 2])
+        
         reflected_ray = self.transform.apply_transform(
-            Rays(collision_points, direction_reflected_rays, luminosities=incident_rays.luminosities,
+            Rays(collision_points, direction_reflected_rays.type(collision_points.dtype), luminosities=incident_rays.luminosities,
                  meta=incident_rays.meta, device=incident_rays.device))
         return reflected_ray, torch.ones(collision_points.shape[0], dtype=torch.bool, device=collision_points.device)
 

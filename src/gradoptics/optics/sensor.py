@@ -34,8 +34,12 @@ class Sensor(BaseOptics):
         self.pixel_size = pixel_size
         self.poisson_noise_mean = poisson_noise_mean
         self.quantum_efficiency = quantum_efficiency
-        self.c2w = LookAtTransform(torch.tensor(viewing_direction), position, up=torch.tensor(up))
-        self.viewing_direction = torch.tensor(viewing_direction)
+        if type(viewing_direction) != torch.Tensor:
+            self.viewing_direction = torch.tensor(viewing_direction)
+        else:
+            self.viewing_direction = viewing_direction
+              
+        self.c2w = LookAtTransform(self.viewing_direction, position, up=torch.tensor(up))
         self.position = position
         self.add_psf = len(psfs.keys()) > 0
         self.psfs = psfs
@@ -135,7 +139,7 @@ class Sensor(BaseOptics):
         y_bins = torch.arange(self.resolution[1] * self.psf_ratio + 1).type(hit_positions.dtype)
 
         # Image convention: vertical axis first, horizontal axis second
-        img, bins = torch.histogramdd(hit_positions[:, :2].cpu(), bins=(y_bins, x_bins), weight=luminosities.cpu())
+        img, bins = torch.histogramdd(hit_positions[:, :2].cpu(), bins=(y_bins, x_bins), weight=luminosities.cpu().type(hit_positions.dtype))
         img = torch.unsqueeze(img, -1)
 
         self.depth_images[depth_id] += img.to(hit_positions.device)

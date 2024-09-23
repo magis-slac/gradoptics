@@ -6,12 +6,14 @@ import numpy as np
 from scipy.spatial import transform
 
 
+class BoundingRect(BaseOptics):
 
-class BoundingBox(BaseOptics):
-
-    def __init__(self, width=1e-3, xc=0.2, yc=0.0, zc=0.0, roll=np.pi/4, pitch=0., yaw=0.):
+    def __init__(self, width=1e-3, height=1e-3, depth=1e-3, xc=0.2, yc=0.0, zc=0.0, 
+                 roll=0., pitch=0., yaw=0.):
         super().__init__()
         self.width = width
+        self.height = height
+        self.depth = depth
         self.xc = xc
         self.yc = yc
         self.zc = zc
@@ -19,7 +21,7 @@ class BoundingBox(BaseOptics):
         self.pitch = pitch
         self.yaw = yaw
 
-    def get_ray_intersection(self, incident_rays, eps=1e-15):
+    def get_ray_intersection_(self, incident_rays, eps=1e-15):
         """
         @Todo
         :param incident_rays:
@@ -30,31 +32,32 @@ class BoundingBox(BaseOptics):
         # Computes the intersection of the incident_ray with the cube
         orig_origins = incident_rays.origins
         orig_directions = incident_rays.directions
+        device = incident_rays.origins.device
 
         # Instead of rotating the cube, apply the inverse rotation to the rays
         inv_rot_mat = transform.Rotation.from_euler('XYZ', [self.roll, self.pitch, self.yaw]).as_matrix().T
-        inv_rot_mat = torch.tensor(inv_rot_mat)
-        expanded_rot = torch.eye(4,dtype=torch.float64)
+        inv_rot_mat = torch.tensor(inv_rot_mat).to(device)
+        expanded_rot = torch.eye(4,dtype=torch.float64).to(device)
         expanded_rot[:3, :3] = inv_rot_mat
         
-        translation_vec = torch.tensor([self.xc, self.yc, self.zc])
+        translation_vec = torch.tensor([self.xc, self.yc, self.zc]).to(orig_origins.device)
 
         origins = torch.matmul(expanded_rot[:-1], 
-                               torch.cat((orig_origins-translation_vec, torch.ones((orig_origins.shape[0],1))), dim=1)[:, :, np.newaxis]).squeeze(dim=-1)+translation_vec
+                               torch.cat((orig_origins-translation_vec, torch.ones((orig_origins.shape[0],1), device=device)), dim=1)[:, :, np.newaxis]).squeeze(dim=-1)+translation_vec
         directions = torch.matmul(expanded_rot[:-1], 
-                               torch.cat((orig_directions, torch.zeros((orig_directions.shape[0],1))), dim=1)[:, :, np.newaxis]).squeeze(dim=-1)
+                               torch.cat((orig_directions, torch.zeros((orig_directions.shape[0],1), device=device)), dim=1)[:, :, np.newaxis]).squeeze(dim=-1)
         
         directions = directions/torch.sqrt(torch.sum(directions**2, dim=1, keepdim=True))
 
         # Now that we've rotated, we're axis aligned. Set up the faces of the cube
-        fx0 = self.xc - self.width/2 
-        fx1 = self.xc + self.width/2
+        fx0 = self.xc - self.depth/2 
+        fx1 = self.xc + self.depth/2
         
         fy0 = self.yc - self.width/2 
         fy1 = self.yc + self.width/2
         
-        fz0 = self.zc - self.width/2 
-        fz1 = self.zc + self.width/2
+        fz0 = self.zc - self.height/2 
+        fz1 = self.zc + self.height/2
         
         # Get the time of intersection with the planes corresponding to each face
         tx0 = ((fx0 - origins[:, 0]) / directions[:, 0])[:, None]
@@ -85,15 +88,26 @@ class BoundingBox(BaseOptics):
                               pointy0, pointy1, 
                               pointz0, pointz1])
         
-        # Select the points that fall within the cube volume (with some tolerance)
-        in_cube_mask = ((all_int[:, :, 0] >= fx0-eps) & (all_int[:, :, 0] <= fx1+eps) & 
+        # Select the points that fall within the rect volume (with some tolerance)
+        in_rect_mask = ((all_int[:, :, 0] >= fx0-eps) & (all_int[:, :, 0] <= fx1+eps) & 
                         (all_int[:, :, 1] >= fy0-eps) & (all_int[:, :, 1] <= fy1+eps) &
                         (all_int[:, :, 2] >= fz0-eps) & (all_int[:, :, 2] <= fz1+eps))
 
-        all_ts[~in_cube_mask] = float('inf')
+        all_t_min = all_ts.clone()
+        all_t_min[~in_rect_mask] = float('inf')
+        t_min = all_t_min.min(dim=0).values.squeeze()
+        t_min[t_min.isinf()] = float('nan')
+        
+        all_t_max = all_ts.clone()
+        all_t_max[~in_rect_mask] = -float('inf')
+        t_max = all_t_max.max(dim=0).values.squeeze()
+        t_max[t_max.isinf()] = float('nan')
        
-        # Return first intersection and corresponding (rotated) origin/direction 
-        return all_ts.min(dim=0).values, origins, directions
+        # Return intersections
+        return t_min, t_max
+    
+    def get_ray_intersection(self, incident_rays, eps=1e-15):
+        return self.get_ray_intersection_(incident_rays, eps=eps)[0]
     
     def intersect(self, incident_rays, t):
         origins = incident_rays.origins
@@ -116,6 +130,6 @@ class BoundingBox(BaseOptics):
         y = np.sin(Phi)*np.sin(Theta)
         z = np.cos(Theta)/np.sqrt(2)
         
-        ax.plot_surface(x*self.width+self.xc, 
+        ax.plot_surface(x*self.depth+self.xc, 
                         y*self.width+self.yc, 
-                        z*self.width+self.zc, color=color, alpha=alpha)
+                        z*self.height+self.zc, color=color, alpha=alpha)

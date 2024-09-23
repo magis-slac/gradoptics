@@ -31,7 +31,10 @@ class AtomCloud(BaseDistribution):
         super().__init__()
         self.n = n
         self.f = f
-        self.position = torch.tensor(position)
+        if isinstance(position, torch.Tensor):
+            self.position = position
+        else:
+            self.position = torch.tensor(position)
         self.w0 = w0
         self.h_bar = h_bar
         self.m = m

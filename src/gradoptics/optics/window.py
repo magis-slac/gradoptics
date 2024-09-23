@@ -33,6 +33,22 @@ class Window(BaseOptics):
         self.n_glass = n_glass
         self.eps = eps
         self.w2obj = SimpleTransform(*orientation, torch.zeros(3))
+        
+    def fresnel_coeff(self, theta, n1, n2):
+        """
+        Fresnel transmission coefficient
+        :param cos_theta: cos(theta) between window normal and ray direction
+        """
+        num_s = n1*torch.cos(theta)-n2*torch.sqrt(1-(n1/n2*torch.sin(theta))**2)
+        den_s = n1*torch.cos(theta)+n2*torch.sqrt(1-(n1/n2*torch.sin(theta))**2)
+        r_s = abs(num_s/den_s)**2
+        
+        num_p = n1*torch.sqrt(1-(n1/n2*torch.sin(theta))**2)-n2*torch.cos(theta)
+        den_p = n1*torch.sqrt(1-(n1/n2*torch.sin(theta))**2)+n2*torch.cos(theta)
+        
+        r_p = abs(num_p/den_p)**2
+
+        return 1-0.5*(r_s+r_p) 
 
     def _get_ray_intersection_left_interface(self, incident_rays):
         """
@@ -73,7 +89,7 @@ class Window(BaseOptics):
         t[~condition] = float('inf')
         return t
 
-    def _get_rays_inside_window(self, incident_rays, t):
+    def _get_rays_inside_window(self, incident_rays, t, real_intersect=False):
         
         # Rotate to coords with window along positive x
         incident_rays = self.w2obj.apply_inverse_transform(incident_rays)
@@ -96,7 +112,8 @@ class Window(BaseOptics):
         direction_refracted_rays = torch.sqrt(tmp).unsqueeze(1) * window_normal + mu * (
                 directions - c.unsqueeze(1) * window_normal)
 
-        output_rays = Rays(origin_refracted_rays, direction_refracted_rays, luminosities=incident_rays.luminosities,
+        trans_coeff = self.fresnel_coeff(torch.acos(c), self.n_ext, self.n_glass)
+        output_rays = Rays(origin_refracted_rays, direction_refracted_rays, luminosities=incident_rays.luminosities*trans_coeff,
                     device=incident_rays.device)
 
         # Rotate to back to world coords
@@ -148,7 +165,7 @@ class Window(BaseOptics):
 
     def intersect(self, incident_rays, t):
 
-        ray_in_glass, window_normal = self._get_rays_inside_window(incident_rays, t)
+        ray_in_glass, window_normal = self._get_rays_inside_window(incident_rays, t, real_intersect=True)
 
         # Interaction with the second interface
         t = self._get_t_min(ray_in_glass)
@@ -168,8 +185,8 @@ class Window(BaseOptics):
         c = dot_product(window_normal, directions)
         direction_refracted_rays = torch.sqrt(tmp).unsqueeze(1) * window_normal + mu * (
                 directions - c.unsqueeze(1) * window_normal)
-
-        return (Rays(origin_refracted_rays, direction_refracted_rays, luminosities=incident_rays.luminosities,
+        trans_coeff = self.fresnel_coeff(torch.acos(c), self.n_glass, self.n_ext)
+        return (Rays(origin_refracted_rays, direction_refracted_rays, luminosities=incident_rays.luminosities*trans_coeff,
                     meta=incident_rays.meta, device=incident_rays.device),
                 torch.ones(origin_refracted_rays.shape[0], dtype=torch.bool, device=origin_refracted_rays.device))
 

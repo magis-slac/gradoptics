@@ -7,11 +7,12 @@ class StratifiedSamplingIntegrator(BaseIntegrator):
     Computes line integrals using stratified sampling
     """
 
-    def __init__(self, nb_mc_steps):
+    def __init__(self, nb_mc_steps, with_var=False):
         """
         :param nb_mc_steps: Number of Monte Carlo integration steps used for approximating the integral (:obj:`int`)
         """
         self.nb_mc_steps = nb_mc_steps
+        self.with_var = with_var
 
     def compute_integral(self, incident_rays, pdf, t_min, t_max):
 
@@ -34,4 +35,8 @@ class StratifiedSamplingIntegrator(BaseIntegrator):
 
         densities = pdf(x.reshape(-1, 3)).reshape((x.shape[:2]))
 
-        return (densities * delta).sum(dim=1)
+        if self.with_var:
+            variances = pdf(x.reshape(-1, 3), return_var=True).reshape((x.shape[:2]))
+            return (densities * delta).sum(dim=1), (variances * (delta**2)).sum(dim=1)
+        else:
+            return (densities * delta).sum(dim=1)

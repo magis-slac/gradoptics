@@ -1,5 +1,7 @@
 imageio
 matplotlib
 numpy>=1.17
-torch
+torch>=1.10
 tqdm
+pytest
+scipy

@@ -6,6 +6,7 @@ from gradoptics.distributions.point_source import PointSource
 from gradoptics.distributions.atom_cloud import AtomCloud
 from gradoptics.distributions.simple_atom_cloud import SimpleAtomCloud
 from gradoptics.distributions.atom_cloud_donut import AtomCloudDonut
+from gradoptics.distributions.atom_cloud_spike import AtomCloudSpike
 
 from gradoptics.inference.rejection_sampling import rejection_sampling
 
