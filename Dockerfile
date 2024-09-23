@@ -1,4 +1,4 @@
-FROM pytorch/pytorch:1.12.0-cuda11.3-cudnn8-devel
+FROM pytorch/pytorch:1.13.1-cuda11.6-cudnn8-devel
 
 MAINTAINER Sean Gasiorowski "sgaz@slac.stanford.edu"
 
@@ -14,7 +14,7 @@ ADD requirements.txt /work/requirements.txt
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y git wget build-essential
+    apt-get install -y git wget build-essential libc6
 
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
